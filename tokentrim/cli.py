@@ -71,6 +71,11 @@ def _is_ours(entry):
     return any("tokentrim_hook.py" in (h.get("command") or "") for h in entry.get("hooks", []))
 
 
+def _plugin_enabled(s):
+    """The tokentrim Claude Code plugin is enabled in user settings."""
+    return any(k.split("@")[0] == TAG and v for k, v in (s.get("enabledPlugins") or {}).items())
+
+
 def _load_settings():
     try:
         with open(SETTINGS) as fh:
@@ -118,6 +123,8 @@ def install(profile="strong", guidance=True):
     if guidance:
         _write_guidance(True)
         print("  guidance   ->", CLAUDE_MD, "(~110 tokens)")
+    if _plugin_enabled(s):
+        print("  plugin     -> tokentrim plugin is also enabled; its hooks stand down while these are installed")
     print("\nNew sessions pick this up. Already-open sessions keep their old settings.")
 
 
@@ -169,6 +176,8 @@ def status():
     s = _load_settings()
     ours = [ev for ev, lst in (s.get("hooks") or {}).items() if any(_is_ours(e) for e in lst)]
     print("installed hooks:", ", ".join(ours) or "none")
+    if _plugin_enabled(s):
+        print("plugin: enabled" + (" (standing down: settings hooks above run instead)" if ours else " (its hooks are active)"))
     print("compaction window:", (s.get("env") or {}).get("CLAUDE_CODE_AUTO_COMPACT_WINDOW", "default"))
     print("profile:", (s.get("tokentrim") or {}).get("profile", "-"))
     log = os.path.expanduser("~/.cache/tokentrim/events.log")

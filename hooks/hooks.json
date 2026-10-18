@@ -1,0 +1,22 @@
+{
+  "description": "tokentrim hooks. They stand down when `tokentrim install` has put the same hooks in ~/.claude/settings.json, so nothing runs twice.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|mcp__.*(Claude_Browser|claude-in-chrome|Claude_in_Chrome|Claude_Preview).*",
+        "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/tokentrim_hook.py\" pre --plugin", "timeout": 20}]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|mcp__.*",
+        "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/tokentrim_hook.py\" post --plugin", "timeout": 10}]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/tokentrim_hook.py\" prompt --plugin", "timeout": 5}]
+      }
+    ]
+  }
+}

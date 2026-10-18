@@ -445,8 +445,23 @@ def on_prompt(event, cfg):
         _out({"systemMessage": "tokentrim: " + "\ntokentrim: ".join(msgs)})
 
 
+def settings_hooks_installed():
+    """True when `tokentrim install` put our hooks in ~/.claude/settings.json."""
+    try:
+        with open(os.path.expanduser("~/.claude/settings.json")) as fh:
+            hooks = json.load(fh).get("hooks") or {}
+    except (OSError, ValueError, AttributeError):
+        return False
+    return any("tokentrim_hook.py" in (h.get("command") or "")
+               for lst in hooks.values() for e in lst for h in e.get("hooks", []))
+
+
 def main():
     event_name = sys.argv[1] if len(sys.argv) > 1 else "pre"
+    # Plugin hooks stand down when the settings.json install is present, so a
+    # user with both never gets each rule applied twice.
+    if "--plugin" in sys.argv[2:] and settings_hooks_installed():
+        return
     try:
         event = json.load(sys.stdin)
         global SESSION
