@@ -324,6 +324,10 @@ def serve(port=PORT, open_it=True):
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
     cache = _Cache()
+    from . import live
+    holder = {"snap": None}
+    threading.Thread(target=live.run, args=(live.Tracker(), holder), daemon=True).start()
+    live_html = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live.html")
 
     class H(BaseHTTPRequestHandler):
         def _send(self, body, ctype):
@@ -342,12 +346,49 @@ def serve(port=PORT, open_it=True):
                         html = fh.read()
                     blob = cache.get().decode().replace("</", "<\\/")
                     self._send(html.replace("/*__DATA__*/null", blob).encode(), "text/html; charset=utf-8")
+                elif path in ("/live", "/live/"):
+                    with open(live_html, "rb") as fh:
+                        self._send(fh.read(), "text/html; charset=utf-8")
+                elif path == "/live.json":
+                    snap = holder["snap"]
+                    if snap is None:
+                        self.send_response(204)
+                        self.end_headers()
+                    else:
+                        self._send(json.dumps(snap, separators=(",", ":")).encode(), "application/json")
                 elif path == "/data.json":
                     self._send(cache.get(force="rebuild=1" in self.path), "application/json")
                 else:
                     self.send_error(404)
             except BrokenPipeError:
                 pass
+
+        def do_POST(self):
+            # Settings from the live page. Only this Mac's own pages may call it: the custom header forces a
+            # CORS preflight this server never approves, and the Host check stops DNS-rebinding tricks.
+            host = (self.headers.get("Host") or "").split(":")[0]
+            if self.path.split("?", 1)[0] != "/settings":
+                return self.send_error(404)
+            if host not in ("localhost", "127.0.0.1") or self.headers.get("X-TokenTrim") != "1":
+                return self.send_error(403)
+            from . import controls
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+                body = json.loads(self.rfile.read(min(n, 4096)) or b"{}")
+                st, done = controls.apply(body.get("changes"), source="local")
+                t = holder.get("tracker")
+                if t is not None:
+                    t._ctl_at = 0
+                out, code = {"ok": True, "controls": st, "changed": done}, 200
+            except (ValueError, OSError) as e:
+                out, code = {"ok": False, "error": str(e)}, 400
+            blob = json.dumps(out).encode()
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(blob)))
+            self.end_headers()
+            self.wfile.write(blob)
 
         def log_message(self, *a):
             pass

@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>tokentrim: make Claude Code limits last longer</title>
+<meta name="description" content="Claude Code re-reads your whole conversation on every step. tokentrim keeps it small: 74% less history re-read on real sessions, so usage limits last 3.9× longer. Free and open source; see your own number before installing.">
+<meta property="og:title" content="tokentrim: stop paying Claude to re-read your whole conversation">
+<meta property="og:description" content="74% less history re-read on 115 real Claude Code conversations. Free, open source, local-only. Run the replay and get your own number.">
+<meta property="og:image" content="https://raw.githubusercontent.com/suncal/tokentrim/main/docs/savings.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0a0c0b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0c0b'/%3E%3Crect x='6' y='9' width='20' height='4' rx='2' fill='%23f08a5d'/%3E%3Crect x='6' y='19' width='8' height='4' rx='2' fill='%234ade80'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#0a0c0b; --bg2:#0f1311; --card:#121715; --line:#212a25; --line2:#2c3731;
+  --ink:#eef2ef; --soft:#b4bfb8; --mute:#7d8a82;
+  --green:#4ade80; --green-d:#22c55e; --orange:#f08a5d;
+  --sans:"Geist",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
+  --buy:"https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva";
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+code,.mono{font-family:var(--mono)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 max(20px,env(safe-area-inset-left))}
+section{padding:96px 0;border-top:1px solid var(--line)}
+.eyebrow{font:500 13px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin:0 0 14px}
+h1,h2,h3{margin:0;letter-spacing:-.025em;text-wrap:balance}
+h2{font-size:clamp(30px,4.2vw,46px);line-height:1.08;font-weight:700;max-width:760px}
+.lede{color:var(--soft);font-size:19px;max-width:660px;margin:18px 0 0}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:rgba(10,12,11,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:28px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font:700 18px var(--sans);text-decoration:none;letter-spacing:-.02em}
+.logo i{display:grid;gap:4px;width:22px}.logo i b{display:block;height:4px;border-radius:2px;background:var(--orange)}.logo i b+b{width:45%;background:var(--green)}
+nav .links{display:flex;gap:24px;margin-left:auto;font-size:15px;color:var(--soft)}
+nav .links a{text-decoration:none;white-space:nowrap}nav .links a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 20px;border-radius:10px;font:600 15px var(--sans);text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s,background .15s,border-color .15s;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--green);color:#052e16}.btn.primary:hover{background:#6ee7a0}
+.btn.ghost{border-color:var(--line2);color:var(--ink);background:transparent}.btn.ghost:hover{border-color:var(--mute)}
+.btn.sm{height:38px;padding:0 14px;font-size:14px}
+
+/* hero */
+.hero{padding:88px 0 72px;border-top:0;position:relative}
+.hero:before{content:"";position:absolute;inset:-120px 0 auto;height:620px;background:radial-gradient(600px 300px at 72% 30%,rgba(74,222,128,.12),transparent 70%),radial-gradient(500px 260px at 15% 10%,rgba(240,138,93,.07),transparent 70%);pointer-events:none}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative}
+.hero .wrap>div,.cmd span{min-width:0}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line2);border-radius:99px;font-size:13px;color:var(--soft);margin-bottom:24px}
+.pill b{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(74,222,128,.18)}
+h1{font-size:clamp(40px,5.6vw,66px);line-height:1.02;font-weight:800}
+h1 em{font-style:normal;color:var(--green)}
+.hero p.sub{font-size:20px;color:var(--soft);margin:22px 0 30px;max-width:560px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.cmd{display:flex;align-items:center;gap:12px;margin-top:22px;padding:10px 10px 10px 16px;border:1px solid var(--line2);border-radius:10px;background:var(--bg2);font:14px var(--mono);color:var(--soft);max-width:560px}
+.cmd span{flex:1;overflow-x:auto;white-space:nowrap;scrollbar-width:none}.cmd span::-webkit-scrollbar{display:none}
+.cmd span:before{content:"$ ";color:var(--green)}
+.copy{flex:none;height:32px;padding:0 12px;border-radius:7px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:500 13px var(--sans);cursor:pointer}
+.copy:hover{border-color:var(--mute)}
+.trust{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:20px;font-size:14px;color:var(--mute)}
+.trust span:before{content:"✓ ";color:var(--green)}
+
+/* terminal */
+.term{border:1px solid var(--line2);border-radius:14px;background:linear-gradient(180deg,#121816,#0d110f);box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.02) inset;overflow:hidden}
+.term .bar{display:flex;align-items:center;gap:7px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.term .bar i{width:11px;height:11px;border-radius:50%;background:#2a332e}
+.term .bar span{margin-left:8px;font:12px var(--mono);color:var(--mute)}
+.term pre{margin:0;padding:22px 20px 24px;font:13.5px/1.75 var(--mono);color:var(--soft);white-space:pre-wrap;min-height:330px}
+.term .p{color:var(--green)}.term .w{color:var(--ink)}.term .d{color:var(--mute)}
+.meter{display:grid;grid-template-columns:110px 1fr 62px;gap:12px;align-items:center;margin:6px 0}
+.meter .t{height:14px;border-radius:4px;background:#1b221f;overflow:hidden}
+.meter .f{height:100%;width:0;border-radius:4px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.meter .n{text-align:right;color:var(--ink)}
+.big{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line2);color:var(--ink)}
+.big b{color:var(--green);font-size:22px;font-weight:600}
+.caret{display:inline-block;width:8px;height:16px;background:var(--green);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.fine{font-size:12.5px;color:var(--mute);margin-top:10px;text-align:right}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:72px}
+.stats div{padding:24px 24px 22px;background:var(--bg2)}
+.stats div+div{border-left:1px solid var(--line)}
+.stats b{display:block;font:600 34px var(--mono);letter-spacing:-.03em;color:var(--ink)}
+.stats b.g{color:var(--green)}
+.stats span{font-size:14px;color:var(--mute)}
+
+/* problem chart */
+.chart{margin-top:44px;border:1px solid var(--line);border-radius:16px;background:var(--bg2);padding:28px}
+.chart .row{display:grid;grid-template-columns:150px 1fr 90px;gap:18px;align-items:end;padding:12px 0}
+.chart .row+.row{border-top:1px solid var(--line)}
+.chart .lbl b{display:block;font-size:15px}.chart .lbl span{font-size:13px;color:var(--mute)}
+.bars{display:flex;align-items:flex-end;gap:3px;height:150px}
+.bars i{flex:1;border-radius:2px 2px 0 0;transform-origin:bottom;transform:scaleY(.02);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.chart.in .bars i{transform:scaleY(1)}
+.chart .tot{font:600 22px var(--mono);text-align:right}
+.chart .tot small{display:block;font:400 12px var(--sans);color:var(--mute)}
+.chart .note{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:18px;font-size:14px;color:var(--mute)}
+.chart .note b{color:var(--ink);font-weight:500}
+
+/* steps */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+.card{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:26px}
+.card .k{font:500 13px var(--mono);color:var(--green)}
+.card h3{font-size:21px;margin:10px 0 8px}
+.card p{margin:0;color:var(--soft);font-size:15.5px}
+.card code{font-size:13px;color:var(--ink);background:#1b221f;padding:2px 6px;border-radius:5px}
+
+/* rules */
+.rules{margin-top:40px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.rule{display:grid;grid-template-columns:200px 1fr 170px;gap:20px;padding:18px 22px;align-items:baseline;background:var(--bg2)}
+.rule+.rule{border-top:1px solid var(--line)}
+.rule b{font-weight:600}
+.rule p{margin:0;color:var(--soft);font-size:15px}
+.rule span{font:13px var(--mono);color:var(--mute);text-align:right}
+.rule span.ok{color:var(--green)}
+
+/* honest */
+.honest{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.honest ul{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.honest li{padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--soft);font-size:15.5px}
+.honest li b{color:var(--ink);display:block;margin-bottom:2px}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:16px;margin-top:48px;align-items:stretch}
+.plan{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:30px;display:flex;flex-direction:column}
+.plan.hot{border-color:rgba(74,222,128,.55);background:linear-gradient(180deg,rgba(74,222,128,.08),var(--card) 45%);box-shadow:0 30px 70px -40px rgba(74,222,128,.45);position:relative}
+.tag{position:absolute;top:-12px;left:30px;background:var(--green);color:#052e16;font:600 12px var(--mono);padding:4px 10px;border-radius:99px;letter-spacing:.03em}
+.plan h3{font-size:18px;font-weight:600}
+.price{display:flex;align-items:baseline;gap:6px;margin:14px 0 4px}
+.price b{font:700 48px var(--sans);letter-spacing:-.04em}
+.price span{color:var(--mute);font-size:15px}
+.plan .why{color:var(--mute);font-size:14px;margin:0 0 20px;min-height:44px}
+.plan ul{list-style:none;padding:0;margin:0 0 26px;display:grid;gap:10px;font-size:15px;color:var(--soft)}
+.plan li{display:flex;gap:10px}.plan li:before{content:"✓";color:var(--green);font-weight:700}
+.plan li.off{color:var(--mute)}.plan li.off:before{content:"–";color:var(--mute)}
+.plan .btn{margin-top:auto;width:100%}
+.assure{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;margin-top:26px;font-size:14px;color:var(--mute)}
+
+/* faq */
+.faq{max-width:820px;margin-top:36px}
+details{border-bottom:1px solid var(--line);padding:4px 0}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;padding:18px 0;font-size:18px;font-weight:500}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";font:400 24px var(--mono);color:var(--mute);line-height:1;transition:transform .2s}
+details[open] summary:after{transform:rotate(45deg)}
+details p{margin:0 0 20px;color:var(--soft);max-width:720px}
+
+/* final */
+.final{text-align:center;padding:110px 0}
+.final h2{margin:0 auto}
+.final .lede{margin:18px auto 32px}
+.final .cta{justify-content:center}
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer a{text-decoration:none}footer a:hover{color:var(--ink)}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .7s,transform .7s}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:960px){
+  .hero .wrap,.honest{grid-template-columns:1fr;gap:44px}
+  .plans{grid-template-columns:1fr;max-width:480px;margin-inline:auto}
+  .plan.hot{order:-1}
+  .grid3{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stats div:nth-child(3){border-left:0}
+  .stats div:nth-child(n+3){border-top:1px solid var(--line)}
+  .rule{grid-template-columns:1fr;gap:4px}.rule span{text-align:left}
+}
+@media (max-width:900px){nav .links a[href="#honest"]{display:none}}
+@media (max-width:640px){
+  body{font-size:16px}
+  section{padding:72px 0}
+  .hero{padding:48px 0 56px}
+  nav .links a:not(.keep){display:none}
+  nav .wrap{gap:12px}
+  .hero p.sub{font-size:18px}
+  .cta .btn{flex:1}
+  .chart{padding:18px}
+  .chart .row{grid-template-columns:1fr;gap:10px}
+  .chart .tot{text-align:left}
+  .bars{height:110px;gap:2px}
+  .stats b{font-size:28px}
+  .stats div{padding:18px}
+  .term pre{font-size:12px;padding:18px 14px;min-height:300px}
+  .meter{grid-template-columns:86px 1fr 52px;gap:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .reveal{opacity:1;transform:none}
+  .bars i{transform:scaleY(1)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top"><i><b></b><b></b></i>tokentrim</a>
+    <div class="links">
+      <a href="#how">How it works</a>
+      <a href="#control">Live control</a>
+      <a href="#honest">The numbers</a>
+      <a href="#pricing" class="keep">Pricing</a>
+      <a href="https://github.com/suncal/tokentrim">GitHub</a>
+    </div>
+    <a class="btn primary sm" data-buy href="#pricing">Get Pro</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="pill"><b></b>Free &amp; open source · for Claude Code</div>
+      <h1>Stop paying Claude to re-read <em>your whole conversation.</em></h1>
+      <p class="sub">On every step, Claude Code sends everything said so far back to the model. tokentrim keeps that history small. On 115 real conversations that meant <b style="color:var(--ink)">74% less re-read</b> and usage limits that lasted <b style="color:var(--ink)">3.9× longer</b>.</p>
+      <div class="cta">
+        <a class="btn primary" href="#install">Get your number free →</a>
+        <a class="btn ghost" href="#pricing">See Pro · $49 lifetime</a>
+      </div>
+      <div class="cmd" id="install"><span>git clone https://github.com/suncal/tokentrim &amp;&amp; tokentrim/bin/tokentrim replay</span><button class="copy" data-copy="git clone https://github.com/suncal/tokentrim && tokentrim/bin/tokentrim replay">Copy</button></div>
+      <div class="trust"><span>Nothing leaves your machine</span><span>No dependencies</span><span>One-command uninstall</span></div>
+    </div>
+
+    <div>
+      <div class="term" aria-label="Example replay output">
+        <div class="bar"><i></i><i></i><i></i><span>~/tokentrim — replay</span></div>
+        <pre id="term"><span class="p">$</span> <span class="w">bin/tokentrim replay</span>
+<span class="d">reading 115 conversations from ~/.claude …</span>
+<span class="d">24,706 steps · median step re-read 408k tokens</span>
+
+<div class="meter"><span>without</span><div class="t"><div class="f" data-w="100" style="background:var(--orange)"></div></div><span class="n">10.93B</span></div><div class="meter"><span>with (strong)</span><div class="t"><div class="f" data-w="25.8" style="background:var(--green)"></div></div><span class="n">2.81B</span></div>
+<div class="big"><b>−74%</b> history re-read
+limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"></span></pre>
+      </div>
+      <div class="fine">The author's own sessions. The replay shows you yours.</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats reveal">
+      <div><b class="g">−74%</b><span>history re-read, on 115 real conversations</span></div>
+      <div><b>3.9×</b><span>longer before you hit usage limits</span></div>
+      <div><b>~$3.3K</b><span>saved at API prices</span></div>
+      <div><b>0</b><span>bytes of your code sent anywhere</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <p class="eyebrow">The hidden cost</p>
+    <h2>Your limit isn't spent on new work. It's spent re-reading old work.</h2>
+    <p class="lede">An agent loop re-sends the entire conversation on every step. A long session carrying 400k tokens pays for those 400k again on step 301. About 97% of the tokens Claude Code bills are this re-reading.</p>
+
+    <div class="chart reveal" id="chart">
+      <div class="row">
+        <div class="lbl"><b>Without tokentrim</b><span>context keeps growing</span></div>
+        <div class="bars" data-mode="grow"></div>
+        <div class="tot" style="color:var(--orange)">10.93B<small>tokens re-read</small></div>
+      </div>
+      <div class="row">
+        <div class="lbl"><b>With tokentrim</b><span>stays small, summarised earlier</span></div>
+        <div class="bars" data-mode="trim"></div>
+        <div class="tot" style="color:var(--green)">2.81B<small>tokens re-read</small></div>
+      </div>
+      <div class="note"><span>Each bar is one step of a long session. <b>Every bar gets paid for again.</b></span><span>Shrinking tool output alone saved <b>6.5%</b>. Keeping the conversation small saved <b>74%</b>.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2>Measure, trim, prove it. In about a minute.</h2>
+    <div class="grid3">
+      <div class="card reveal"><div class="k">01 · measure</div><h3>See where tokens went</h3><p><code>tokentrim audit</code> reads the transcripts Claude Code already keeps on your machine and shows which sessions and habits burn your limit.</p></div>
+      <div class="card reveal"><div class="k">02 · replay</div><h3>Get your own number</h3><p><code>tokentrim replay</code> runs your past sessions through the rules before you install anything. You get your number, not ours.</p></div>
+      <div class="card reveal"><div class="k">03 · install</div><h3>Keep context small</h3><p><code>tokentrim install</code> adds a few Claude Code hooks and an earlier summarise point. It backs up your settings first, and <code>uninstall</code> undoes it exactly.</p></div>
+    </div>
+
+    <div class="rules reveal">
+      <div class="rule"><b>Earlier summarising</b><p>Compacts the conversation before it balloons. This is where most of the savings come from.</p><span>3 strengths</span></div>
+      <div class="rule"><b>Screenshots</b><p>Browser screenshots are taken at half scale, which costs a quarter of the tokens. Clicks still land in the right place.</p><span>¼ the tokens</span></div>
+      <div class="rule"><b>Huge files</b><p>A whole-file read over 40 KB gets an outline first. Asking again lets the full read through.</p><span class="ok">lossless</span></div>
+      <div class="rule"><b>Long command output</b><p>Head and tail kept, repeated lines collapsed, progress bars stripped. The full output is saved to disk.</p><span class="ok">lossless</span></div>
+      <div class="rule"><b>Connector results</b><p>JSON minified, empty fields and base64 blobs dropped. Nothing in a list is ever removed.</p><span class="ok">full copy on disk</span></div>
+      <div class="rule"><b>Context meter</b><p>Tells you, not Claude, when a conversation is getting heavy and a fresh one would be cheaper.</p><span>0 tokens</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="control">
+  <div class="wrap">
+    <p class="eyebrow">Live control</p>
+    <h2>A live dashboard that changes Claude Code for you.</h2>
+    <p class="lede">Watch usage rise and fall minute by minute, with recommendations based on your own sessions. Each one has an Apply button. Switch a setting off and your own value comes back.</p>
+    <div class="rules reveal">
+      <div class="rule"><b>Smart model</b><p>Opus while planning, Sonnet while doing the work (Claude Code's opusplan), or Sonnet for everything. One click.</p><span>new sessions</span></div>
+      <div class="rule"><b>Cheaper sub-agents</b><p>Explore and Task sub-agents run on Sonnet or Haiku. Your main conversation keeps its model.</p><span>new sessions</span></div>
+      <div class="rule"><b>Thinking effort</b><p>Medium or low effort spends fewer thinking tokens on routine work.</p><span>new sessions</span></div>
+      <div class="rule"><b>Daily budget, hard stop</b><p>A dollar cap per day across every session. A note at 80%, and new prompts held once you pass it. Start a message with ++ to send it anyway.</p><span>next message</span></div>
+      <div class="rule"><b>Cold-cache alert</b><p>Back after the prompt cache expired? It tells you what your next message will re-write, and when /clear is cheaper.</p><span>next message</span></div>
+      <div class="rule"><b>Model advisor</b><p>Quick chores like renames, formatting or git running on Opus get a short note that Sonnet does them for less.</p><span>next message</span></div>
+    </div>
+    <p class="fine" style="margin-top:14px">The page shows which Claude Code versions on your machine read each setting, so nothing silently does nothing.</p>
+  </div>
+</section>
+
+<section id="honest">
+  <div class="wrap honest">
+    <div>
+      <p class="eyebrow">The honest numbers</p>
+      <h2>Why we don't promise 90%.</h2>
+      <p class="lede">Claude Code's own system prompt and tool list cost 40–60k tokens on every step, and no setting removes them. Anyone promising 90% across all your work is measuring one noisy command, or not measuring.</p>
+      <p class="lede">So tokentrim shows its working: a replay of real transcripts, every estimate labelled, and three strength settings with the trade-off spelled out.</p>
+      <div class="cta" style="margin-top:28px"><a class="btn ghost" href="https://github.com/suncal/tokentrim#the-honest-numbers">Read the full method</a></div>
+    </div>
+    <ul>
+      <li class="reveal"><b>The trade-off is real</b>Summarising sooner means Claude forgets detail sooner. The default, strong, behaves close to Claude Code's old 200k window. Balanced is gentler; max is cheapest.</li>
+      <li class="reveal"><b>Cost drops less than tokens</b>Re-reads are cheap per token and output isn't touched, so billed cost and limit burn fall about 55–70%, not 74%.</li>
+      <li class="reveal"><b>Fails open, always</b>If a hook errors, Claude Code carries on as if tokentrim weren't there. One setting switches every hook off instantly.</li>
+      <li class="reveal"><b>Local by design</b>Python standard library only. Your prompts, code and transcripts never leave your machine.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <p class="eyebrow">Pricing</p>
+    <h2>The token cutting is free. Pro keeps the savings going.</h2>
+    <p class="lede">Pro puts the live dashboard on any device with nothing to host, and keeps watch for you with a Monday report and budget alerts.</p>
+
+    <div class="plans">
+      <div class="plan reveal">
+        <h3>Free</h3>
+        <div class="price"><b>$0</b><span>forever</span></div>
+        <p class="why">Everything that cuts tokens. Open source.</p>
+        <ul>
+          <li>All hooks and 3 strength profiles</li>
+          <li>Audit and replay on your sessions</li>
+          <li>Live dashboard and one-click smart settings</li>
+          <li>Daily budget guard, cold-cache alert, model advisor</li>
+          <li>Shareable savings card</li>
+          <li class="off">Hosted dashboard on your phone</li>
+          <li class="off">Weekly digest and budget</li>
+        </ul>
+        <a class="btn ghost" href="https://github.com/suncal/tokentrim">Install from GitHub</a>
+      </div>
+
+      <div class="plan hot reveal">
+        <span class="tag">EARLY-BIRD · FIRST 500</span>
+        <h3>Pro Lifetime</h3>
+        <div class="price"><b>$49</b><span>once</span></div>
+        <p class="why">Pay once, keep it. Only for the first 500 buyers. After that, Pro is monthly only.</p>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Hosted live dashboard on any device: sign in with your key</li>
+          <li>Change your settings from your phone</li>
+          <li>Monday digest in plain English</li>
+          <li>Weekly token budget, checked daily, alert at 80%</li>
+          <li>Slack weekly totals (totals only)</li>
+          <li>Up to 3 machines</li>
+          <li>All future Pro updates</li>
+        </ul>
+        <a class="btn primary" data-buy href="#">Get lifetime Pro →</a>
+      </div>
+
+      <div class="plan reveal">
+        <h3>Pro Monthly</h3>
+        <div class="price"><b>$9</b><span>/ month</span></div>
+        <p class="why">Same Pro features, billed monthly. Cancel any time.</p>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Hosted live dashboard on any device: sign in with your key</li>
+          <li>Change your settings from your phone</li>
+          <li>Monday digest in plain English</li>
+          <li>Weekly token budget, checked daily, alert at 80%</li>
+          <li>Slack weekly totals (totals only)</li>
+          <li>Up to 3 machines</li>
+        </ul>
+        <a class="btn ghost" data-buy href="#">Go monthly</a>
+      </div>
+    </div>
+    <div class="assure"><span>Secure checkout by Polar</span><span>Sales tax handled</span><span>Key arrives by email</span><span>Activate: <code>tokentrim pro activate &lt;key&gt;</code></span></div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <p class="eyebrow">Questions</p>
+    <h2>Before you install</h2>
+    <div class="faq">
+      <details><summary>Does anything leave my machine?</summary><p>No. The free tool reads transcripts Claude Code already stores locally and never sends them anywhere. Pro's license check sends only your key and a machine label. The hosted Pro dashboard receives totals and project folder names only, never prompts or code. Slack posting is opt-in and sends weekly totals only.</p></details>
+      <details><summary>Can it pick the best model for each message?</summary><p>Not per message: Claude Code has no switch for that. Smart model uses Claude Code's own opusplan (Opus plans, Sonnet does the work), and pairs well with cheaper sub-agents, lower effort and the model advisor. Model changes apply to new sessions; <code>/model</code> in a session still wins.</p></details>
+      <details><summary>I'm on a Pro or Max plan, not paying per token. Does this help?</summary><p>Yes, and it's the main reason most people use it. Plan limits are spent on the same tokens, so re-reading less means hitting the 5-hour and weekly limits later. On the author's usage, limits lasted 3.9× longer.</p></details>
+      <details><summary>Will Claude forget things?</summary><p>It summarises earlier, so very old detail in a long conversation gets condensed sooner. The default profile behaves close to how Claude Code worked with a 200k window. If you notice it, switch to <code>balanced</code> with one command.</p></details>
+      <details><summary>How do I undo it?</summary><p><code>tokentrim uninstall</code> removes exactly what install added. Your settings were backed up before install, your own hooks are left alone, and one config flag turns every hook off instantly.</p></details>
+      <details><summary>What do I need?</summary><p>Claude Code and Python 3.9 or newer. No packages to install. The Pro Monday digest schedules itself on macOS; elsewhere you can run <code>tokentrim digest</code> from your own scheduler.</p></details>
+      <details><summary>How does the lifetime deal work?</summary><p>$49 once for the first 500 buyers, with all future Pro updates. After that, Pro is $9 a month. Either way you get a license key by email that works on up to 3 machines; move it with <code>tokentrim pro deactivate</code>.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Find out what your conversations are costing you.</h2>
+    <p class="lede">One command, about a minute, nothing installed. If the number is small, you've lost nothing.</p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Get your number free →</a>
+      <a class="btn ghost" data-buy href="#">Get Pro · $49 lifetime</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>tokentrim · open source · not affiliated with Anthropic</span>
+    <span><a href="https://github.com/suncal/tokentrim">GitHub</a> &nbsp;·&nbsp; <a href="mailto:support@boltak.com">support@boltak.com</a> &nbsp;·&nbsp; <a data-buy href="#">Buy Pro</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var BUY = getComputedStyle(document.documentElement).getPropertyValue('--buy').trim().replace(/^"|"$/g,'');
+  document.querySelectorAll('[data-buy]').forEach(function(a){ a.href = BUY; a.rel = 'noopener'; });
+
+  document.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var done = function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy'; }, 1600); };
+      if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done, done); else done();
+    });
+  });
+
+  // context-growth chart: without = grows every step; with = summarised at a cap
+  var N = window.innerWidth < 640 ? 36 : 60;
+  document.querySelectorAll('.bars').forEach(function(el){
+    var trim = el.dataset.mode === 'trim', ctx = 0.06, html = '';
+    for (var i = 0; i < N; i++){
+      ctx += 0.94 / N * (0.8 + Math.random() * 0.4);
+      var h = trim ? 0.06 + 0.2 * (i % 10) / 9 : ctx;  // grows, then summarised back down
+      html += '<i style="height:' + Math.min(h, 1) * 100 + '%;background:' + (trim ? 'var(--green)' : 'var(--orange)') +
+              ';opacity:' + (trim ? .9 : .55 + .45 * i / N) + ';transition-delay:' + i * 14 + 'ms"></i>';
+    }
+    el.innerHTML = html;
+  });
+
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold: .18}) : null;
+  document.querySelectorAll('.reveal,#chart').forEach(function(el){ io ? io.observe(el) : el.classList.add('in'); });
+
+  setTimeout(function(){ document.querySelectorAll('.meter .f').forEach(function(f){ f.style.width = f.dataset.w + '%'; }); }, 350);
+})();
+</script>
+</body>
+</html>

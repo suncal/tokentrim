@@ -1,8 +1,35 @@
+<div align="center">
+
+<img src="docs/logo.svg" width="80" alt="tokentrim logo">
+
 # tokentrim
 
-**Cut what Claude Code re-reads on every step, measured on your own sessions.**
+**Make Claude Code's usage limits last longer by cutting what it re-reads on every step,<br>measured on your own sessions.**
+
+[![tests](https://github.com/suncal/tokentrim/actions/workflows/tests.yml/badge.svg)](https://github.com/suncal/tokentrim/actions/workflows/tests.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-3776AB.svg?logo=python&logoColor=white)](#install)
+[![Dependencies: 0](https://img.shields.io/badge/dependencies-0-4ade80.svg)](#install)
+[![Website](https://img.shields.io/badge/website-suncal.github.io%2Ftokentrim-0a0c0b.svg)](https://suncal.github.io/tokentrim/)
+[![GitHub stars](https://img.shields.io/github/stars/suncal/tokentrim?style=social)](https://github.com/suncal/tokentrim/stargazers)
+
+[Website](https://suncal.github.io/tokentrim/) · [Quick start](#quick-start) · [The honest numbers](#the-honest-numbers) · [What it changes](#what-it-changes) · [Pro](#pro) · [Discussions](https://github.com/suncal/tokentrim/discussions)
 
 ![74% less history re-read on 115 real conversations; usage limits last 3.9x longer](docs/savings.png)
+
+</div>
+
+## Quick start
+
+```bash
+git clone https://github.com/suncal/tokentrim && cd tokentrim
+bin/tokentrim replay     # your own number, in about a minute; installs nothing
+bin/tokentrim install    # if you like the number
+```
+
+Undo any time with `bin/tokentrim uninstall`. No dependencies, nothing leaves your machine.
+
+## Why it works
 
 **What you're missing out on without it:** Claude Code re-reads your *whole* conversation on every step. On the author's real usage, 74% of that re-reading was avoidable. Run `bin/tokentrim replay` to get **your own** number in about a minute, before installing anything.
 
@@ -75,6 +102,7 @@ bin/tokentrim replay                 # what tokentrim would have saved, on your 
 bin/tokentrim install                # strong profile; or --profile balanced|max, --no-guidance
 bin/tokentrim status                 # what's installed + recent hook activity
 bin/tokentrim serve                  # live dashboard at http://localhost:4747 (--install: keep it running at login)
+bin/tokentrim live                   # real-time savings, updating every 2s (--deploy: open it from anywhere)
 bin/tokentrim share                  # your savings card as a PNG to post (totals only, nothing private)
 bin/tokentrim uninstall              # removes exactly what install added
 ```
@@ -82,6 +110,30 @@ bin/tokentrim uninstall              # removes exactly what install added
 `install` backs up `~/.claude/settings.json` first, keeps all your existing hooks and env, and is idempotent. New sessions pick it up.
 
 Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Set `"enabled": false` to switch every hook off instantly.
+
+## Live view
+
+`bin/tokentrim live` opens a real-time view at http://localhost:4747/live: tokens saved today ticking up, saving and re-reading per minute, the last 60 minutes with and without tokentrim, every running conversation's context against where it will be summarised (with a steps-left forecast), live trims as they happen, and plain-English insights.
+
+Want it on your phone? `bin/tokentrim live --deploy` puts the page on your own Cloudflare account (the free plan is enough) behind a private key, and your Mac pushes **totals and project folder names only** every few seconds: no prompts, titles or code. `bin/tokentrim live --link` prints the link again.
+
+### Smart features (change Claude Code from the dashboard)
+
+The live view has switches that write straight into your Claude Code settings. Your own values are saved first and come back when you switch a feature off (or run `tokentrim uninstall`); a model you pick later with `/model` is left alone.
+
+| Switch | What it writes | When it applies |
+|---|---|---|
+| Smart model: Auto / Sonnet | `model` = `opusplan` (Opus plans, Sonnet does the work) or `sonnet` | new sessions |
+| Sub-agent model | `CLAUDE_CODE_SUBAGENT_MODEL` = sonnet or haiku | new sessions |
+| Thinking effort | `effortLevel` = medium or low | new sessions |
+| Cache lifetime | `promptCacheTtl` = 1h (API-key users; subscriptions already get 1 hour) | new sessions |
+| Daily budget guard / hard stop | warns at 80% and 100% of a daily $ cap; hard stop holds prompts (start with `++` to send anyway) | next message |
+| Cold-cache alert | back after the cache expired? says what the next message will re-write | next message |
+| Model advisor | quick chores on Opus get a "Sonnet does this cheaper" note | next message |
+
+The page shows which Claude Code versions on your Mac read each setting. Older ones silently ignore them, so run `claude update` if it says so. Recommendations come with a one-click **Apply**. Clicks from your phone or the Pro cloud are relayed to your Mac, which only accepts these keys with these values.
+
+There's no per-prompt model switching in Claude Code, so "Auto" is Claude Code's own opusplan plus the cheaper sub-agent model, lower effort and the advisor.
 
 ## The dashboard
 
@@ -95,12 +147,13 @@ The free tool is the whole token-cutting engine and stays free and open source. 
 |---|---|---|
 | Hooks, profiles, audit, replay, dashboard, share card | ✓ | ✓ |
 | `tokentrim digest`: plain-English weekly report, every Monday | | ✓ |
-| `tokentrim budget 2B`: weekly token budget, alert at 80% | | ✓ |
-| Slack weekly totals (opt-in, totals only) | | ✓ |
+| `tokentrim budget 2B`: weekly token budget, checked every morning, notification at 80% | | ✓ |
+| `tokentrim slack <webhook>`: weekly totals in Slack (opt-in, totals only, test message first) | | ✓ |
+| `tokentrim live --cloud`: hosted real-time dashboard with settings relay, sign in with your license key | | ✓ |
 
-**$49 lifetime for the first 500 buyers, then $9/month.** Checkout opens at launch. Star or watch the repo to hear about it. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine.
+**$49 lifetime for the first 500 buyers, then $9/month.** [Get tokentrim Pro](https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva) (checkout by Polar, which handles sales tax). Your license key arrives by email. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine. Billing or license help: [support@boltak.com](mailto:support@boltak.com).
 
-**Teams:** a shared dashboard of everyone's spend and savings, with budgets, is in the works. **Paid audit:** want a teardown of where your team's Claude spend goes, with a fix list? Open an issue titled "audit" and I'll be in touch.
+**Teams:** a shared dashboard of everyone's spend and savings, with budgets, is in the works. **Paid audit:** want a teardown of where your team's Claude spend goes, with a fix list? Email [support@boltak.com](mailto:support@boltak.com) with "audit" in the subject.
 
 ## Pairs well with
 
@@ -115,6 +168,16 @@ python3 -m unittest discover -s tests
 
 The hooks were also verified live in headless Claude Code 2.1.299 (Bash trimming, outline-first reads, image downscaling, compaction trigger point).
 
+## Contributing
+
+Issues, new rules and real-world numbers are all welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and post your `replay` result in [Show and tell](https://github.com/suncal/tokentrim/discussions).
+
 ## License
 
-Apache-2.0
+[Apache-2.0](LICENSE). Not affiliated with Anthropic.
+
+<div align="center">
+
+**If tokentrim saved you tokens, a ⭐ helps other Claude Code users find it.**
+
+</div>

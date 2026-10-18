@@ -264,6 +264,21 @@ class Pro(unittest.TestCase):
             finally:
                 pro.LICENSE = old
 
+    def test_stale_license_revalidates_with_polar(self):
+        from tokentrim import pro
+        with tempfile.TemporaryDirectory() as d:
+            saved = pro.LICENSE, pro.ORG_ID, pro._post
+            pro.LICENSE, pro.ORG_ID = os.path.join(d, "license.json"), "org-1"
+            try:
+                pro._save({"key": "k", "instance": "a", "checked": 0})
+                pro._post = lambda action, f: {"status": "granted", "organization_id": "org-1"}
+                self.assertTrue(pro.is_pro())
+                pro._save({"key": "k", "instance": "a", "checked": 0})
+                pro._post = lambda action, f: {"status": "granted", "organization_id": "someone-else"}
+                self.assertFalse(pro.is_pro())
+            finally:
+                pro.LICENSE, pro.ORG_ID, pro._post = saved
+
     def test_recent_license_works_offline(self):
         import time
         from tokentrim import pro
@@ -278,6 +293,193 @@ class Pro(unittest.TestCase):
     def test_week_counts_long_sessions(self):
         from tokentrim import pro
         self.assertEqual(pro._week(_fake_data())["long"], 1)
+
+    def test_budget_alert_once_per_level(self):
+        from tokentrim import pro
+        sent = []
+        with tempfile.TemporaryDirectory() as d:
+            saved = os.environ.get("HOME"), pro._notify
+            os.environ["HOME"], pro._notify = d, sent.append
+            try:
+                self.assertFalse(pro._budget_alert({"tokens": 70}, 100))   # under 80%
+                self.assertTrue(pro._budget_alert({"tokens": 85}, 100))
+                self.assertFalse(pro._budget_alert({"tokens": 90}, 100))   # already told this week
+                self.assertTrue(pro._budget_alert({"tokens": 120}, 100))   # passing 100% tells again
+                self.assertFalse(pro._budget_alert({"tokens": 130}, 100))
+            finally:
+                os.environ["HOME"], pro._notify = saved
+        self.assertEqual(len(sent), 2)
+        self.assertIn("85%", sent[0])
+
+    def test_slack_post_reports_failures(self):
+        import http.server
+        import threading
+        from tokentrim import pro
+        got = []
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                got.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                code, body = (200, b"ok") if self.path == "/good" else (404, b"no_service")
+                self.send_response(code)
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.HTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        base = "http://127.0.0.1:%d" % srv.server_port
+        try:
+            self.assertIsNone(pro._slack_post(base + "/good", "hi"))
+            self.assertIn("no_service", pro._slack_post(base + "/bad", "hi"))
+            self.assertEqual(got[0], {"text": "hi"})
+        finally:
+            srv.shutdown()
+
+    def test_slack_rejects_non_webhook(self):
+        from tokentrim import pro
+        old, pro.require = pro.require, lambda: None
+        try:
+            with self.assertRaises(SystemExit):
+                pro.slack("https://example.com/hook")
+        finally:
+            pro.require = old
+
+
+class LiveTest(unittest.TestCase):
+    def test_counterfactual_keeps_history_and_trims(self):
+        from tokentrim.live import Conv
+        c = Conv("s", "p")
+        self.assertEqual(c.step(0, 100_000, 850_000), 0)
+        c.pending = 5_000                       # a trimmed tool result lands
+        self.assertEqual(c.step(1, 110_000, 850_000), 5_000)
+        self.assertEqual(c.step(2, 40_000, 850_000), 115_000 - 40_000)  # early summary: without tokentrim keeps it all
+        self.assertEqual(c.compactions, 1)
+        c.step(3, 50_000, 120_000)              # past the native limit: Claude Code would have compacted too
+        self.assertEqual(c.cf, 50_000)
+
+
+class SmartTest(unittest.TestCase):
+    """Daily budget, cold cache and model advisor (hook side), smart settings (controls side). All in a temp HOME."""
+    def setUp(self):
+        self.home = tempfile.mkdtemp()
+
+    def _write(self, rel, obj):
+        path = os.path.join(self.home, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as fh:
+            json.dump(obj, fh)
+
+    def _today(self, cost, ttl=300):
+        import time
+        self._write(".cache/tokentrim/today.json", {"day": time.strftime("%Y-%m-%d"), "ts": time.time(), "cost": cost, "ttl": ttl, "price_in": 5})
+
+    def _transcript(self, ctx, model, ago):
+        import time
+        path = os.path.join(self.home, "t.jsonl")
+        ts = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(time.time() - ago))
+        with open(path, "w") as fh:
+            fh.write(json.dumps({"type": "assistant", "timestamp": ts, "message": {"model": model, "usage": {
+                "input_tokens": 10, "cache_read_input_tokens": ctx, "cache_creation_input_tokens": 0, "output_tokens": 5}}}) + "\n")
+        return path
+
+    def test_budget_blocks_unless_overridden(self):
+        self._write(".config/tokentrim/config.json", {"budget_guard": True, "budget_usd": 10, "budget_block": True})
+        self._today(12.5)
+        out = run_hook("prompt", {"prompt": "add a test", "session_id": "b"}, self.home)
+        self.assertEqual(out["decision"], "block")
+        self.assertIn("$10", out["reason"])
+        out = run_hook("prompt", {"prompt": "++ add a test", "session_id": "b"}, self.home)
+        self.assertNotEqual((out or {}).get("decision"), "block")
+
+    def test_budget_warns_without_block(self):
+        self._write(".config/tokentrim/config.json", {"budget_guard": True, "budget_usd": 10})
+        self._today(8.5)
+        out = run_hook("prompt", {"prompt": "go", "session_id": "w"}, self.home)
+        self.assertIn("budget", out["systemMessage"])
+        self.assertIsNone(run_hook("prompt", {"prompt": "go", "session_id": "w"}, self.home))   # said once
+
+    def test_budget_says_when_paused(self):
+        self._write(".config/tokentrim/config.json", {"budget_guard": True, "budget_usd": 10, "budget_block": True})
+        out = run_hook("prompt", {"prompt": "go", "session_id": "p"}, self.home)   # no today.json: tracker not running
+        self.assertIn("paused", out["systemMessage"])
+        self.assertIsNone(run_hook("prompt", {"prompt": "go", "session_id": "p"}, self.home))   # once a day, never blocks
+
+    def test_cold_cache_after_long_pause(self):
+        self._today(1, ttl=300)
+        t = self._transcript(120_000, "claude-sonnet-4-5", ago=20 * 60)
+        out = run_hook("prompt", {"prompt": "continue", "session_id": "c", "transcript_path": t}, self.home)
+        self.assertIn("cache has expired", out["systemMessage"])
+        t = self._transcript(120_000, "claude-sonnet-4-5", ago=60)
+        out = run_hook("prompt", {"prompt": "continue", "session_id": "c2", "transcript_path": t}, self.home) or {}
+        self.assertNotIn("cache has expired", out.get("systemMessage", ""))   # still warm
+
+    def test_advisor_on_quick_opus_job_only(self):
+        t = self._transcript(10_000, "claude-opus-4-1", ago=30)
+        out = run_hook("prompt", {"prompt": "fix the typo in the readme", "session_id": "a", "transcript_path": t}, self.home)
+        self.assertIn("/model sonnet", out["systemMessage"])
+        out = run_hook("prompt", {"prompt": "debug why the cache rebuilds", "session_id": "a2", "transcript_path": t}, self.home)
+        self.assertIsNone(out)
+
+    def test_claude_settings_remember_and_restore(self):
+        from tokentrim import controls
+        s = {"model": "opus"}
+        controls._claude_set(s, "model_mode", "auto")
+        self.assertEqual(s["model"], "opusplan")
+        controls._claude_set(s, "model_mode", "sonnet")
+        self.assertEqual(s["tokentrim"]["prev"]["model"], "opus")   # the user's own value, not ours
+        controls._claude_set(s, "model_mode", "off")
+        self.assertEqual(s["model"], "opus")
+        controls._claude_set(s, "subagent_model", "haiku")
+        self.assertEqual(s["env"]["CLAUDE_CODE_SUBAGENT_MODEL"], "haiku")
+        controls._claude_set(s, "subagent_model", "off")
+        self.assertNotIn("env", s)
+
+    def test_off_keeps_a_model_picked_later(self):
+        from tokentrim import controls
+        s = {"model": "opus"}
+        controls._claude_set(s, "model_mode", "auto")
+        s["model"] = "haiku"                      # the user picked a model with /model afterwards
+        controls._claude_set(s, "model_mode", "off")
+        self.assertEqual(s["model"], "haiku")
+
+    def test_support_names_old_versions(self):
+        from tokentrim import controls
+        sup = controls.support({"app": "2.1.299", "cli": "2.1.69"})
+        self.assertIsNone(sup["model_mode"])
+        self.assertIn("2.1.69", sup["cache_ttl"])
+        self.assertTrue(controls.support({"cli": "2.1.69"})["cache_ttl"].startswith("Needs"))
+
+    def test_validate_rejects_bad_choices(self):
+        from tokentrim import controls
+        for bad in ({"model_mode": "opus"}, {"budget_usd": 7}, {"budget_usd": True}, {"effort": "max"}):
+            with self.assertRaises(ValueError):
+                controls.validate(bad)
+        self.assertEqual(controls.validate({"budget_usd": 20, "model_mode": "auto"}), {"budget_usd": 20, "model_mode": "auto"})
+
+    def test_uninstall_restores_users_model(self):
+        from tokentrim import controls
+        d = tempfile.mkdtemp()
+        old = cli.SETTINGS, cli.CLAUDE_MD
+        cli.SETTINGS, cli.CLAUDE_MD = os.path.join(d, "settings.json"), os.path.join(d, "CLAUDE.md")
+        with open(cli.SETTINGS, "w") as fh:
+            json.dump({"model": "opus", "effortLevel": "high"}, fh)
+        sys.stdout, real = io.StringIO(), sys.stdout
+        try:
+            cli.install("strong")
+            s = cli._load_settings()
+            controls._claude_set(s, "model_mode", "auto")
+            controls._claude_set(s, "effort", "low")
+            cli._save_settings(s)
+            cli.uninstall()
+            with open(cli.SETTINGS) as fh:
+                s = json.load(fh)
+            self.assertEqual((s["model"], s["effortLevel"]), ("opus", "high"))
+        finally:
+            sys.stdout = real
+            cli.SETTINGS, cli.CLAUDE_MD = old
+
 
 if __name__ == "__main__":
     unittest.main()

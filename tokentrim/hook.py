@@ -20,6 +20,7 @@ import time
 from . import config, filters, outline
 
 STATE = os.path.expanduser("~/.cache/tokentrim")
+TODAY = os.path.join(STATE, "today.json")   # written by the live tracker for the budget and cache guards
 IMG_EXT = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".tiff", ".bmp")
 
 
@@ -291,51 +292,157 @@ def rule_post_mcp(tool, resp, cfg):
 
 # ---------------------------------------------------------------- context meter
 
-def last_context(transcript):
-    """Tokens the most recent API call had in context, from the transcript tail."""
+def _tail(transcript):
+    """-> (context tokens of the last API call, its model, timestamp of the last entry) from the transcript tail."""
     try:
         with open(transcript, "rb") as fh:
             fh.seek(0, 2)
             fh.seek(max(fh.tell() - 400_000, 0))
             tail = fh.read().decode("utf-8", "replace").splitlines()
     except OSError:
-        return 0
+        return 0, "", 0
+    ctx, model, last = None, "", 0
     for line in reversed(tail):
-        if '"usage"' not in line:
-            continue
-        try:
-            u = json.loads(line)["message"]["usage"]
-        except (ValueError, KeyError, TypeError):
-            continue
-        return (u.get("input_tokens", 0) or 0) + (u.get("cache_read_input_tokens", 0) or 0) \
-            + (u.get("cache_creation_input_tokens", 0) or 0)
-    return 0
+        if not last and '"timestamp"' in line:
+            try:
+                last = _iso(json.loads(line).get("timestamp"))
+            except (ValueError, AttributeError):
+                pass
+        if ctx is None and '"usage"' in line:
+            try:
+                m = json.loads(line)["message"]
+                u = m["usage"]
+            except (ValueError, KeyError, TypeError):
+                continue
+            ctx = (u.get("input_tokens", 0) or 0) + (u.get("cache_read_input_tokens", 0) or 0) \
+                + (u.get("cache_creation_input_tokens", 0) or 0)
+            model = m.get("model") or ""
+        if ctx is not None and last:
+            break
+    return ctx or 0, model, last
+
+
+def _iso(ts):
+    if not ts:
+        return 0
+    import calendar
+    return calendar.timegm(time.strptime(ts[:19], "%Y-%m-%dT%H:%M:%S"))
+
+
+def last_context(transcript):
+    return _tail(transcript)[0]
+
+
+def _once(name, value):
+    """True the first time `value` is seen for this marker name (per session)."""
+    os.makedirs(os.path.join(STATE, "meter"), exist_ok=True)
+    mark = os.path.join(STATE, "meter", hashlib.sha1(name.encode()).hexdigest())
+    try:
+        with open(mark) as fh:
+            if fh.read() == str(value):
+                return False
+    except OSError:
+        pass
+    with open(mark, "w") as fh:
+        fh.write(str(value))
+    return True
+
+
+def _today():
+    """What the live tracker last measured: {day, cost, ttl, price_in}; {} when it isn't running."""
+    try:
+        with open(TODAY) as fh:
+            t = json.load(fh)
+    except (OSError, ValueError):
+        return {}
+    if t.get("day") != time.strftime("%Y-%m-%d") or time.time() - t.get("ts", 0) > 900:
+        return {}
+    return t
+
+
+PRICE_IN = {"opus": 5, "sonnet": 3, "haiku": 1}
+QUICK = re.compile(r"\b(rename|typo|spelling|format|lint|indent|commit|push|pull|merge|git|bump|version|changelog|readme|"
+                   r"docstring|comment|run (the )?tests?|list|grep|find|delete|remove|move|copy|install|update deps?)\b", re.I)
+HARD = re.compile(r"\b(architect|design|refactor|debug|why|investigate|plan|security|race|concurren|performance|optimi|"
+                  r"migrat|algorithm|prove|review|explain how)", re.I)
+
+
+def meter(ctx, event, cfg):
+    warn = cfg["context_warn_tokens"]
+    if not ctx or ctx < warn or not _once("meter" + (event.get("session_id") or ""), ctx // 50_000):
+        return None   # speak once per 50k of growth, not on every prompt
+    _log("meter", "%d tokens" % ctx)
+    return ("this session is carrying %sk tokens of context, re-sent on every step (~%.0fx a fresh session). "
+            "Run /compact, or start a new session for the next task." % ("{:,}".format(ctx // 1000), ctx / max(cfg["baseline_tokens"], 1)))
+
+
+def budget(event, cfg, today):
+    """-> (message, block reason)."""
+    cost, cap = today.get("cost"), float(cfg.get("budget_usd") or 0)
+    if cap <= 0:
+        return None, None
+    if cost is None:   # nothing measures today's spend: say so once a day instead of silently guarding nothing
+        if _once("budget-paused-" + time.strftime("%Y%m%d"), 1):
+            return ("the daily budget guard is paused because the live tracker isn't running. "
+                    "`tokentrim serve --install` keeps it running in the background."), None
+        return None, None
+    if cost >= cap:
+        prompt = (event.get("prompt") or "").lstrip()
+        if cfg.get("budget_block") and not prompt.startswith("++"):
+            _log("budget", "held at $%.2f of $%.0f" % (cost, cap))
+            return None, ("tokentrim: today's usage is $%.2f at API prices, past your $%.0f daily budget, so this prompt was held. "
+                          "Start your message with ++ to send it anyway, or raise the budget in the live dashboard." % (cost, cap))
+        if _once("budget-over-" + time.strftime("%Y%m%d"), 1):
+            return "today's usage is $%.2f, past your $%.0f daily budget." % (cost, cap), None
+    elif cost >= 0.8 * cap and _once("budget-80-" + time.strftime("%Y%m%d"), 1):
+        return "$%.2f of your $%.0f daily budget used (%d%%)." % (cost, cap, 100 * cost / cap), None
+    return None, None
+
+
+def cold_cache(ctx, model, last, today):
+    ttl = today.get("ttl") or 300
+    idle = time.time() - last if last else 0
+    if ctx < 50_000 or idle <= ttl or idle > 12 * 3600:
+        return None
+    fam = next((f for f in PRICE_IN if f in model), None)
+    price = PRICE_IN.get(fam) or today.get("price_in") or 3
+    usd = ctx * 1.25 * price / 1e6
+    _log("cold_cache", "%d tokens after %ds" % (ctx, idle))
+    return ("idle %d min, so Claude's prompt cache has expired: this message re-writes ~%sk tokens of context (about $%.2f). "
+            "If it's a new task, /clear first is cheaper." % (idle // 60, "{:,}".format(ctx // 1000), usd))
+
+
+def advisor(event, model):
+    prompt = event.get("prompt") or ""
+    if "opus" not in model or len(prompt) > 240 or not QUICK.search(prompt) or HARD.search(prompt):
+        return None
+    if not _once("advisor" + (event.get("session_id") or ""), int(time.time() // 1800)):   # at most every 30 min
+        return None
+    _log("advisor", prompt[:40])
+    return ("this looks like a quick job. /model sonnet does it for about 60% of Opus's price "
+            "(/model opus to switch back), or turn on Smart model in the live dashboard.")
 
 
 def on_prompt(event, cfg):
-    ctx = last_context(event.get("transcript_path") or "")
-    warn = cfg["context_warn_tokens"]
-    if not ctx or ctx < warn:
+    ctx, model, last = _tail(event.get("transcript_path") or "")
+    today = _today()
+    msgs, block = [], None
+    if cfg.get("budget_guard"):
+        m, block = budget(event, cfg, today)
+        msgs.append(m)
+    if block:
+        _out({"decision": "block", "reason": block})
         return
-    # speak once per 50k of growth, not on every prompt
-    step = ctx // 50_000
-    os.makedirs(os.path.join(STATE, "meter"), exist_ok=True)
-    mark = os.path.join(STATE, "meter", hashlib.sha1((event.get("session_id") or "").encode()).hexdigest())
-    try:
-        with open(mark) as fh:
-            if int(fh.read() or 0) >= step:
-                return
-    except (OSError, ValueError):
-        pass
-    with open(mark, "w") as fh:
-        fh.write(str(step))
-    _log("meter", "%d tokens" % ctx)
-    times = ctx / max(cfg["baseline_tokens"], 1)
-    # systemMessage is shown to the user only; it never enters Claude's context.
-    _out({"systemMessage":
-          "tokentrim: this session is carrying %sk tokens of context, re-sent on every step "
-          "(~%.0fx a fresh session). Run /compact, or start a new session for the next task."
-          % ("{:,}".format(ctx // 1000), times)})
+    if cfg.get("cache_guard", True):
+        msgs.append(cold_cache(ctx, model, last, today))
+    if cfg.get("model_advisor", True):
+        msgs.append(advisor(event, model))
+    if cfg.get("rule_meter", True):
+        msgs.append(meter(ctx, event, cfg))
+    msgs = [m for m in msgs if m]
+    if msgs:
+        # systemMessage is shown to the user only; it never enters Claude's context.
+        _out({"systemMessage": "tokentrim: " + "\ntokentrim: ".join(msgs)})
 
 
 def settings_hooks_installed():
@@ -367,14 +474,20 @@ def main():
             inp = event.get("tool_input") or {}
             if not isinstance(inp, dict):
                 return
-            rule_screenshot(tool, inp, cfg, event.get("session_id") or "")
-            rule_read_image(tool, inp, cfg)
-            rule_read_text(tool, inp, cfg, event.get("session_id") or "")
+            on = cfg.get  # each rule can be switched off from the live dashboard (see controls.py)
+            if on("rule_screenshots", True):
+                rule_screenshot(tool, inp, cfg, event.get("session_id") or "")
+            if on("rule_images", True):
+                rule_read_image(tool, inp, cfg)
+            if on("rule_outline", True):
+                rule_read_text(tool, inp, cfg, event.get("session_id") or "")
         elif event_name == "post":
             tool = event.get("tool_name") or ""
             resp = event.get("tool_response")
-            rule_post_bash(tool, resp, cfg)
-            rule_post_mcp(tool, resp, cfg)
+            if cfg.get("rule_bash", True):
+                rule_post_bash(tool, resp, cfg)
+            if cfg.get("rule_mcp", True):
+                rule_post_mcp(tool, resp, cfg)
         elif event_name == "prompt":
             on_prompt(event, cfg)
     except SystemExit:

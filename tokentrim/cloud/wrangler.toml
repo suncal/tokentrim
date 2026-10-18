@@ -1,0 +1,20 @@
+# tokentrim Pro cloud: the hosted real-time dashboard. One Durable Object per license.
+# Deploy (maintainer only): bin/tokentrim-cloud-deploy, or copy live.html next to worker.js and `npx wrangler@4 deploy`.
+name = "tokentrim-cloud"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+rules = [{ type = "Text", globs = ["**/*.html"], fallthrough = false }]
+
+[vars]
+POLAR_ORG = "d3cd7f3b-ea6d-4453-af1b-dc308458c629"
+BUY_URL = "https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva"
+
+[[durable_objects.bindings]]
+name = "TENANT"
+class_name = "Tenant"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Tenant"]

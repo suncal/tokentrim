@@ -6,6 +6,17 @@ PATH = os.path.expanduser("~/.config/tokentrim/config.json")
 
 DEFAULTS = {
     "enabled": True,
+    "rule_screenshots": True,        # per-rule switches; the live dashboard's Controls panel flips these
+    "rule_images": True,
+    "rule_outline": True,
+    "rule_bash": True,
+    "rule_mcp": True,
+    "rule_meter": True,
+    "budget_guard": False,           # daily budget: off until you pick one in the dashboard
+    "budget_usd": 20,
+    "budget_block": False,
+    "cache_guard": True,             # tell the user when a message will re-write an expired cache
+    "model_advisor": True,           # point out quick jobs running on Opus
     "screenshot_scale": 0.4,         # browser screenshots: 0.4 = ~16% of the tokens; UI text stays legible
     "zoom_scale": 0.6,               # zoom is for detail, so it keeps more resolution
     "batch_extra_scale": 0.25,       # screenshots in a browser_batch other than the last one

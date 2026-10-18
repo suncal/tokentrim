@@ -12,12 +12,12 @@ from . import cli
 
 STATE = os.path.expanduser("~/.cache/tokentrim")
 # $ per million tokens: input, output (cache read = 0.1x input)
-PRICES = {"opus": (5, 25), "sonnet": (3, 15), "haiku": (1, 5), "other": (3, 15)}
+PRICES = {"opus": (5, 25), "sonnet": (3, 15), "haiku": (1, 5), "fable": (3, 15), "other": (3, 15)}  # fable: list price not public, Sonnet-class estimate
 
 
 def _fam(model):
     m = model.lower()
-    return next((f for f in ("opus", "sonnet", "haiku") if f in m), "other")
+    return next((f for f in ("opus", "sonnet", "haiku", "fable") if f in m), "other")
 
 
 def load(rebuild=False):
@@ -105,9 +105,12 @@ def _png(svg_path):
 
 def write(out_dir=None, open_it=True):
     s = summary(load())
-    out_dir = out_dir or os.path.expanduser("~/Desktop")
-    if not os.path.isdir(out_dir):
-        out_dir = os.getcwd()
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    else:
+        out_dir = os.path.expanduser("~/Desktop")
+        if not os.path.isdir(out_dir):
+            out_dir = os.getcwd()
     path = os.path.join(out_dir, "tokentrim-savings.svg")
     with open(path, "w") as fh:
         fh.write(svg(s))
