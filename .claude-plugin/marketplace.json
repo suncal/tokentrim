@@ -1,0 +1,19 @@
+{
+  "name": "tokentrim",
+  "description": "tokentrim: measure and cut Claude Code context tokens",
+  "owner": {
+    "name": "suncal",
+    "url": "https://github.com/suncal"
+  },
+  "plugins": [
+    {
+      "name": "tokentrim",
+      "source": "./",
+      "description": "Token-cutting hooks plus /tokentrim:replay, /tokentrim:dashboard and /tokentrim:share"
+    }
+  ],
+  "metadata": {
+    "description": "tokentrim: measure and cut Claude Code context tokens",
+    "version": "0.1.0"
+  }
+}

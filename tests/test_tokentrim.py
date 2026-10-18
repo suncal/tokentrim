@@ -14,9 +14,9 @@ from tokentrim import cli, filters, outline  # noqa: E402
 HOOK = [sys.executable, os.path.join(ROOT, "tokentrim_hook.py")]
 
 
-def run_hook(event, payload, home):
+def run_hook(event, payload, home, *extra):
     env = dict(os.environ, HOME=home)
-    r = subprocess.run(HOOK + [event], input=json.dumps(payload), capture_output=True, text=True, env=env, timeout=30)
+    r = subprocess.run(HOOK + [event] + list(extra), input=json.dumps(payload), capture_output=True, text=True, env=env, timeout=30)
     return json.loads(r.stdout) if r.stdout.strip() else None
 
 
@@ -174,6 +174,29 @@ class Hooks(unittest.TestCase):
         env = dict(os.environ, HOME=self.home)
         r = subprocess.run(HOOK + ["pre"], input="not json", capture_output=True, text=True, env=env)
         self.assertEqual((r.returncode, r.stdout), (0, ""))
+
+
+class Plugin(unittest.TestCase):
+    SHOT = {"tool_name": "mcp__Claude_Browser__computer", "tool_input": {"action": "screenshot"}}
+
+    def test_plugin_hook_acts_without_settings_install(self):
+        out = run_hook("pre", self.SHOT, tempfile.mkdtemp(), "--plugin")
+        self.assertEqual(out["hookSpecificOutput"]["updatedInput"]["scale"], 0.4)
+
+    def test_plugin_hook_stands_down_when_settings_installed(self):
+        home = tempfile.mkdtemp()
+        os.makedirs(os.path.join(home, ".claude"))
+        with open(os.path.join(home, ".claude", "settings.json"), "w") as fh:
+            json.dump({"hooks": {k: [v] for k, v in cli._entries().items()}}, fh)
+        self.assertIsNone(run_hook("pre", self.SHOT, home, "--plugin"))
+        self.assertIsNotNone(run_hook("pre", self.SHOT, home))  # the settings hook itself still runs
+
+    def test_plugin_hooks_match_install(self):
+        with open(os.path.join(ROOT, "hooks", "hooks.json")) as fh:
+            plugin = json.load(fh)["hooks"]
+        for event, entry in cli._entries().items():
+            self.assertEqual(plugin[event][0].get("matcher", ""), entry["matcher"])
+            self.assertIn("--plugin", plugin[event][0]["hooks"][0]["command"])
 
 
 class Install(unittest.TestCase):

@@ -51,6 +51,23 @@ Why compaction dominates: the median API call carried **408k tokens** of context
 
 ## Install
 
+### As a Claude Code plugin (one command)
+
+```bash
+claude plugin marketplace add suncal/tokentrim && claude plugin install tokentrim@tokentrim
+```
+
+Or inside a session: `/plugin marketplace add suncal/tokentrim`, then `/plugin install tokentrim@tokentrim`. New sessions get:
+
+- the hooks: screenshots, image reads, huge-file outlines, Bash/MCP trimming, context meter
+- `/tokentrim:replay [--window N]`: what tokentrim would have saved on your past sessions
+- `/tokentrim:dashboard [--no-open]`: the usage and savings dashboard
+- `/tokentrim:share [--out DIR]`: your savings card to post
+
+The plugin needs `python3` on your PATH and nothing else. Two things a plugin can't do: set the compaction window (`env`) and add the guidance to `~/.claude/CLAUDE.md`. For those, also run `tokentrim install` from a clone (below). It's safe to have both: the plugin's hooks stand down while `tokentrim install` has its hooks in `~/.claude/settings.json`, so nothing runs twice. `tokentrim status` shows which set is active. Remove the plugin with `claude plugin uninstall tokentrim@tokentrim`.
+
+### From a clone
+
 ```bash
 git clone https://github.com/suncal/tokentrim && cd tokentrim
 bin/tokentrim audit                  # where your tokens went

@@ -1,0 +1,13 @@
+{
+  "name": "tokentrim",
+  "version": "0.1.0",
+  "description": "Cut what Claude Code re-reads on every step: half-scale screenshots, outlines for huge files, trimmed Bash and MCP output (full copy on disk), and a context meter.",
+  "author": {
+    "name": "suncal",
+    "url": "https://github.com/suncal"
+  },
+  "homepage": "https://github.com/suncal/tokentrim",
+  "repository": "https://github.com/suncal/tokentrim",
+  "license": "Apache-2.0",
+  "keywords": ["tokens", "context", "cost", "hooks", "compaction"]
+}
