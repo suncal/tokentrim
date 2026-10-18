@@ -9,6 +9,9 @@
   tokentrim dashboard [--no-open] full usage + savings dashboard (dashboard.html)
   tokentrim serve [--port N]      live dashboard at http://localhost:4747 (auto-refreshing)
   tokentrim serve --install       keep it running at login; --uninstall removes that
+  tokentrim live                  real-time savings page (http://localhost:4747/live)
+  tokentrim live --deploy         also put it on your Cloudflare account, to open from anywhere
+  tokentrim live --link           print the private link to the remote page
   tokentrim share [--out DIR]     savings card to post (totals only, no prompts or paths)
 
 Pro (https://github.com/suncal/tokentrim#pro):
@@ -225,6 +228,16 @@ def main(argv=None):
             dashboard.uninstall_agent()
         else:
             dashboard.serve(port, open_it="--no-open" not in argv)
+    elif cmd == "live":
+        from . import live
+        if "--deploy" in argv:
+            live.deploy(titles="--titles" in argv)
+        elif "--link" in argv:
+            live.link()
+        else:
+            import webbrowser
+            webbrowser.open("http://localhost:4747/live")
+            print("http://localhost:4747/live  (needs `tokentrim serve` running; `tokentrim serve --install` keeps it on)")
     elif cmd == "share":
         from .share import write as share
         share(argv[argv.index("--out") + 1] if "--out" in argv else None, open_it="--no-open" not in argv)

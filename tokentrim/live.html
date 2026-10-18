@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>tokentrim live</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2310b981'/%3E%3Cpath d='M8 11h16M8 16h11M8 21h6' stroke='%23052e1f' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* Layout: status bar, a hero counter beside rate gauges, the 60-minute chart, then live conversations,
+   insights and the event feed in a responsive grid. Dark by default: it's a monitor you leave open. */
+:root{
+  --bg:#07090c;--panel:#0e1217;--panel2:#131922;--line:#1e2631;--ink:#e8edf3;--mute:#8592a3;--dim:#56616f;
+  --good:#22d39b;--good2:#0f8f68;--would:#f0884f;--warn:#f5b84a;--bad:#f2645b;--info:#7aa7ff;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Helvetica,Arial,sans-serif;
+  color-scheme:dark}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f4f6f8;--panel:#fff;--panel2:#f7f9fb;--line:#e1e6ec;--ink:#131a22;--mute:#5d6977;--dim:#98a2ae;
+  --good:#0c9f72;--good2:#0c9f72;--would:#d86a2c;--warn:#b7791f;--bad:#cf3b32;--info:#2f62d6;color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f4f6f8;--panel:#fff;--panel2:#f7f9fb;--line:#e1e6ec;--ink:#131a22;--mute:#5d6977;--dim:#98a2ae;
+  --good:#0c9f72;--good2:#0c9f72;--would:#d86a2c;--warn:#b7791f;--bad:#cf3b32;--info:#2f62d6;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-left)) 48px;display:grid;gap:16px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font:700 15px var(--mono);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.brand i{width:22px;height:22px;border-radius:6px;background:var(--good);display:inline-block}
+.pill{display:inline-flex;align-items:center;gap:7px;font:600 12px var(--mono);padding:4px 10px;border-radius:99px;background:var(--panel);border:1px solid var(--line);color:var(--mute)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.on .dot{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 1.6s infinite}
+.stale .dot{background:var(--warn)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 60%,transparent)}100%{box-shadow:0 0 0 9px transparent}}
+.sp{flex:1}
+.top a{color:var(--mute);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.lbl{font:600 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+.hero{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.big{font:700 clamp(44px,8vw,84px)/1 var(--mono);letter-spacing:-.03em;color:var(--good);font-variant-numeric:tabular-nums;margin:10px 0 6px}
+.sub{color:var(--mute);font-size:14px}.sub b{color:var(--ink);font-family:var(--mono)}
+.vs{margin-top:16px;display:grid;gap:8px}
+.vsrow{display:grid;grid-template-columns:110px 1fr 84px;gap:10px;align-items:center;font-size:13px;color:var(--mute)}
+.track{height:12px;background:var(--panel2);border-radius:6px;overflow:hidden}
+.fill{height:100%;border-radius:6px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.num{font:600 13px var(--mono);text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+.gauges{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g{background:var(--panel2);border-radius:10px;padding:14px;display:grid;gap:4px}
+.g b{font:700 26px var(--mono);font-variant-numeric:tabular-nums}
+.g span{font-size:12px;color:var(--mute)}
+.chart{height:200px;position:relative;margin-top:10px}
+canvas{width:100%;height:100%;display:block}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--mute);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.grid3{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.convs{display:grid;gap:12px;margin-top:12px}
+.conv{background:var(--panel2);border-radius:12px;padding:14px;display:grid;gap:10px;border:1px solid transparent;transition:border-color .4s}
+.conv.flash{border-color:var(--good)}
+.ch{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ch b{font-weight:600}.ch .t{color:var(--mute);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.tag{font:600 11px var(--mono);padding:2px 7px;border-radius:99px;background:var(--panel);color:var(--mute);white-space:nowrap}
+.tag.live{color:var(--good)}
+.cstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;color:var(--mute)}
+.cstats b{display:block;font:600 15px var(--mono);color:var(--ink)}
+.meter{position:relative;height:8px;border-radius:4px;background:var(--panel);overflow:visible}
+.meter .f{height:100%;border-radius:4px;transition:width .9s,background .4s}
+.meter .mk{position:absolute;top:-4px;width:2px;height:16px;background:var(--mute)}
+svg.spark{width:100%;height:54px;display:block}
+.ins{display:grid;gap:10px;margin-top:12px}
+.in{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:14px;align-items:start;animation:fade .5s}
+.in .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 12px var(--mono)}
+.good .ic{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.warn .ic{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.tip .ic{background:color-mix(in srgb,var(--info) 18%,transparent);color:var(--info)}
+.info .ic{background:var(--panel2);color:var(--mute)}
+.feed{display:grid;gap:2px;margin-top:10px;max-height:420px;overflow:auto}
+.ev{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
+.ev.new{animation:slide .6s}
+.ev time{font:12px var(--mono);color:var(--dim)}
+.ev .p{color:var(--dim);font-size:12px}
+.ev .k{font:600 12px var(--mono)}
+.ev.trim .k{color:var(--good)}.ev.compact .k{color:var(--info)}.ev.jump .k{color:var(--warn)}
+@keyframes slide{from{opacity:0;transform:translateY(-6px);background:color-mix(in srgb,var(--good) 12%,transparent)}to{opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.rules{display:grid;gap:8px;margin-top:12px}
+.rule{display:grid;grid-template-columns:1fr 70px;gap:4px 10px;font-size:13px}
+.rule .track{grid-column:1/3;height:6px}
+.empty{color:var(--mute);font-size:14px;padding:18px 0}
+.foot{color:var(--dim);font-size:12px;text-align:center}
+.gate{max-width:420px;margin:12vh auto;display:grid;gap:12px;text-align:center}
+.gate input{font:15px var(--mono);padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.gate button{font:600 15px var(--sans);padding:12px;border-radius:10px;border:0;background:var(--good);color:#04231a;cursor:pointer}
+@media (max-width:900px){.hero,.grid3{grid-template-columns:1fr}}
+@media (max-width:520px){.gauges{grid-template-columns:1fr 1fr}.cstats{grid-template-columns:1fr 1fr}.vsrow{grid-template-columns:84px 1fr 64px}.g b{font-size:21px}.chart{height:160px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="top">
+    <div class="brand"><i></i>tokentrim live</div>
+    <span class="pill" id="status"><span class="dot"></span><span id="statustxt">connecting…</span></span>
+    <span class="sp"></span>
+    <a href="#" id="theme">theme</a>
+  </div>
+
+  <div class="hero">
+    <div class="card">
+      <div class="lbl">Tokens saved today</div>
+      <div class="big" id="saved">0</div>
+      <div class="sub">≈ <b id="usd">$0</b> at API prices · <b id="pct">0%</b> less re-read · limits last <b id="x">1.0×</b> longer</div>
+      <div class="vs">
+        <div class="vsrow"><span>Without tokentrim</span><div class="track"><div class="fill" id="wbar" style="background:var(--would);width:100%"></div></div><span class="num" id="would">0</span></div>
+        <div class="vsrow"><span>With tokentrim</span><div class="track"><div class="fill" id="ubar" style="background:var(--good);width:0"></div></div><span class="num" id="used">0</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl">Right now</div>
+      <div class="gauges" style="margin-top:12px">
+        <div class="g"><span>Saving</span><b id="spm" style="color:var(--good)">0</b><span>tokens / min</span></div>
+        <div class="g"><span>Re-reading</span><b id="upm">0</b><span>tokens / min</span></div>
+        <div class="g"><span>Live conversations</span><b id="nconv">0</b><span id="nagents">0 sub-agents</span></div>
+        <div class="g"><span>Trimmed live today</span><b id="trimmed">0</b><span id="trims">0 actions</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="top"><div class="lbl">Last 60 minutes, tokens re-read per minute</div><span class="sp"></span>
+      <div class="legend"><span><i style="background:var(--would)"></i>without tokentrim</span><span><i style="background:var(--good)"></i>with tokentrim</span></div></div>
+    <div class="chart"><canvas id="c60"></canvas></div>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="lbl">Live conversations</div>
+      <div class="convs" id="convs"></div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="card"><div class="lbl">Insights</div><div class="ins" id="ins"></div></div>
+      <div class="card"><div class="lbl">What's saving the most today</div><div class="rules" id="rules"></div></div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="card"><div class="lbl">Live events</div><div class="feed" id="feed"></div></div>
+    <div class="card"><div class="lbl">Today by hour</div><div class="chart"><canvas id="ch"></canvas></div></div>
+  </div>
+
+  <div class="foot">Updates every 2 seconds. "Without tokentrim" replays each step as if nothing had been trimmed or summarised early (same model as <code>tokentrim replay</code>). Only totals and project folder names are shown here.</div>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var css = function(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); };
+  var store = { get:function(k){ try{return localStorage.getItem(k);}catch(e){return null;} },
+                set:function(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
+
+  // theme toggle
+  var th = store.get("tt-theme"); if (th) document.documentElement.dataset.theme = th;
+  $("theme").onclick = function(e){ e.preventDefault();
+    var dark = matchMedia("(prefers-color-scheme: dark)").matches;
+    var cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+    var nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; store.set("tt-theme", nx); last && render(last); };
+
+  // remote access key: #k=... in the link, remembered on this device
+  var m = location.hash.match(/k=([A-Za-z0-9_-]+)/);
+  if (m) { store.set("tt-key", m[1]); history.replaceState(null, "", location.pathname); }
+  var key = store.get("tt-key");
+  var remote = location.hostname !== "localhost" && location.hostname !== "127.0.0.1";
+
+  function fmt(n){ n = +n || 0; var a = Math.abs(n);
+    if (a >= 1e9) return (n/1e9).toFixed(a >= 1e10 ? 1 : 2).replace(/\.?0+$/,"") + "B";
+    if (a >= 1e6) return (n/1e6).toFixed(a >= 1e8 ? 0 : 1).replace(/\.0$/,"") + "M";
+    if (a >= 1e3) return (n/1e3).toFixed(a >= 1e5 ? 0 : 1).replace(/\.0$/,"") + "k";
+    return String(Math.round(n)); }
+  function money(n){ return "$" + (n >= 100 ? Math.round(n).toLocaleString() : (+n).toFixed(2)); }
+  function ago(s){ s = Math.max(0, Math.round(s)); return s < 60 ? s + "s" : s < 3600 ? Math.round(s/60) + "m" : Math.round(s/3600) + "h"; }
+  function hhmm(t){ var d = new Date(t*1000); return d.toTimeString().slice(0,5); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  // smooth number tweening
+  var tw = {};
+  function tween(id, to, f){
+    var t = tw[id] || (tw[id] = {v: 0}); t.from = t.v; t.to = to; t.t0 = performance.now(); t.f = f;
+    if (!t.raf) step(id); }
+  function step(id){ var t = tw[id];
+    t.raf = requestAnimationFrame(function(now){
+      var k = Math.min(1, (now - t.t0) / 1100), e = 1 - Math.pow(1 - k, 3);
+      t.v = t.from + (t.to - t.from) * e; $(id).textContent = t.f(t.v);
+      if (k < 1) step(id); else t.raf = null; }); }
+
+  // canvas helpers
+  function setup(cv){ var r = cv.getBoundingClientRect(), d = devicePixelRatio || 1;
+    cv.width = r.width * d; cv.height = r.height * d; var g = cv.getContext("2d"); g.setTransform(d,0,0,d,0,0); return [g, r.width, r.height]; }
+  function axis(g, w, h, max, pad){
+    g.strokeStyle = css("--line"); g.fillStyle = css("--dim"); g.font = "11px " + css("--mono"); g.lineWidth = 1;
+    for (var i = 0; i <= 3; i++){ var y = pad.t + (h - pad.t - pad.b) * i / 3;
+      g.beginPath(); g.moveTo(pad.l, y); g.lineTo(w - pad.r, y); g.stroke();
+      g.fillText(fmt(max * (1 - i/3)), 0, y + 4); } }
+
+  function chart60(d){
+    var a = setup($("c60")), g = a[0], w = a[1], h = a[2], pad = {l:44, r:4, t:8, b:20};
+    var rows = d.minutes, max = 1; rows.forEach(function(r){ max = Math.max(max, r[2], r[1]); }); max *= 1.12;
+    axis(g, w, h, max, pad);
+    var X = function(i){ return pad.l + (w - pad.l - pad.r) * i / (rows.length - 1); };
+    var Y = function(v){ return h - pad.b - (h - pad.t - pad.b) * v / max; };
+    function area(idx, col){
+      var gr = g.createLinearGradient(0, pad.t, 0, h - pad.b); gr.addColorStop(0, col + "66"); gr.addColorStop(1, col + "05");
+      g.beginPath(); g.moveTo(X(0), Y(0)); rows.forEach(function(r, i){ g.lineTo(X(i), Y(r[idx])); }); g.lineTo(X(rows.length-1), Y(0)); g.closePath();
+      g.fillStyle = gr; g.fill();
+      g.beginPath(); rows.forEach(function(r, i){ i ? g.lineTo(X(i), Y(r[idx])) : g.moveTo(X(i), Y(r[idx])); });
+      g.strokeStyle = col; g.lineWidth = 2; g.stroke(); }
+    area(2, css("--would")); area(1, css("--good"));
+    g.fillStyle = css("--dim"); g.font = "11px " + css("--mono");
+    [0, 15, 30, 45, 59].forEach(function(i){ var t = i === 59 ? "now" : "-" + (59 - i) + "m"; g.fillText(t, Math.min(X(i) - 8, w - 26), h - 4); });
+    var lr = rows[rows.length - 1]; if (lr[1]) { g.fillStyle = css("--good"); g.beginPath(); g.arc(X(rows.length-1), Y(lr[1]), 4, 0, 7); g.fill(); }
+  }
+
+  function chartHours(d){
+    var a = setup($("ch")), g = a[0], w = a[1], h = a[2], pad = {l:44, r:4, t:8, b:20};
+    var rows = d.hours, max = 1; rows.forEach(function(r){ max = Math.max(max, r[2]); }); max *= 1.1;
+    axis(g, w, h, max, pad);
+    var bw = (w - pad.l - pad.r) / 24, now = new Date().getHours();
+    rows.forEach(function(r, i){
+      var x = pad.l + i * bw + 2, ww = Math.max(2, bw - 4), Y = function(v){ return (h - pad.t - pad.b) * v / max; };
+      g.fillStyle = css("--would") + "55"; g.fillRect(x, h - pad.b - Y(r[2]), ww, Y(r[2]));
+      g.fillStyle = css("--good"); g.fillRect(x, h - pad.b - Y(r[1]), ww, Y(r[1]));
+      if (i % 6 === 0 || i === now){ g.fillStyle = i === now ? css("--ink") : css("--dim"); g.font = "11px " + css("--mono"); g.fillText(i === now ? "now" : i + "h", x, h - 4); } });
+  }
+
+  function spark(series, trig){
+    if (series.length < 2) return "";
+    var max = trig; series.forEach(function(p){ max = Math.max(max, p[0], p[1]); }); max *= 1.05;
+    var n = series.length, W = 300, H = 54;
+    var pts = function(k){ return series.map(function(p, i){ return (i * W / (n - 1)).toFixed(1) + "," + (H - p[k] / max * H).toFixed(1); }).join(" "); };
+    var ty = (H - trig / max * H).toFixed(1);
+    return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+      '<line x1="0" x2="' + W + '" y1="' + ty + '" y2="' + ty + '" stroke="var(--dim)" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>' +
+      '<polygon points="0,' + H + ' ' + pts(1) + ' ' + W + ',' + H + '" fill="var(--would)" opacity=".16"/>' +
+      '<polyline points="' + pts(1) + '" fill="none" stroke="var(--would)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
+      '<polygon points="0,' + H + ' ' + pts(0) + ' ' + W + ',' + H + '" fill="var(--good)" opacity=".22"/>' +
+      '<polyline points="' + pts(0) + '" fill="none" stroke="var(--good)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+  }
+
+  var seenFeed = {}, prevSteps = {}, last = null;
+  function render(d){
+    last = d;
+    var T = d.today, would = T.would || 0, used = T.used || 0;
+    tween("saved", T.saved || 0, function(v){ return fmt(v); });
+    tween("usd", T.usd || 0, money);
+    $("pct").textContent = would ? Math.round((1 - used / would) * 100) + "%" : "0%";
+    $("x").textContent = (used ? would / used : 1).toFixed(1) + "×";
+    $("would").textContent = fmt(would); $("used").textContent = fmt(used);
+    $("ubar").style.width = (would ? used / would * 100 : 0) + "%";
+    tween("spm", Math.max(0, d.rate.saved_pm), fmt); tween("upm", d.rate.used_pm, fmt);
+    $("nconv").textContent = d.convs.length;
+    $("nagents").textContent = d.convs.reduce(function(s, c){ return s + c.agents; }, 0) + " sub-agents";
+    tween("trimmed", T.trimmed || 0, fmt); $("trims").textContent = (T.trims || 0) + " actions";
+    chart60(d); chartHours(d);
+
+    // conversations
+    $("convs").innerHTML = d.convs.length ? d.convs.map(function(c){
+      var pct = Math.min(100, c.ctx / d.trigger * 100), col = pct > 90 ? "var(--bad)" : pct > 75 ? "var(--warn)" : "var(--good)";
+      var fresh = d.now - c.last < 90, flash = prevSteps[c.id] != null && prevSteps[c.id] !== c.steps;
+      prevSteps[c.id] = c.steps;
+      return '<div class="conv' + (flash ? " flash" : "") + '">' +
+        '<div class="ch"><b>' + esc(c.project) + '</b><span class="t">' + esc(c.title || "#" + c.id) + '</span>' +
+        '<span class="tag' + (fresh ? " live" : "") + '">' + (fresh ? "● working" : "idle " + ago(d.now - c.last)) + '</span>' +
+        (c.model !== "other" ? '<span class="tag">' + esc(c.model) + '</span>' : "") + '</div>' +
+        spark(c.series, d.trigger) +
+        '<div class="meter" title="context now vs where tokentrim summarises"><div class="f" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+        '<div class="cstats"><span><b>' + fmt(c.ctx) + '</b>context now</span><span><b style="color:var(--would)">' + fmt(c.cf) + '</b>without tokentrim</span>' +
+        '<span><b style="color:var(--good)">' + fmt(c.saved) + '</b>saved today</span><span><b>' +
+        (c.to_compact != null ? "~" + c.to_compact : "–") + '</b>steps to summary</span></div></div>';
+    }).join("") : '<div class="empty">No conversation is running. Start one in Claude Code and it shows up here within seconds.</div>';
+    setTimeout(function(){ document.querySelectorAll(".conv.flash").forEach(function(e){ e.classList.remove("flash"); }); }, 700);
+
+    var icon = {good:"✓", warn:"!", tip:"→", info:"i"};
+    $("ins").innerHTML = d.insights.map(function(i){
+      return '<div class="in ' + i.level + '"><span class="ic">' + icon[i.level] + '</span><span>' + esc(i.text) + '</span></div>'; }).join("");
+
+    var rmax = Math.max.apply(null, d.rules.map(function(r){ return r[2]; }).concat([1]));
+    $("rules").innerHTML = d.rules.length ? d.rules.map(function(r){
+      return '<div class="rule"><span>' + esc(r[0]) + ' <span style="color:var(--dim)">×' + r[1] + '</span></span><span class="num">' + fmt(r[2]) + '</span>' +
+        '<div class="track"><div class="fill" style="width:' + (r[2] / rmax * 100) + '%;background:var(--good)"></div></div></div>'; }).join("")
+      : '<div class="empty">Nothing trimmed yet today.</div>';
+
+    var label = {trim:"trimmed", compact:"summarised", jump:"big step"};
+    $("feed").innerHTML = d.feed.length ? d.feed.map(function(f){
+      var k = f.ts + f.kind + f.tokens, isNew = last && Object.keys(seenFeed).length && !seenFeed[k]; seenFeed[k] = 1;
+      return '<div class="ev ' + f.kind + (isNew ? " new" : "") + '"><time>' + hhmm(f.ts) + '</time><span>' + esc(f.text) +
+        (f.project ? ' <span class="p">' + esc(f.project) + '</span>' : "") + '</span><span class="k">' +
+        (f.kind === "jump" ? "+" : "−") + fmt(f.tokens) + '</span></div>'; }).join("")
+      : '<div class="empty">Events appear as tokentrim trims tool results and summarises conversations.</div>';
+    status();
+  }
+
+  function status(){
+    var p = $("status"), t = $("statustxt");
+    if (!last){ return; }
+    var age = Date.now() / 1000 - last.now;
+    p.className = "pill " + (age < 20 ? "on" : "stale");
+    t.textContent = age < 20 ? "live · updated " + ago(age) + " ago" : (remote ? "Mac offline? last update " + ago(age) + " ago" : "last update " + ago(age) + " ago");
+  }
+  setInterval(status, 1000);
+
+  function gate(msg){
+    document.getElementById("app").innerHTML = '<div class="gate"><div class="brand" style="justify-content:center"><i></i>tokentrim live</div>' +
+      '<p style="color:var(--mute)">' + msg + '</p><input id="k" placeholder="access key" autocomplete="off"><button id="go">Open</button></div>';
+    $("go").onclick = function(){ store.set("tt-key", $("k").value.trim()); location.reload(); };
+  }
+
+  var busy = false;
+  function poll(){
+    if (busy || document.hidden) return; busy = true;
+    var h = {}; if (key) h.Authorization = "Bearer " + key;
+    fetch("live.json", {headers: h, cache: "no-store"}).then(function(r){
+      if (r.status === 401) { gate("Paste the access key from <code>tokentrim live --link</code>, or open the full link once on this device."); throw 0; }
+      if (r.status === 204) { $("statustxt").textContent = "waiting for your Mac…"; throw 0; }
+      return r.json(); }).then(render).catch(function(){}).then(function(){ busy = false; });
+  }
+  if (remote && !key) gate("This page is private. Open the link from <code>tokentrim live --link</code> once on this device, or paste its key.");
+  else { poll(); setInterval(poll, 2000); document.addEventListener("visibilitychange", poll); }
+  addEventListener("resize", function(){ last && (chart60(last), chartHours(last)); });
+})();
+</script>
+</body>
+</html>

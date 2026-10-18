@@ -271,5 +271,19 @@ class Pro(unittest.TestCase):
         from tokentrim import pro
         self.assertEqual(pro._week(_fake_data())["long"], 1)
 
+
+class LiveTest(unittest.TestCase):
+    def test_counterfactual_keeps_history_and_trims(self):
+        from tokentrim.live import Conv
+        c = Conv("s", "p")
+        self.assertEqual(c.step(0, 100_000, 850_000), 0)
+        c.pending = 5_000                       # a trimmed tool result lands
+        self.assertEqual(c.step(1, 110_000, 850_000), 5_000)
+        self.assertEqual(c.step(2, 40_000, 850_000), 115_000 - 40_000)  # early summary: without tokentrim keeps it all
+        self.assertEqual(c.compactions, 1)
+        c.step(3, 50_000, 120_000)              # past the native limit: Claude Code would have compacted too
+        self.assertEqual(c.cf, 50_000)
+
+
 if __name__ == "__main__":
     unittest.main()

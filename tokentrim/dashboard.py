@@ -324,6 +324,10 @@ def serve(port=PORT, open_it=True):
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
     cache = _Cache()
+    from . import live
+    holder = {"snap": None}
+    threading.Thread(target=live.run, args=(live.Tracker(), holder), daemon=True).start()
+    live_html = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live.html")
 
     class H(BaseHTTPRequestHandler):
         def _send(self, body, ctype):
@@ -342,6 +346,16 @@ def serve(port=PORT, open_it=True):
                         html = fh.read()
                     blob = cache.get().decode().replace("</", "<\\/")
                     self._send(html.replace("/*__DATA__*/null", blob).encode(), "text/html; charset=utf-8")
+                elif path in ("/live", "/live/"):
+                    with open(live_html, "rb") as fh:
+                        self._send(fh.read(), "text/html; charset=utf-8")
+                elif path == "/live.json":
+                    snap = holder["snap"]
+                    if snap is None:
+                        self.send_response(204)
+                        self.end_headers()
+                    else:
+                        self._send(json.dumps(snap, separators=(",", ":")).encode(), "application/json")
                 elif path == "/data.json":
                     self._send(cache.get(force="rebuild=1" in self.path), "application/json")
                 else:

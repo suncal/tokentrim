@@ -85,6 +85,7 @@ bin/tokentrim replay                 # what tokentrim would have saved, on your 
 bin/tokentrim install                # strong profile; or --profile balanced|max, --no-guidance
 bin/tokentrim status                 # what's installed + recent hook activity
 bin/tokentrim serve                  # live dashboard at http://localhost:4747 (--install: keep it running at login)
+bin/tokentrim live                   # real-time savings, updating every 2s (--deploy: open it from anywhere)
 bin/tokentrim share                  # your savings card as a PNG to post (totals only, nothing private)
 bin/tokentrim uninstall              # removes exactly what install added
 ```
@@ -92,6 +93,12 @@ bin/tokentrim uninstall              # removes exactly what install added
 `install` backs up `~/.claude/settings.json` first, keeps all your existing hooks and env, and is idempotent. New sessions pick it up.
 
 Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Set `"enabled": false` to switch every hook off instantly.
+
+## Live view
+
+`bin/tokentrim live` opens a real-time view at http://localhost:4747/live: tokens saved today ticking up, saving and re-reading per minute, the last 60 minutes with and without tokentrim, every running conversation's context against where it will be summarised (with a steps-left forecast), live trims as they happen, and plain-English insights.
+
+Want it on your phone? `bin/tokentrim live --deploy` puts the page on your own Cloudflare account (the free plan is enough) behind a private key, and your Mac pushes **totals and project folder names only** every few seconds: no prompts, titles or code. `bin/tokentrim live --link` prints the link again.
 
 ## The dashboard
 
