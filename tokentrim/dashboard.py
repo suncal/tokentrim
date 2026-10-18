@@ -277,3 +277,134 @@ def write(out=None, open_it=True):
     if open_it:
         webbrowser.open("file://" + out)
     return out
+
+
+# ---------- live server: `tokentrim serve`
+
+PORT = 4747
+REFRESH = 120  # seconds between background rebuilds while a tab is open
+IDLE = 600     # no requests for this long = nobody watching, stop rebuilding
+AGENT = os.path.expanduser("~/Library/LaunchAgents/com.tokentrim.dashboard.plist")
+
+
+class _Cache:
+    def __init__(self):
+        import threading
+        self.lock = threading.Lock()
+        self.blob = None
+        self.built = 0.0
+        self.seen = time.time()
+        self.disk = os.path.join(STATE, "dashboard.json")
+        try:  # last good data, so a restart serves instantly
+            with open(self.disk, "rb") as fh:
+                self.blob = fh.read()
+            self.built = os.path.getmtime(self.disk)
+        except OSError:
+            pass
+
+    def get(self, force=False, viewer=True):
+        if viewer:
+            self.seen = time.time()
+        with self.lock:
+            if force or self.blob is None:
+                data = build()
+                self.blob = json.dumps(data, separators=(",", ":")).encode()
+                self.built = time.time()
+                try:
+                    with open(self.disk + ".tmp", "wb") as fh:
+                        fh.write(self.blob)
+                    os.replace(self.disk + ".tmp", self.disk)
+                except OSError:
+                    pass
+            return self.blob
+
+
+def serve(port=PORT, open_it=True):
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    cache = _Cache()
+
+    class H(BaseHTTPRequestHandler):
+        def _send(self, body, ctype):
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            path = self.path.split("?", 1)[0]
+            try:
+                if path in ("/", "/index.html"):
+                    with open(TEMPLATE) as fh:  # re-read so template edits show on reload
+                        html = fh.read()
+                    blob = cache.get().decode().replace("</", "<\\/")
+                    self._send(html.replace("/*__DATA__*/null", blob).encode(), "text/html; charset=utf-8")
+                elif path == "/data.json":
+                    self._send(cache.get(force="rebuild=1" in self.path), "application/json")
+                else:
+                    self.send_error(404)
+            except BrokenPipeError:
+                pass
+
+        def log_message(self, *a):
+            pass
+
+    srv = ThreadingHTTPServer(("127.0.0.1", port), H)  # localhost only: transcripts never leave the machine
+
+    def warm():
+        while True:
+            try:
+                if cache.blob is None or (time.time() - cache.seen < IDLE and time.time() - cache.built >= REFRESH):
+                    cache.get(force=True, viewer=False)
+            except Exception as e:  # keep serving the last good data
+                print("rebuild failed:", e, flush=True)
+            time.sleep(15)
+
+    threading.Thread(target=warm, daemon=True).start()
+    url = "http://localhost:%d/" % port
+    print("tokentrim dashboard live at %s  (rebuilds every %ds while open, Ctrl-C to stop)" % (url, REFRESH), flush=True)
+    if open_it:
+        webbrowser.open(url)
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+
+def install_agent(port=PORT):
+    """Run the live dashboard at login, always on localhost:<port>."""
+    import subprocess
+    import sys
+    log = os.path.join(STATE, "dashboard.log")
+    os.makedirs(STATE, exist_ok=True)
+    plist = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.tokentrim.dashboard</string>
+  <key>ProgramArguments</key><array>
+    <string>%s</string><string>%s</string><string>serve</string><string>--no-open</string><string>--port</string><string>%d</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ProcessType</key><string>Background</string>
+  <key>Nice</key><integer>10</integer>
+  <key>StandardOutPath</key><string>%s</string>
+  <key>StandardErrorPath</key><string>%s</string>
+</dict></plist>
+""" % (sys.executable, os.path.join(cli.ROOT, "bin", "tokentrim"), port, log, log)
+    subprocess.run(["launchctl", "unload", AGENT], capture_output=True)
+    with open(AGENT, "w") as fh:
+        fh.write(plist)
+    subprocess.run(["launchctl", "load", AGENT], check=True)
+    print("dashboard agent -> %s\nalways at http://localhost:%d/  (remove: tokentrim serve --uninstall)" % (AGENT, port))
+
+
+def uninstall_agent():
+    import subprocess
+    if os.path.exists(AGENT):
+        subprocess.run(["launchctl", "unload", AGENT], capture_output=True)
+        os.remove(AGENT)
+    print("dashboard agent removed")

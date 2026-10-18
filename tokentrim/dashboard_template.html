@@ -62,7 +62,7 @@ svg text{fill:var(--mute);font-size:11px}
     <a href="#where">Where it goes</a><a href="#savings">Savings</a><a href="#models">Models &amp; projects</a>
     <a href="#sessions">Sessions</a><a href="#floor">Fixed floor</a>
   </nav>
-  <div class="right"><span id="gen"></span><button id="theme" title="Toggle theme">◐</button></div>
+  <div class="right"><span id="live" class="mute" style="display:none"></span><button id="refresh" title="Rebuild now" style="display:none">↻</button><span id="gen"></span><button id="theme" title="Toggle theme">◐</button></div>
 </div></header>
 <main>
 
@@ -156,7 +156,7 @@ svg text{fill:var(--mute);font-size:11px}
 </main>
 <div class="tip" id="tip"></div>
 <script>
-const D = /*__DATA__*/null;
+let D = /*__DATA__*/null;
 const $ = s => document.querySelector(s);
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const fmt = n => { n = +n || 0; const a = Math.abs(n);
@@ -186,7 +186,7 @@ const cost = (m, cr, cw, inp, out) => { const [i,o] = PRICES[fam(m)]; return (cr
 const money = x => '$' + (x >= 1000 ? Math.round(x).toLocaleString() : x.toFixed(2));
 
 // ---------- totals
-const S = D.sessions;
+let S = D ? D.sessions : [];
 function totals(list){ const t = {calls:0, cr:0, cw:0, inp:0, out:0, subcalls:0};
   for (const s of list){ t.calls += s.calls; t.cr += s.cr + s.sub[1]; t.cw += s.cw + s.sub[2]; t.inp += s.inp + s.sub[3]; t.out += s.out + s.sub[4]; t.subcalls += s.sub[0]; }
   return t; }
@@ -408,11 +408,35 @@ function renderFloor(){
     `<tr><td><b>set by Claude Code and connectors</b></td><td>~${full(Math.max(D.baseline_median - own, 0))}</td><td>${pct(Math.max(D.baseline_median - own, 0) / Math.max(D.baseline_median, 1))}</td></tr></tbody>`;
 }
 
-function renderAll(){ renderOverview(); renderBA(); renderTimeline(); renderWhere(); renderSavings(); renderPrices(); renderModels(); renderSessions(); renderFloor(); }
+function renderAll(){ if (!D) return; renderOverview(); renderBA(); renderTimeline(); renderWhere(); renderSavings(); renderPrices(); renderModels(); renderSessions(); renderFloor(); }
 $('#tl-mode').onchange = renderTimeline; $('#tl-range').onchange = renderTimeline;
 $('#q').oninput = renderSessions; $('#sf').onchange = renderSessions;
 let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(renderTimeline, 150); });
-renderAll();
+// live mode: served by `tokentrim serve`, polls for fresh data
+let openSession = null;
+const _show = showSession;
+showSession = s => { openSession = s && s.id; _show(s); };
+function apply(data){
+  D = data; S = D.sessions; renderAll();
+  const s = openSession && S.find(x => x.id === openSession);
+  if (s) { const y = scrollY; _show(s); scrollTo(0, y); }
+}
+async function poll(force){
+  try {
+    const r = await fetch('data.json' + (force ? '?rebuild=1' : ''), {cache: 'no-store'});
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    if (!D || data.generated !== D.generated) apply(data);
+    $('#live').textContent = '● live · checked ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+    $('#live').style.color = css('--good');
+  } catch (e) { $('#live').textContent = '● offline'; $('#live').style.color = css('--bad'); }
+}
+if (location.protocol.startsWith('http')) {
+  $('#live').style.display = $('#refresh').style.display = '';
+  $('#refresh').onclick = async () => { $('#refresh').disabled = true; $('#live').textContent = 'rebuilding…'; await poll(true); $('#refresh').disabled = false; };
+  setInterval(poll, 30000);
+}
+renderAll(); if (location.protocol.startsWith('http')) poll();
 </script>
 </body>
 </html>

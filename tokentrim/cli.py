@@ -7,6 +7,8 @@
   tokentrim uninstall             remove exactly what install added
   tokentrim status                what is installed, and recent hook activity
   tokentrim dashboard [--no-open] full usage + savings dashboard (dashboard.html)
+  tokentrim serve [--port N]      live dashboard at http://localhost:4747 (auto-refreshing)
+  tokentrim serve --install       keep it running at login; --uninstall removes that
 """
 import json
 import os
@@ -208,6 +210,15 @@ def main(argv=None):
     elif cmd == "dashboard":
         from .dashboard import write
         write(open_it="--no-open" not in argv)
+    elif cmd == "serve":
+        from . import dashboard
+        port = int(argv[argv.index("--port") + 1]) if "--port" in argv else dashboard.PORT
+        if "--install" in argv:
+            dashboard.install_agent(port)
+        elif "--uninstall" in argv:
+            dashboard.uninstall_agent()
+        else:
+            dashboard.serve(port, open_it="--no-open" not in argv)
     elif cmd == "fixed":
         fixed()
     else:

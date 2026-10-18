@@ -53,6 +53,7 @@ bin/tokentrim audit                  # where your tokens went
 bin/tokentrim replay                 # what tokentrim would have saved, on your sessions
 bin/tokentrim install                # strong profile; or --profile balanced|max, --no-guidance
 bin/tokentrim status                 # what's installed + recent hook activity
+bin/tokentrim serve                  # live dashboard at http://localhost:4747 (--install: keep it running at login)
 bin/tokentrim uninstall              # removes exactly what install added
 ```
 
