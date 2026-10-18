@@ -18,8 +18,8 @@ import urllib.error
 import urllib.request
 
 LICENSE = os.path.expanduser("~/.config/tokentrim/license.json")
-BUY_URL = "https://github.com/suncal/tokentrim#pro"
-ORG_ID = None               # Polar organization id; set at launch. None = checkout not open yet.
+BUY_URL = "https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva"
+ORG_ID = "d3cd7f3b-ea6d-4453-af1b-dc308458c629"  # Polar organization "tokentrim"
 API = "https://api.polar.sh/v1/customer-portal/license-keys/"
 RECHECK = 7 * 86400         # re-validate weekly
 GRACE = 30 * 86400          # keep working offline for this long after the last good check
@@ -40,7 +40,10 @@ def _post(action, fields):
             body = json.load(e)
         except ValueError:
             body = {}
-        return {"error": body.get("detail") or body.get("error") or "HTTP %d" % e.code}
+        detail = body.get("detail")
+        if isinstance(detail, list):  # validation errors come back as a list
+            detail = "; ".join(d.get("msg", "") for d in detail if isinstance(d, dict))
+        return {"error": detail or body.get("error") or "HTTP %d" % e.code}
 
 
 def _save(lic):

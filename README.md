@@ -81,7 +81,7 @@ The free tool is the whole token-cutting engine and stays free and open source. 
 | `tokentrim budget 2B`: weekly token budget, alert at 80% | | ✓ |
 | Slack weekly totals (opt-in, totals only) | | ✓ |
 
-**$49 lifetime for the first 500 buyers, then $9/month.** Checkout opens at launch. Star or watch the repo to hear about it. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine.
+**$49 lifetime for the first 500 buyers, then $9/month.** [Get tokentrim Pro](https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva) (checkout by Polar, which handles sales tax). Your license key arrives by email. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine.
 
 **Teams:** a shared dashboard of everyone's spend and savings, with budgets, is in the works. **Paid audit:** want a teardown of where your team's Claude spend goes, with a fix list? Open an issue titled "audit" and I'll be in touch.
 
