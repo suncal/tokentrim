@@ -105,9 +105,12 @@ def _png(svg_path):
 
 def write(out_dir=None, open_it=True):
     s = summary(load())
-    out_dir = out_dir or os.path.expanduser("~/Desktop")
-    if not os.path.isdir(out_dir):
-        out_dir = os.getcwd()
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    else:
+        out_dir = os.path.expanduser("~/Desktop")
+        if not os.path.isdir(out_dir):
+            out_dir = os.getcwd()
     path = os.path.join(out_dir, "tokentrim-savings.svg")
     with open(path, "w") as fh:
         fh.write(svg(s))

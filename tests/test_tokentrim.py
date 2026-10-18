@@ -271,6 +271,58 @@ class Pro(unittest.TestCase):
         from tokentrim import pro
         self.assertEqual(pro._week(_fake_data())["long"], 1)
 
+    def test_budget_alert_once_per_level(self):
+        from tokentrim import pro
+        sent = []
+        with tempfile.TemporaryDirectory() as d:
+            saved = os.environ.get("HOME"), pro._notify
+            os.environ["HOME"], pro._notify = d, sent.append
+            try:
+                self.assertFalse(pro._budget_alert({"tokens": 70}, 100))   # under 80%
+                self.assertTrue(pro._budget_alert({"tokens": 85}, 100))
+                self.assertFalse(pro._budget_alert({"tokens": 90}, 100))   # already told this week
+                self.assertTrue(pro._budget_alert({"tokens": 120}, 100))   # passing 100% tells again
+                self.assertFalse(pro._budget_alert({"tokens": 130}, 100))
+            finally:
+                os.environ["HOME"], pro._notify = saved
+        self.assertEqual(len(sent), 2)
+        self.assertIn("85%", sent[0])
+
+    def test_slack_post_reports_failures(self):
+        import http.server
+        import threading
+        from tokentrim import pro
+        got = []
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                got.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                code, body = (200, b"ok") if self.path == "/good" else (404, b"no_service")
+                self.send_response(code)
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.HTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        base = "http://127.0.0.1:%d" % srv.server_port
+        try:
+            self.assertIsNone(pro._slack_post(base + "/good", "hi"))
+            self.assertIn("no_service", pro._slack_post(base + "/bad", "hi"))
+            self.assertEqual(got[0], {"text": "hi"})
+        finally:
+            srv.shutdown()
+
+    def test_slack_rejects_non_webhook(self):
+        from tokentrim import pro
+        old, pro.require = pro.require, lambda: None
+        try:
+            with self.assertRaises(SystemExit):
+                pro.slack("https://example.com/hook")
+        finally:
+            pro.require = old
+
 
 class LiveTest(unittest.TestCase):
     def test_counterfactual_keeps_history_and_trims(self):
@@ -324,6 +376,12 @@ class SmartTest(unittest.TestCase):
         out = run_hook("prompt", {"prompt": "go", "session_id": "w"}, self.home)
         self.assertIn("budget", out["systemMessage"])
         self.assertIsNone(run_hook("prompt", {"prompt": "go", "session_id": "w"}, self.home))   # said once
+
+    def test_budget_says_when_paused(self):
+        self._write(".config/tokentrim/config.json", {"budget_guard": True, "budget_usd": 10, "budget_block": True})
+        out = run_hook("prompt", {"prompt": "go", "session_id": "p"}, self.home)   # no today.json: tracker not running
+        self.assertIn("paused", out["systemMessage"])
+        self.assertIsNone(run_hook("prompt", {"prompt": "go", "session_id": "p"}, self.home))   # once a day, never blocks
 
     def test_cold_cache_after_long_pause(self):
         self._today(1, ttl=300)

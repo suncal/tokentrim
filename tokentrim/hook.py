@@ -379,7 +379,12 @@ def meter(ctx, event, cfg):
 def budget(event, cfg, today):
     """-> (message, block reason)."""
     cost, cap = today.get("cost"), float(cfg.get("budget_usd") or 0)
-    if cost is None or cap <= 0:
+    if cap <= 0:
+        return None, None
+    if cost is None:   # nothing measures today's spend: say so once a day instead of silently guarding nothing
+        if _once("budget-paused-" + time.strftime("%Y%m%d"), 1):
+            return ("the daily budget guard is paused because the live tracker isn't running. "
+                    "`tokentrim serve --install` keeps it running in the background."), None
         return None, None
     if cost >= cap:
         prompt = (event.get("prompt") or "").lstrip()

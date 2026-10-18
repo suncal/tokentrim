@@ -19,8 +19,10 @@
 
 Pro (https://github.com/suncal/tokentrim#pro):
   tokentrim pro [activate KEY | deactivate]   license status / activate / free this seat
-  tokentrim digest [--install]    plain-English weekly report (+ Slack, budget alert); --install: Mondays 9am
-  tokentrim budget 2B|off         weekly token budget; notifies at 80%
+  tokentrim digest [--install]    plain-English weekly report (+ Slack); --install: digest Mondays,
+                                  budget check every day at 9am
+  tokentrim budget 2B|off         weekly token budget; notification at 80% (sets up the daily check)
+  tokentrim slack URL|off         post weekly totals to a Slack incoming webhook (test message first)
 """
 import json
 import os
@@ -272,10 +274,18 @@ def main(argv=None):
             pro.status()
     elif cmd == "digest":
         from . import pro
-        pro.install_digest() if "--install" in argv else pro.digest(post="--no-post" not in argv)
+        if "--install" in argv:
+            pro.install_digest()
+        elif "--auto" in argv:
+            pro.check()
+        else:
+            pro.digest(post="--no-post" not in argv)
     elif cmd == "budget":
         from . import pro
         pro.budget(argv[0] if argv else sys.exit("usage: tokentrim budget 2B|off"))
+    elif cmd == "slack":
+        from . import pro
+        pro.slack(argv[0] if argv else None)
     elif cmd == "fixed":
         fixed()
     else:

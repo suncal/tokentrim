@@ -113,6 +113,59 @@ def status():
               datetime.datetime.fromtimestamp(lic.get("checked", 0)).strftime("%Y-%m-%d")))
 
 
+# ---------- config + Slack
+
+def _cfg_load():
+    from .config import PATH
+    try:
+        with open(PATH) as fh:
+            cfg = json.load(fh)
+        return cfg if isinstance(cfg, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _cfg_save(cfg):
+    from .config import PATH
+    os.makedirs(os.path.dirname(PATH), exist_ok=True)
+    with open(PATH, "w") as fh:
+        json.dump(cfg, fh, indent=2)
+
+
+def _slack_post(hook, text):
+    """-> None if Slack took it, else the reason it didn't."""
+    try:
+        with urllib.request.urlopen(urllib.request.Request(hook, data=json.dumps({"text": text}).encode(),
+                                    headers={"Content-Type": "application/json"}), timeout=15) as r:
+            body = r.read().decode("utf-8", "replace").strip()
+        return None if body in ("ok", "") else body
+    except urllib.error.HTTPError as e:
+        return "HTTP %d %s" % (e.code, e.read().decode("utf-8", "replace")[:100])
+    except (OSError, ValueError) as e:
+        return str(e)
+
+
+def slack(value):
+    """`tokentrim slack <webhook URL>` posts weekly totals there; `off` stops; no argument shows it."""
+    require()
+    cfg = _cfg_load()
+    if value is None:
+        return print("Slack: %s" % ("on (weekly totals only)" if cfg.get("slack_webhook") else
+                     "off. Create an incoming webhook (https://api.slack.com/messaging/webhooks), then: tokentrim slack <URL>"))
+    if value == "off":
+        cfg.pop("slack_webhook", None)
+        _cfg_save(cfg)
+        return print("Slack: off")
+    if not value.startswith("https://hooks.slack.com/"):
+        sys.exit("That isn't a Slack incoming-webhook URL (it starts with https://hooks.slack.com/).")
+    err = _slack_post(value, "tokentrim is connected. Weekly totals will be posted here on Mondays.")
+    if err:
+        sys.exit("Slack didn't accept the test message (%s). Nothing was saved." % err)
+    cfg["slack_webhook"] = value
+    _cfg_save(cfg)
+    print("Slack: on. A test message was posted; weekly totals follow every Monday (run `tokentrim digest --install`).")
+
+
 # ---------- weekly digest
 
 def _week(data, days=7):
@@ -160,13 +213,44 @@ def digest(post=True):
     print(text + "\nsaved -> " + out)
     hook = cfg.get("slack_webhook") or os.environ.get("TOKENTRIM_SLACK_WEBHOOK")
     if post and hook:  # totals only: conversation titles stay on this machine
-        body = {"text": "\n".join(l for l in lines[2:5 + bool(budget)])}
-        urllib.request.urlopen(urllib.request.Request(hook, data=json.dumps(body).encode(),
-                               headers={"Content-Type": "application/json"}), timeout=15)
-        print("posted to Slack")
-    if budget and w["tokens"] >= 0.8 * budget:
-        _notify("tokentrim: %d%% of weekly budget used" % round(100 * w["tokens"] / budget))
+        err = _slack_post(hook, "\n".join(lines[2:5 + bool(budget)]))
+        print("posted to Slack" if not err else "Slack post failed: %s" % err)
+    _budget_alert(w, budget)
     return out
+
+
+def _budget_alert(w, budget):
+    """Notify once a week when the last 7 days pass 80% (and again at 100%) of the budget."""
+    if not budget or w["tokens"] < 0.8 * budget:
+        return False
+    level = 100 if w["tokens"] >= budget else 80
+    mark = os.path.expanduser("~/.cache/tokentrim/budget-alert-%s-%d" % (datetime.date.today().strftime("%G-W%V"), level))
+    if os.path.exists(mark):
+        return False
+    os.makedirs(os.path.dirname(mark), exist_ok=True)
+    open(mark, "w").close()
+    _notify("tokentrim: %d%% of your weekly budget used (%s of %s tokens in the last 7 days)"
+            % (round(100 * w["tokens"] / budget), _fmt_tokens(w["tokens"]), _fmt_tokens(budget)))
+    return True
+
+
+def _fmt_tokens(n):
+    from .share import _fmt
+    return _fmt(n)
+
+
+def check():
+    """Daily run (LaunchAgent): the full digest on Mondays, otherwise just the budget check."""
+    if datetime.date.today().weekday() == 0:
+        return digest()
+    require()
+    from .share import load
+    budget = _cfg_load().get("weekly_budget_tokens")
+    if not budget:
+        return print("no weekly budget set")
+    w = _week(load(rebuild=True))
+    if not _budget_alert(w, budget):
+        print("budget: %d%% used in the last 7 days" % round(100 * w["tokens"] / budget))
 
 
 def _notify(msg):
@@ -179,40 +263,42 @@ def _notify(msg):
 def budget(value):
     """`tokentrim budget 2B` sets a weekly token budget; `tokentrim budget off` clears it."""
     require()
-    from .config import PATH
-    try:
-        with open(PATH) as fh:
-            cfg = json.load(fh)
-    except (OSError, ValueError):
-        cfg = {}
+    cfg = _cfg_load()
     if value == "off":
         cfg.pop("weekly_budget_tokens", None)
     else:
         mult = {"k": 1e3, "m": 1e6, "b": 1e9}.get(value[-1].lower(), 1)
-        cfg["weekly_budget_tokens"] = int(float(value.rstrip("kKmMbB")) * mult)
-    os.makedirs(os.path.dirname(PATH), exist_ok=True)
-    with open(PATH, "w") as fh:
-        json.dump(cfg, fh, indent=2)
-    print("weekly budget:", cfg.get("weekly_budget_tokens", "off"))
+        try:
+            cfg["weekly_budget_tokens"] = int(float(value.rstrip("kKmMbB")) * mult)
+        except ValueError:
+            sys.exit("usage: tokentrim budget 2B|500M|off")
+    _cfg_save(cfg)
+    if value == "off":
+        return print("weekly budget: off")
+    print("weekly budget: %s tokens over the last 7 days, checked every morning at 9:00; you get a notification at 80%%."
+          % _fmt_tokens(cfg["weekly_budget_tokens"]))
+    if sys.platform == "darwin" and not os.path.exists(AGENT):
+        install_digest()
 
 
 def install_digest():
-    """Run the digest every Monday 09:00 (macOS LaunchAgent)."""
+    """Every day at 09:00 (macOS LaunchAgent): budget check, plus the full digest on Mondays."""
     require()
     from . import cli
     plist = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
 <key>Label</key><string>com.tokentrim.digest</string>
-<key>ProgramArguments</key><array><string>/usr/bin/env</string><string>python3</string><string>%s</string><string>digest</string></array>
-<key>StartCalendarInterval</key><dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+<key>ProgramArguments</key><array><string>/usr/bin/env</string><string>python3</string><string>%s</string><string>digest</string><string>--auto</string></array>
+<key>StartCalendarInterval</key><dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
 <key>StandardOutPath</key><string>%s</string><key>StandardErrorPath</key><string>%s</string>
 <key>Nice</key><integer>10</integer>
 </dict></plist>
 """ % (os.path.join(cli.ROOT, "bin", "tokentrim"), os.path.expanduser("~/.cache/tokentrim/digest.log"),
        os.path.expanduser("~/.cache/tokentrim/digest.log"))
+    os.makedirs(os.path.dirname(AGENT), exist_ok=True)
     with open(AGENT, "w") as fh:
         fh.write(plist)
     subprocess.run(["launchctl", "unload", AGENT], capture_output=True)
     subprocess.run(["launchctl", "load", AGENT], capture_output=True)
-    print("weekly digest scheduled: Mondays 09:00 ->", AGENT)
+    print("scheduled: budget check daily at 09:00, digest on Mondays ->", AGENT)

@@ -130,8 +130,8 @@ The free tool is the whole token-cutting engine and stays free and open source. 
 |---|---|---|
 | Hooks, profiles, audit, replay, dashboard, share card | ✓ | ✓ |
 | `tokentrim digest`: plain-English weekly report, every Monday | | ✓ |
-| `tokentrim budget 2B`: weekly token budget, alert at 80% | | ✓ |
-| Slack weekly totals (opt-in, totals only) | | ✓ |
+| `tokentrim budget 2B`: weekly token budget, checked every morning, notification at 80% | | ✓ |
+| `tokentrim slack <webhook>`: weekly totals in Slack (opt-in, totals only, test message first) | | ✓ |
 | `tokentrim live --cloud`: hosted real-time dashboard with settings relay, sign in with your license key | | ✓ |
 
 **$49 lifetime for the first 500 buyers, then $9/month.** [Get tokentrim Pro](https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva) (checkout by Polar, which handles sales tax). Your license key arrives by email. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine. Billing or license help: [support@boltak.com](mailto:support@boltak.com).
