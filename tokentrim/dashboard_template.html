@@ -22,6 +22,7 @@ nav a:hover{background:var(--chip);color:var(--ink)}
 .right{margin-left:auto;color:var(--mute);font-size:12px;display:flex;gap:10px;align-items:center}
 button,select,input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
 button{cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:0;padding:8px 14px;font-weight:600;border-radius:8px;margin-right:8px}
 main{max-width:1240px;margin:0 auto;padding:16px}
 section{margin:0 0 22px}
 h2{font-size:17px;margin:0 0 4px}
@@ -93,6 +94,8 @@ dl.gl dt{font-weight:600}dl.gl dd{margin:0;color:var(--mute)}
     <p class="lead" id="hero-lead"></p>
     <div id="hero-cmp"></div>
     <div class="note" id="hero-note"></div>
+    <div style="margin-top:12px"><button id="share-btn" class="btn">Share my savings (PNG)</button>
+      <span class="note">Only totals go on the image: no prompts, files or project names.</span></div>
   </div>
   <div class="grid k6" id="hero-kpis" style="margin-top:12px"></div>
   <div class="grid k2" style="margin-top:12px">
@@ -512,6 +515,28 @@ function renderHero(){
   tips.push('Unused connectors add their tool list to every step. Turn off the ones you rarely use.');
   $('#tips').innerHTML = tips.map(t => `<li>${t}</li>`).join('');
 }
+
+function shareCard(){
+  const rp = D.replay, prof = D.profile || 'strong', withT = rp[prof] || rp.strong, without = rp.orig;
+  const share = 1 - withT / Math.max(without, 1), x = without / Math.max(withT, 1);
+  let crTok = 0, crUsd = 0;
+  for (const ms of Object.values(D.daily)) for (const [m, r] of Object.entries(ms)) { crTok += r[0]; crUsd += cost(m, r[0], 0, 0, 0); }
+  const usd = (without - withT) * crUsd / Math.max(crTok, 1);
+  const c = document.createElement('canvas'); c.width = 1200; c.height = 630; const g = c.getContext('2d');
+  const F = (w, sz) => `${w} ${sz}px -apple-system,Segoe UI,Helvetica,Arial,sans-serif`;
+  g.fillStyle = '#0f1115'; g.fillRect(0, 0, 1200, 630);
+  g.fillStyle = '#9aa3b2'; g.font = F(400, 34); g.fillText('My Claude Code, with tokentrim', 70, 110);
+  g.fillStyle = '#4ade80'; g.font = F(800, 120); g.fillText(Math.round(share * 100) + '% less', 70, 230);
+  g.fillStyle = '#e6e9ef'; g.font = F(400, 34); g.fillText(`history re-read, on my own ${S.length.toLocaleString()} conversations`, 70, 290);
+  const ww = Math.max(820 * withT / Math.max(without, 1), 6), rr = (x0, y, w, col) => { g.fillStyle = col; g.beginPath(); g.roundRect(x0, y, w, 36, 8); g.fill(); };
+  g.font = F(400, 24); g.fillStyle = '#9aa3b2'; g.fillText('Without', 70, 370); g.fillText('With', 70, 430);
+  rr(210, 345, 820, '#f08a5d'); rr(210, 405, ww, '#4ade80');
+  g.font = F(700, 26); g.fillStyle = '#e6e9ef'; g.fillText(fmt(without), 1045, 372); g.fillText(fmt(withT), 210 + ww + 15, 432);
+  g.font = F(400, 30); g.fillText(`Usage limits last ${x.toFixed(1)}× longer · ~${money(usd)} at API prices`, 70, 520);
+  g.fillStyle = '#6b7280'; g.font = F(400, 24); g.fillText('github.com/suncal/tokentrim · measured by replaying real transcripts, not a benchmark', 70, 585);
+  const a = document.createElement('a'); a.download = 'tokentrim-savings.png'; a.href = c.toDataURL('image/png'); a.click();
+}
+document.addEventListener('click', e => { if (e.target.id === 'share-btn') shareCard(); });
 
 function renderAll(){ if (!D) return; renderHero(); renderOverview(); renderBA(); renderTimeline(); renderWhere(); renderSavings(); renderPrices(); renderModels(); renderSessions(); renderFloor(); }
 $('#tl-mode').onchange = renderTimeline; $('#tl-range').onchange = renderTimeline;

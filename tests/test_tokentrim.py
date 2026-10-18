@@ -204,5 +204,57 @@ class Install(unittest.TestCase):
             self.assertEqual(fh.read(), "# my notes\n")
 
 
+def _fake_data():
+    import time
+    now = time.time()
+    return {"profile": "strong", "replay": {"orig": 1_000_000, "trimmed": 900_000, "strong": 250_000},
+            "daily": {"2026-01-01": {"claude-opus-5": [1_000_000, 0, 0, 0, 1]}},
+            "savings": {"daily": {}},
+            "sessions": [{"start": now - 86400 * 60, "end": now, "title": "secret project", "calls": 400,
+                          "cr": 10, "sub": [0, 0, 0, 0, 0]}]}
+
+
+class Share(unittest.TestCase):
+    def test_summary_math(self):
+        from tokentrim.share import summary
+        s = summary(_fake_data())
+        self.assertAlmostEqual(s["share"], 0.75)
+        self.assertAlmostEqual(s["times"], 4.0)
+        self.assertAlmostEqual(s["usd"], 750_000 * 0.5 / 1e6)  # opus cache read = $0.50/M
+
+    def test_card_has_totals_only(self):
+        from tokentrim.share import summary, svg
+        card = svg(summary(_fake_data()))
+        self.assertIn("75% less", card)
+        self.assertNotIn("secret project", card)
+
+
+class Pro(unittest.TestCase):
+    def test_free_user_is_gated(self):
+        from tokentrim import pro
+        with tempfile.TemporaryDirectory() as d:
+            old, pro.LICENSE = pro.LICENSE, os.path.join(d, "license.json")
+            try:
+                self.assertFalse(pro.is_pro())
+                with self.assertRaises(SystemExit):
+                    pro.require()
+            finally:
+                pro.LICENSE = old
+
+    def test_recent_license_works_offline(self):
+        import time
+        from tokentrim import pro
+        with tempfile.TemporaryDirectory() as d:
+            old, pro.LICENSE = pro.LICENSE, os.path.join(d, "license.json")
+            try:
+                pro._save({"key": "k", "instance": "i", "checked": time.time()})
+                self.assertTrue(pro.is_pro())  # inside RECHECK: no network call
+            finally:
+                pro.LICENSE = old
+
+    def test_week_counts_long_sessions(self):
+        from tokentrim import pro
+        self.assertEqual(pro._week(_fake_data())["long"], 1)
+
 if __name__ == "__main__":
     unittest.main()

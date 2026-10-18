@@ -2,6 +2,10 @@
 
 **Cut what Claude Code re-reads on every step, measured on your own sessions.**
 
+![74% less history re-read on 115 real conversations; usage limits last 3.9x longer](docs/savings.png)
+
+**What you're missing out on without it:** Claude Code re-reads your *whole* conversation on every step. On the author's real usage, 74% of that re-reading was avoidable. Run `bin/tokentrim replay` to get **your own** number in about a minute, before installing anything.
+
 Most "save 90% tokens" tools shrink tool output. That's the wrong target. In an agent loop, about 98% of the input tokens you're billed for are **cache reads**: Claude Code re-sends the *entire* context on every API call. A session carrying 400k tokens of context pays for those 400k again on each step.
 
 tokentrim does three things:
@@ -54,12 +58,32 @@ bin/tokentrim replay                 # what tokentrim would have saved, on your 
 bin/tokentrim install                # strong profile; or --profile balanced|max, --no-guidance
 bin/tokentrim status                 # what's installed + recent hook activity
 bin/tokentrim serve                  # live dashboard at http://localhost:4747 (--install: keep it running at login)
+bin/tokentrim share                  # your savings card as a PNG to post (totals only, nothing private)
 bin/tokentrim uninstall              # removes exactly what install added
 ```
 
 `install` backs up `~/.claude/settings.json` first, keeps all your existing hooks and env, and is idempotent. New sessions pick it up.
 
 Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Set `"enabled": false` to switch every hook off instantly.
+
+## The dashboard
+
+`bin/tokentrim serve` opens a plain-English dashboard: **with tokentrim vs without it** on your own conversations, what you'd be missing out on, tips, usage by day, every conversation's size over time, and a glossary for the jargon. The details (sources, fixed floor, replay profiles) are one click down. **Share my savings** saves the card above with your numbers.
+
+## Pro
+
+The free tool is the whole token-cutting engine and stays free and open source. **tokentrim Pro** keeps the savings going without you watching a dashboard:
+
+| | Free | Pro |
+|---|---|---|
+| Hooks, profiles, audit, replay, dashboard, share card | ✓ | ✓ |
+| `tokentrim digest`: plain-English weekly report, every Monday | | ✓ |
+| `tokentrim budget 2B`: weekly token budget, alert at 80% | | ✓ |
+| Slack weekly totals (opt-in, totals only) | | ✓ |
+
+**$49 lifetime for the first 500 buyers, then $9/month.** Checkout opens at launch. Star or watch the repo to hear about it. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine.
+
+**Teams:** a shared dashboard of everyone's spend and savings, with budgets, is in the works. **Paid audit:** want a teardown of where your team's Claude spend goes, with a fix list? Open an issue titled "audit" and I'll be in touch.
 
 ## Pairs well with
 

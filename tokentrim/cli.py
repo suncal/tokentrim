@@ -9,6 +9,12 @@
   tokentrim dashboard [--no-open] full usage + savings dashboard (dashboard.html)
   tokentrim serve [--port N]      live dashboard at http://localhost:4747 (auto-refreshing)
   tokentrim serve --install       keep it running at login; --uninstall removes that
+  tokentrim share [--out DIR]     savings card to post (totals only, no prompts or paths)
+
+Pro (https://github.com/suncal/tokentrim#pro):
+  tokentrim pro [activate KEY | deactivate]   license status / activate / free this seat
+  tokentrim digest [--install]    plain-English weekly report (+ Slack, budget alert); --install: Mondays 9am
+  tokentrim budget 2B|off         weekly token budget; notifies at 80%
 """
 import json
 import os
@@ -219,6 +225,23 @@ def main(argv=None):
             dashboard.uninstall_agent()
         else:
             dashboard.serve(port, open_it="--no-open" not in argv)
+    elif cmd == "share":
+        from .share import write as share
+        share(argv[argv.index("--out") + 1] if "--out" in argv else None, open_it="--no-open" not in argv)
+    elif cmd == "pro":
+        from . import pro
+        if argv[:1] == ["activate"] and len(argv) > 1:
+            pro.activate(argv[1])
+        elif argv[:1] == ["deactivate"]:
+            pro.deactivate()
+        else:
+            pro.status()
+    elif cmd == "digest":
+        from . import pro
+        pro.install_digest() if "--install" in argv else pro.digest(post="--no-post" not in argv)
+    elif cmd == "budget":
+        from . import pro
+        pro.budget(argv[0] if argv else sys.exit("usage: tokentrim budget 2B|off"))
     elif cmd == "fixed":
         fixed()
     else:
