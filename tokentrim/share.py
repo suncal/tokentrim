@@ -12,12 +12,12 @@ from . import cli
 
 STATE = os.path.expanduser("~/.cache/tokentrim")
 # $ per million tokens: input, output (cache read = 0.1x input)
-PRICES = {"opus": (5, 25), "sonnet": (3, 15), "haiku": (1, 5), "other": (3, 15)}
+PRICES = {"opus": (5, 25), "sonnet": (3, 15), "haiku": (1, 5), "fable": (3, 15), "other": (3, 15)}  # fable: list price not public, Sonnet-class estimate
 
 
 def _fam(model):
     m = model.lower()
-    return next((f for f in ("opus", "sonnet", "haiku") if f in m), "other")
+    return next((f for f in ("opus", "sonnet", "haiku", "fable") if f in m), "other")
 
 
 def load(rebuild=False):

@@ -10,6 +10,9 @@
   tokentrim serve [--port N]      live dashboard at http://localhost:4747 (auto-refreshing)
   tokentrim serve --install       keep it running at login; --uninstall removes that
   tokentrim live                  real-time savings page (http://localhost:4747/live)
+  tokentrim live --cloud          Pro: hosted real-time dashboard, sign in with your license key
+                                  (--titles to include chat titles, --no-control: page can't change settings,
+                                   --rotate: new link, old one stops working, `--cloud off` to stop)
   tokentrim live --deploy         also put it on your Cloudflare account, to open from anywhere
   tokentrim live --link           print the private link to the remote page
   tokentrim share [--out DIR]     savings card to post (totals only, no prompts or paths)
@@ -74,11 +77,15 @@ def _load_settings():
         return {}
 
 
-def _save_settings(s):
+def _save_settings(s, rolling=False):
+    """rolling: dashboard clicks keep one backup that each change replaces, instead of a new file per click."""
     if os.path.exists(SETTINGS):
-        backup = "%s.bak-tokentrim-%s" % (SETTINGS, time.strftime("%Y%m%d-%H%M%S"))
-        shutil.copy2(SETTINGS, backup)
-        print("  backup     ->", backup)
+        if rolling:
+            shutil.copy2(SETTINGS, SETTINGS + ".bak-tokentrim-dashboard")
+        else:
+            backup = "%s.bak-tokentrim-%s" % (SETTINGS, time.strftime("%Y%m%d-%H%M%S"))
+            shutil.copy2(SETTINGS, backup)
+            print("  backup     ->", backup)
     os.makedirs(os.path.dirname(SETTINGS), exist_ok=True)
     tmp = SETTINGS + ".tmp"
     with open(tmp, "w") as fh:
@@ -134,6 +141,16 @@ def uninstall():
         if not s["hooks"][event]:
             del s["hooks"][event]
     marker = s.pop("tokentrim", {}) or {}
+    for where, value in (marker.get("prev") or {}).items():   # smart settings: put the user's own values back
+        if where.startswith("env."):
+            if value is None:
+                (s.get("env") or {}).pop(where[4:], None)
+            else:
+                s.setdefault("env", {})[where[4:]] = value
+        elif value is None:
+            s.pop(where, None)
+        else:
+            s[where] = value
     env = s.get("env") or {}
     if "prev_window" in marker:
         env["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = marker["prev_window"]
@@ -230,7 +247,11 @@ def main(argv=None):
             dashboard.serve(port, open_it="--no-open" not in argv)
     elif cmd == "live":
         from . import live
-        if "--deploy" in argv:
+        if "--cloud" in argv:
+            key = argv[argv.index("--key") + 1] if "--key" in argv else None
+            live.cloud(key, titles="--titles" in argv, off="off" in argv, rotate="--rotate" in argv,
+                       control="--no-control" not in argv)
+        elif "--deploy" in argv:
             live.deploy(titles="--titles" in argv)
         elif "--link" in argv:
             live.link()

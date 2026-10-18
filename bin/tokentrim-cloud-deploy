@@ -1,0 +1,15 @@
+#!/bin/sh
+# Maintainer only: deploy the hosted Pro dashboard (tokentrim/cloud) to Cloudflare.
+#   bin/tokentrim-cloud-deploy              deploy code
+#   bin/tokentrim-cloud-deploy --comp FILE  also set COMP_KEYS (comma-separated free keys) from FILE, never echoed
+set -e
+here=$(cd "$(dirname "$0")/.." && pwd)
+build=$(mktemp -d "${TMPDIR:-/tmp}/tokentrim-cloud-XXXXXX")
+trap 'rm -rf "$build"' EXIT
+cp "$here/tokentrim/cloud/worker.js" "$here/tokentrim/cloud/wrangler.toml" "$here/tokentrim/live.html" "$build/"
+cd "$build"
+npx --yes wrangler@4 deploy
+if [ "$1" = "--comp" ] && [ -n "$2" ]; then
+  tr -d '\n' < "$2" | npx --yes wrangler@4 secret put COMP_KEYS >/dev/null
+  echo "COMP_KEYS set from $2"
+fi

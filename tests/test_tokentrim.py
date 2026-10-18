@@ -285,5 +285,120 @@ class LiveTest(unittest.TestCase):
         self.assertEqual(c.cf, 50_000)
 
 
+class SmartTest(unittest.TestCase):
+    """Daily budget, cold cache and model advisor (hook side), smart settings (controls side). All in a temp HOME."""
+    def setUp(self):
+        self.home = tempfile.mkdtemp()
+
+    def _write(self, rel, obj):
+        path = os.path.join(self.home, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as fh:
+            json.dump(obj, fh)
+
+    def _today(self, cost, ttl=300):
+        import time
+        self._write(".cache/tokentrim/today.json", {"day": time.strftime("%Y-%m-%d"), "ts": time.time(), "cost": cost, "ttl": ttl, "price_in": 5})
+
+    def _transcript(self, ctx, model, ago):
+        import time
+        path = os.path.join(self.home, "t.jsonl")
+        ts = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(time.time() - ago))
+        with open(path, "w") as fh:
+            fh.write(json.dumps({"type": "assistant", "timestamp": ts, "message": {"model": model, "usage": {
+                "input_tokens": 10, "cache_read_input_tokens": ctx, "cache_creation_input_tokens": 0, "output_tokens": 5}}}) + "\n")
+        return path
+
+    def test_budget_blocks_unless_overridden(self):
+        self._write(".config/tokentrim/config.json", {"budget_guard": True, "budget_usd": 10, "budget_block": True})
+        self._today(12.5)
+        out = run_hook("prompt", {"prompt": "add a test", "session_id": "b"}, self.home)
+        self.assertEqual(out["decision"], "block")
+        self.assertIn("$10", out["reason"])
+        out = run_hook("prompt", {"prompt": "++ add a test", "session_id": "b"}, self.home)
+        self.assertNotEqual((out or {}).get("decision"), "block")
+
+    def test_budget_warns_without_block(self):
+        self._write(".config/tokentrim/config.json", {"budget_guard": True, "budget_usd": 10})
+        self._today(8.5)
+        out = run_hook("prompt", {"prompt": "go", "session_id": "w"}, self.home)
+        self.assertIn("budget", out["systemMessage"])
+        self.assertIsNone(run_hook("prompt", {"prompt": "go", "session_id": "w"}, self.home))   # said once
+
+    def test_cold_cache_after_long_pause(self):
+        self._today(1, ttl=300)
+        t = self._transcript(120_000, "claude-sonnet-4-5", ago=20 * 60)
+        out = run_hook("prompt", {"prompt": "continue", "session_id": "c", "transcript_path": t}, self.home)
+        self.assertIn("cache has expired", out["systemMessage"])
+        t = self._transcript(120_000, "claude-sonnet-4-5", ago=60)
+        out = run_hook("prompt", {"prompt": "continue", "session_id": "c2", "transcript_path": t}, self.home) or {}
+        self.assertNotIn("cache has expired", out.get("systemMessage", ""))   # still warm
+
+    def test_advisor_on_quick_opus_job_only(self):
+        t = self._transcript(10_000, "claude-opus-4-1", ago=30)
+        out = run_hook("prompt", {"prompt": "fix the typo in the readme", "session_id": "a", "transcript_path": t}, self.home)
+        self.assertIn("/model sonnet", out["systemMessage"])
+        out = run_hook("prompt", {"prompt": "debug why the cache rebuilds", "session_id": "a2", "transcript_path": t}, self.home)
+        self.assertIsNone(out)
+
+    def test_claude_settings_remember_and_restore(self):
+        from tokentrim import controls
+        s = {"model": "opus"}
+        controls._claude_set(s, "model_mode", "auto")
+        self.assertEqual(s["model"], "opusplan")
+        controls._claude_set(s, "model_mode", "sonnet")
+        self.assertEqual(s["tokentrim"]["prev"]["model"], "opus")   # the user's own value, not ours
+        controls._claude_set(s, "model_mode", "off")
+        self.assertEqual(s["model"], "opus")
+        controls._claude_set(s, "subagent_model", "haiku")
+        self.assertEqual(s["env"]["CLAUDE_CODE_SUBAGENT_MODEL"], "haiku")
+        controls._claude_set(s, "subagent_model", "off")
+        self.assertNotIn("env", s)
+
+    def test_off_keeps_a_model_picked_later(self):
+        from tokentrim import controls
+        s = {"model": "opus"}
+        controls._claude_set(s, "model_mode", "auto")
+        s["model"] = "haiku"                      # the user picked a model with /model afterwards
+        controls._claude_set(s, "model_mode", "off")
+        self.assertEqual(s["model"], "haiku")
+
+    def test_support_names_old_versions(self):
+        from tokentrim import controls
+        sup = controls.support({"app": "2.1.299", "cli": "2.1.69"})
+        self.assertIsNone(sup["model_mode"])
+        self.assertIn("2.1.69", sup["cache_ttl"])
+        self.assertTrue(controls.support({"cli": "2.1.69"})["cache_ttl"].startswith("Needs"))
+
+    def test_validate_rejects_bad_choices(self):
+        from tokentrim import controls
+        for bad in ({"model_mode": "opus"}, {"budget_usd": 7}, {"budget_usd": True}, {"effort": "max"}):
+            with self.assertRaises(ValueError):
+                controls.validate(bad)
+        self.assertEqual(controls.validate({"budget_usd": 20, "model_mode": "auto"}), {"budget_usd": 20, "model_mode": "auto"})
+
+    def test_uninstall_restores_users_model(self):
+        from tokentrim import controls
+        d = tempfile.mkdtemp()
+        old = cli.SETTINGS, cli.CLAUDE_MD
+        cli.SETTINGS, cli.CLAUDE_MD = os.path.join(d, "settings.json"), os.path.join(d, "CLAUDE.md")
+        with open(cli.SETTINGS, "w") as fh:
+            json.dump({"model": "opus", "effortLevel": "high"}, fh)
+        sys.stdout, real = io.StringIO(), sys.stdout
+        try:
+            cli.install("strong")
+            s = cli._load_settings()
+            controls._claude_set(s, "model_mode", "auto")
+            controls._claude_set(s, "effort", "low")
+            cli._save_settings(s)
+            cli.uninstall()
+            with open(cli.SETTINGS) as fh:
+                s = json.load(fh)
+            self.assertEqual((s["model"], s["effortLevel"]), ("opus", "high"))
+        finally:
+            sys.stdout = real
+            cli.SETTINGS, cli.CLAUDE_MD = old
+
+
 if __name__ == "__main__":
     unittest.main()

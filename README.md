@@ -100,6 +100,24 @@ Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.p
 
 Want it on your phone? `bin/tokentrim live --deploy` puts the page on your own Cloudflare account (the free plan is enough) behind a private key, and your Mac pushes **totals and project folder names only** every few seconds: no prompts, titles or code. `bin/tokentrim live --link` prints the link again.
 
+### Smart features (change Claude Code from the dashboard)
+
+The live view has switches that write straight into your Claude Code settings. Your own values are saved first and come back when you switch a feature off (or run `tokentrim uninstall`); a model you pick later with `/model` is left alone.
+
+| Switch | What it writes | When it applies |
+|---|---|---|
+| Smart model: Auto / Sonnet | `model` = `opusplan` (Opus plans, Sonnet does the work) or `sonnet` | new sessions |
+| Sub-agent model | `CLAUDE_CODE_SUBAGENT_MODEL` = sonnet or haiku | new sessions |
+| Thinking effort | `effortLevel` = medium or low | new sessions |
+| Cache lifetime | `promptCacheTtl` = 1h (API-key users; subscriptions already get 1 hour) | new sessions |
+| Daily budget guard / hard stop | warns at 80% and 100% of a daily $ cap; hard stop holds prompts (start with `++` to send anyway) | next message |
+| Cold-cache alert | back after the cache expired? says what the next message will re-write | next message |
+| Model advisor | quick chores on Opus get a "Sonnet does this cheaper" note | next message |
+
+The page shows which Claude Code versions on your Mac read each setting. Older ones silently ignore them, so run `claude update` if it says so. Recommendations come with a one-click **Apply**. Clicks from your phone or the Pro cloud are relayed to your Mac, which only accepts these keys with these values.
+
+There's no per-prompt model switching in Claude Code, so "Auto" is Claude Code's own opusplan plus the cheaper sub-agent model, lower effort and the advisor.
+
 ## The dashboard
 
 `bin/tokentrim serve` opens a plain-English dashboard: **with tokentrim vs without it** on your own conversations, what you'd be missing out on, tips, usage by day, every conversation's size over time, and a glossary for the jargon. The details (sources, fixed floor, replay profiles) are one click down. **Share my savings** saves the card above with your numbers.
@@ -114,6 +132,7 @@ The free tool is the whole token-cutting engine and stays free and open source. 
 | `tokentrim digest`: plain-English weekly report, every Monday | | ✓ |
 | `tokentrim budget 2B`: weekly token budget, alert at 80% | | ✓ |
 | Slack weekly totals (opt-in, totals only) | | ✓ |
+| `tokentrim live --cloud`: hosted real-time dashboard with settings relay, sign in with your license key | | ✓ |
 
 **$49 lifetime for the first 500 buyers, then $9/month.** [Get tokentrim Pro](https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva) (checkout by Polar, which handles sales tax). Your license key arrives by email. Activate with `bin/tokentrim pro activate <key>`. The license check sends only your key and a machine label; usage data never leaves your machine. Billing or license help: [support@boltak.com](mailto:support@boltak.com).
 

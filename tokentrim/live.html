@@ -5,323 +5,1075 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>tokentrim live</title>
 <meta name="robots" content="noindex">
+<meta name="description" content="Real-time token usage and savings for Claude Code.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2310b981'/%3E%3Cpath d='M8 11h16M8 16h11M8 21h6' stroke='%23052e1f' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<!--TT_MODE-->
 <style>
-/* Layout: status bar, a hero counter beside rate gauges, the 60-minute chart, then live conversations,
-   insights and the event feed in a responsive grid. Dark by default: it's a monitor you leave open. */
+/* A monitor you leave open: dark by default, quiet surfaces, colour only where it carries meaning.
+   green = saved / with tokentrim, orange = what it would have been without, blue = info, amber/red = attention. */
 :root{
-  --bg:#07090c;--panel:#0e1217;--panel2:#131922;--line:#1e2631;--ink:#e8edf3;--mute:#8592a3;--dim:#56616f;
-  --good:#22d39b;--good2:#0f8f68;--would:#f0884f;--warn:#f5b84a;--bad:#f2645b;--info:#7aa7ff;
-  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Helvetica,Arial,sans-serif;
+  --bg:#06080b;--bg2:#0a0d12;--panel:#0d1117;--panel2:#121821;--line:#1b232e;--line2:#253041;
+  --ink:#eef2f6;--ink2:#c5cdd8;--mute:#8592a3;--dim:#525d6b;
+  --good:#2ee6a6;--good-soft:rgba(46,230,166,.14);--would:#ff9a5c;--would-soft:rgba(255,154,92,.13);
+  --used:#5aa9ff;--warn:#f7c04f;--bad:#ff6b63;--info:#8ab4ff;--violet:#b394ff;
+  --shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px -12px rgba(0,0,0,.6);
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Helvetica,Arial,sans-serif;
   color-scheme:dark}
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
-  --bg:#f4f6f8;--panel:#fff;--panel2:#f7f9fb;--line:#e1e6ec;--ink:#131a22;--mute:#5d6977;--dim:#98a2ae;
-  --good:#0c9f72;--good2:#0c9f72;--would:#d86a2c;--warn:#b7791f;--bad:#cf3b32;--info:#2f62d6;color-scheme:light}}
+  --bg:#f3f5f8;--bg2:#eef1f5;--panel:#fff;--panel2:#f7f9fb;--line:#e3e8ee;--line2:#d5dce5;
+  --ink:#0f1720;--ink2:#2b3746;--mute:#5d6977;--dim:#9aa4b1;
+  --good:#0a9f6e;--good-soft:rgba(10,159,110,.10);--would:#d9692b;--would-soft:rgba(217,105,43,.10);
+  --used:#2f6fe0;--warn:#b7791f;--bad:#d23c33;--info:#2f62d6;--violet:#6b4fd8;
+  --shadow:0 1px 2px rgba(15,23,32,.05),0 8px 24px -14px rgba(15,23,32,.18);color-scheme:light}}
 :root[data-theme="light"]{
-  --bg:#f4f6f8;--panel:#fff;--panel2:#f7f9fb;--line:#e1e6ec;--ink:#131a22;--mute:#5d6977;--dim:#98a2ae;
-  --good:#0c9f72;--good2:#0c9f72;--would:#d86a2c;--warn:#b7791f;--bad:#cf3b32;--info:#2f62d6;color-scheme:light}
+  --bg:#f3f5f8;--bg2:#eef1f5;--panel:#fff;--panel2:#f7f9fb;--line:#e3e8ee;--line2:#d5dce5;
+  --ink:#0f1720;--ink2:#2b3746;--mute:#5d6977;--dim:#9aa4b1;
+  --good:#0a9f6e;--good-soft:rgba(10,159,110,.10);--would:#d9692b;--would-soft:rgba(217,105,43,.10);
+  --used:#2f6fe0;--warn:#b7791f;--bad:#d23c33;--info:#2f62d6;--violet:#6b4fd8;
+  --shadow:0 1px 2px rgba(15,23,32,.05),0 8px 24px -14px rgba(15,23,32,.18);color-scheme:light}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
-.wrap{max-width:1240px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-left)) 48px;display:grid;gap:16px}
-.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.brand{font:700 15px var(--mono);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.brand i{width:22px;height:22px;border-radius:6px;background:var(--good);display:inline-block}
-.pill{display:inline-flex;align-items:center;gap:7px;font:600 12px var(--mono);padding:4px 10px;border-radius:99px;background:var(--panel);border:1px solid var(--line);color:var(--mute)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
-.on .dot{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 1.6s infinite}
-.stale .dot{background:var(--warn)}
-@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 60%,transparent)}100%{box-shadow:0 0 0 9px transparent}}
-.sp{flex:1}
-.top a{color:var(--mute);font-size:13px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
-.lbl{font:600 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
-.hero{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
-.big{font:700 clamp(44px,8vw,84px)/1 var(--mono);letter-spacing:-.03em;color:var(--good);font-variant-numeric:tabular-nums;margin:10px 0 6px}
-.sub{color:var(--mute);font-size:14px}.sub b{color:var(--ink);font-family:var(--mono)}
-.vs{margin-top:16px;display:grid;gap:8px}
-.vsrow{display:grid;grid-template-columns:110px 1fr 84px;gap:10px;align-items:center;font-size:13px;color:var(--mute)}
-.track{height:12px;background:var(--panel2);border-radius:6px;overflow:hidden}
-.fill{height:100%;border-radius:6px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
-.num{font:600 13px var(--mono);text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
-.gauges{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.g{background:var(--panel2);border-radius:10px;padding:14px;display:grid;gap:4px}
-.g b{font:700 26px var(--mono);font-variant-numeric:tabular-nums}
-.g span{font-size:12px;color:var(--mute)}
-.chart{height:200px;position:relative;margin-top:10px}
-canvas{width:100%;height:100%;display:block}
-.legend{display:flex;gap:16px;font-size:12px;color:var(--mute);flex-wrap:wrap}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.grid3{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
-.convs{display:grid;gap:12px;margin-top:12px}
-.conv{background:var(--panel2);border-radius:12px;padding:14px;display:grid;gap:10px;border:1px solid transparent;transition:border-color .4s}
-.conv.flash{border-color:var(--good)}
-.ch{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.ch b{font-weight:600}.ch .t{color:var(--mute);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
-.tag{font:600 11px var(--mono);padding:2px 7px;border-radius:99px;background:var(--panel);color:var(--mute);white-space:nowrap}
-.tag.live{color:var(--good)}
-.cstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;color:var(--mute)}
-.cstats b{display:block;font:600 15px var(--mono);color:var(--ink)}
-.meter{position:relative;height:8px;border-radius:4px;background:var(--panel);overflow:visible}
-.meter .f{height:100%;border-radius:4px;transition:width .9s,background .4s}
-.meter .mk{position:absolute;top:-4px;width:2px;height:16px;background:var(--mute)}
-svg.spark{width:100%;height:54px;display:block}
-.ins{display:grid;gap:10px;margin-top:12px}
-.in{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:14px;align-items:start;animation:fade .5s}
-.in .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 12px var(--mono)}
-.good .ic{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
-.warn .ic{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
-.tip .ic{background:color-mix(in srgb,var(--info) 18%,transparent);color:var(--info)}
-.info .ic{background:var(--panel2);color:var(--mute)}
-.feed{display:grid;gap:2px;margin-top:10px;max-height:420px;overflow:auto}
-.ev{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
-.ev.new{animation:slide .6s}
-.ev time{font:12px var(--mono);color:var(--dim)}
-.ev .p{color:var(--dim);font-size:12px}
-.ev .k{font:600 12px var(--mono)}
-.ev.trim .k{color:var(--good)}.ev.compact .k{color:var(--info)}.ev.jump .k{color:var(--warn)}
-@keyframes slide{from{opacity:0;transform:translateY(-6px);background:color-mix(in srgb,var(--good) 12%,transparent)}to{opacity:1}}
-@keyframes fade{from{opacity:0}to{opacity:1}}
-.rules{display:grid;gap:8px;margin-top:12px}
-.rule{display:grid;grid-template-columns:1fr 70px;gap:4px 10px;font-size:13px}
-.rule .track{grid-column:1/3;height:6px}
-.empty{color:var(--mute);font-size:14px;padding:18px 0}
-.foot{color:var(--dim);font-size:12px;text-align:center}
-.gate{max-width:420px;margin:12vh auto;display:grid;gap:12px;text-align:center}
-.gate input{font:15px var(--mono);padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
-.gate button{font:600 15px var(--sans);padding:12px;border-radius:10px;border:0;background:var(--good);color:#04231a;cursor:pointer}
-@media (max-width:900px){.hero,.grid3{grid-template-columns:1fr}}
-@media (max-width:520px){.gauges{grid-template-columns:1fr 1fr}.cstats{grid-template-columns:1fr 1fr}.vsrow{grid-template-columns:84px 1fr 64px}.g b{font-size:21px}.chart{height:160px}}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"cv11" 1}
+body{background:radial-gradient(1200px 500px at 15% -10%,rgba(46,230,166,.07),transparent 60%),radial-gradient(900px 400px at 100% 0,rgba(90,169,255,.06),transparent 60%),var(--bg);min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--info)}
+.wrap{max-width:1320px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-left)) 56px;display:grid;gap:14px}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono)}
+.mute{color:var(--mute)}.dim{color:var(--dim)}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:4px 0 6px;position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 70%,transparent);backdrop-filter:blur(6px)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:-.01em;font-size:15px}
+.brand svg{width:26px;height:26px}
+.brand small{font:600 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--good);border:1px solid var(--good-soft);background:var(--good-soft);padding:2px 7px;border-radius:99px}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:7px;font:600 11.5px var(--mono);padding:5px 10px;border-radius:99px;background:var(--panel);border:1px solid var(--line);color:var(--mute);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+.dot.live{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
+.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,230,166,.55)}70%{box-shadow:0 0 0 8px rgba(46,230,166,0)}100%{box-shadow:0 0 0 0 rgba(46,230,166,0)}}
+.btn{border:1px solid var(--line2);background:var(--panel);border-radius:9px;padding:6px 11px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.btn:hover{border-color:var(--mute)}
+.btn.on{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.icon{width:32px;padding:6px 0;text-align:center}
+
+/* panels */
+.card{background:linear-gradient(180deg,var(--panel),var(--panel) 60%,var(--bg2));border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);min-width:0}
+.card h2{margin:0 0 12px;font-size:12px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);display:flex;align-items:center;gap:8px}
+.card h2 .r{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500;font-size:12px}
+.grid{display:grid;gap:14px}
+.g-kpi{grid-template-columns:repeat(6,minmax(0,1fr))}
+.g-2{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.g-2b{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1180px){.g-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.g-2,.g-2b,.g-3{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.g-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}}
+
+/* KPIs */
+.kpi .lbl{font-size:11.5px;color:var(--mute);font-weight:600;letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+.kpi .val{font-size:clamp(22px,2.6vw,30px);font-weight:720;letter-spacing:-.02em;margin:4px 0 2px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .sub{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.hero{background:linear-gradient(160deg,rgba(46,230,166,.16),transparent 55%),var(--panel);border-color:rgba(46,230,166,.35)}
+.kpi.hero .val{color:var(--good)}
+.up{color:var(--good)}.down{color:var(--bad)}
+.bar2{height:6px;border-radius:9px;background:var(--would-soft);overflow:hidden;margin-top:8px}
+.bar2 i{display:block;height:100%;background:var(--used);border-radius:9px;transition:width .6s}
+
+/* window */
+.win-top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.win-big{font-size:34px;font-weight:740;letter-spacing:-.02em;line-height:1}
+.track{position:relative;height:16px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);margin:16px 0 6px;overflow:visible}
+.track .fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,var(--used),#7cc3ff);transition:width .6s}
+.track .proj{position:absolute;top:0;bottom:0;border-radius:0 9px 9px 0;background:repeating-linear-gradient(135deg,rgba(90,169,255,.35) 0 6px,rgba(90,169,255,.12) 6px 12px);transition:all .6s}
+.track .peak{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--warn)}
+.track .peak b{position:absolute;top:-18px;transform:translateX(-50%);font:600 10.5px var(--mono);color:var(--warn);white-space:nowrap}
+.track.ghost{height:8px;margin:10px 0 4px}
+.track.ghost .fill{background:var(--would);opacity:.75}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:9px 11px;min-width:0}
+.stat b{display:block;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat span{font-size:11px;color:var(--mute)}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* insights */
+.ins{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ins li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:11px;background:var(--panel2);border:1px solid var(--line);font-size:13px;line-height:1.45;color:var(--ink2)}
+.ins li .tag{flex:none;font:700 9.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:6px;margin-top:1px}
+.ins .warn .tag{background:rgba(247,192,79,.15);color:var(--warn)}
+.ins .good .tag{background:var(--good-soft);color:var(--good)}
+.ins .tip .tag{background:rgba(179,148,255,.15);color:var(--violet)}
+.ins .info .tag{background:rgba(138,180,255,.13);color:var(--info)}
+.ins .warn{border-color:rgba(247,192,79,.35)}
+
+/* charts */
+.chart{position:relative;width:100%;height:210px}
+.chart canvas{position:absolute;inset:0;width:100%;height:100%}
+div.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line2);border-radius:9px;padding:7px 9px;font-size:12px;box-shadow:var(--shadow);white-space:nowrap;display:none;z-index:2}
+.heat{display:grid;grid-template-columns:34px repeat(24,minmax(0,1fr));gap:3px;font:10.5px var(--mono);color:var(--dim)}
+.heat .c{aspect-ratio:1/1;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+.heat .h{text-align:center}
+
+/* conversations */
+.convs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.conv{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px 13px;min-width:0}
+.conv .t{display:flex;align-items:center;gap:8px;min-width:0}
+.conv .t b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.badge{font:600 10.5px var(--mono);padding:2px 7px;border-radius:6px;background:var(--panel);border:1px solid var(--line2);color:var(--mute);white-space:nowrap}
+.badge.g{color:var(--good);border-color:rgba(46,230,166,.35)}
+.badge.w{color:var(--warn);border-color:rgba(247,192,79,.4)}
+.badge.r{color:var(--bad);border-color:rgba(255,107,99,.4)}
+.conv svg{display:block;width:100%;height:64px;margin:8px 0 6px}
+.meter{height:6px;border-radius:9px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--good);transition:width .6s}
+.meter.w i{background:var(--warn)}.meter.r i{background:var(--bad)}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:9px}
+.kv div{min-width:0}.kv b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kv span{font-size:10.5px;color:var(--mute)}
+.empty{color:var(--mute);font-size:13px;padding:18px;text-align:center;border:1px dashed var(--line2);border-radius:12px}
+
+/* breakdown lists */
+.rows{display:grid;gap:9px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:13px}
+.row .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .v{color:var(--mute);font-size:12px;text-align:right;white-space:nowrap}
+.row .b{grid-column:1/-1;height:5px;border-radius:9px;background:var(--line);overflow:hidden}
+.row .b i{display:block;height:100%;border-radius:9px}
+
+/* feed */
+.feed{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:330px;overflow:auto}
+.feed li{display:grid;grid-template-columns:62px 18px minmax(0,1fr);gap:8px;padding:6px 4px;border-bottom:1px solid var(--line);font-size:12.5px;align-items:baseline}
+.feed li .w{color:var(--dim);font:11px var(--mono)}
+.feed li .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+
+/* log */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 0 0 1px var(--line2)}
+.seg button .c{font:600 10.5px var(--mono);color:var(--dim);margin-left:4px}
+.inp{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12.5px;min-width:0}
+.inp:focus{outline:2px solid var(--good-soft);border-color:var(--good)}
+.wrap>*{min-width:0}   /* grid children may shrink: wide tables scroll inside their card instead of widening the page */
+.tablewrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;min-width:980px}
+th{position:sticky;top:0;background:var(--panel2);text-align:right;font-weight:650;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:1}
+td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:nth-child(-n+4),td:nth-child(-n+4){text-align:left}
+td.conv-c{max-width:260px;overflow:hidden;text-overflow:ellipsis}
+tbody tr:hover td{background:var(--panel2)}
+tr.new td{animation:flash 2.4s ease-out}
+@keyframes flash{0%{background:rgba(46,230,166,.18)}100%{background:transparent}}
+.k{font:600 10.5px var(--mono);padding:2px 7px;border-radius:6px;white-space:nowrap}
+.k-step{background:rgba(90,169,255,.12);color:var(--used)}
+.k-trim{background:var(--good-soft);color:var(--good)}
+.k-compact{background:rgba(179,148,255,.15);color:var(--violet)}
+.k-rebuild{background:rgba(247,192,79,.15);color:var(--warn)}
+.k-agent{background:var(--panel);color:var(--mute);border:1px solid var(--line2)}
+tfoot td{position:sticky;bottom:0;background:var(--panel2);font-weight:700;border-top:1px solid var(--line2)}
+.g{color:var(--good)}.o{color:var(--would)}
+
+/* gate + footer */
+.gate{max-width:440px;margin:12vh auto;padding:28px;text-align:left}
+.gate h1{font-size:22px;margin:12px 0 6px;letter-spacing:-.01em}
+.gate p{color:var(--mute);margin:0 0 16px}
+.gate form{display:flex;gap:8px}
+.gate input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2)}
+.gate .err{color:var(--bad);font-size:13px;margin-top:10px;min-height:18px}
+.cta{display:inline-block;background:var(--good);color:#04130d;font-weight:700;border-radius:10px;padding:10px 14px;text-decoration:none;border:0;cursor:pointer}
+.foot{color:var(--dim);font-size:12px;line-height:1.6;display:grid;gap:4px}
+.foot b{color:var(--mute)}
+.banner{border-radius:12px;padding:10px 14px;font-size:13px;border:1px solid rgba(247,192,79,.4);background:rgba(247,192,79,.08);color:var(--ink2);display:none}
+.skel{opacity:.35}
+
+/* hero live graph */
+.hero-card{padding:18px 18px 12px;background:radial-gradient(800px 260px at 20% 0,rgba(46,230,166,.08),transparent 70%),linear-gradient(180deg,var(--panel),var(--bg2))}
+.hero-head{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.readout{display:flex;gap:26px;flex-wrap:wrap}
+.readout .big{font-size:clamp(26px,3.4vw,38px);font-weight:760;letter-spacing:-.025em;line-height:1.05}
+.readout .lab{font-size:11.5px;color:var(--mute);font-weight:600;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.readout .chg{font:600 12px var(--mono);margin-left:6px}
+.tabs{margin-left:auto;display:inline-flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.tabs button{border:0;background:transparent;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:650;color:var(--mute);cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--ink);box-shadow:0 0 0 1px var(--line2),0 0 18px -6px var(--good)}
+.chart.hero{height:300px;margin-top:4px}
+@media (max-width:560px){.chart.hero{height:230px}.tabs{margin-left:0}}
+
+/* recommendations */
+.recs{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.rec{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:0 12px;padding:11px 12px 11px 0;border-radius:12px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.rec .lv{border-radius:0 4px 4px 0;background:var(--info)}
+.rec.high .lv{background:var(--bad)}.rec.med .lv{background:var(--warn)}.rec.low .lv{background:var(--info)}
+.rec b{font-size:13.5px;display:block;margin-bottom:2px}
+.rec p{margin:0;font-size:12.5px;color:var(--mute);line-height:1.45}
+.rec .side{display:flex;flex-direction:column;align-items:flex-end;gap:7px;justify-content:center}
+.impact{font:700 12px var(--mono);color:var(--good);background:var(--good-soft);padding:3px 8px;border-radius:7px;white-space:nowrap}
+.btn.go{background:var(--good);color:#04130d;border-color:var(--good)}
+.btn.go:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.55;cursor:default}
+@media (max-width:560px){.rec{grid-template-columns:4px minmax(0,1fr)}.rec .side{grid-column:2;flex-direction:row;justify-content:flex-start;margin-top:8px}}
+
+/* controls */
+.ctl{display:grid;gap:2px}
+.ctl .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line)}
+.ctl .it:last-child{border-bottom:0}
+.ctl .it b{font-size:13.5px;font-weight:650}
+.ctl .it p{grid-column:1;margin:0;font-size:12px;color:var(--mute);line-height:1.4}
+.ctl .it .when{font:600 9.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-left:6px}
+.ctl .it .st{font:600 10.5px var(--mono);margin-left:6px}
+.sw{position:relative;width:42px;height:24px;border-radius:99px;background:var(--line2);border:0;cursor:pointer;transition:background .2s;grid-row:1/span 2;grid-column:2;padding:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .2s}
+.sw.on{background:var(--good)}.sw.on::after{transform:translateX(18px)}
+.sw.busy{opacity:.6}
+.sw:focus-visible,.seg button:focus-visible,.tabs button:focus-visible{outline:2px solid var(--good);outline-offset:2px}
+.ctl .master{background:var(--good-soft);border:1px solid rgba(46,230,166,.3);border-radius:12px;padding:12px;margin-bottom:6px}
+.ctl .master.off{background:rgba(255,107,99,.08);border-color:rgba(255,107,99,.35)}
+.prof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0 4px}
+.prof button{border:1px solid var(--line2);background:var(--panel2);border-radius:10px;padding:8px 6px;cursor:pointer;text-align:center;font-size:12.5px;font-weight:650;color:var(--ink2)}
+.prof button small{display:block;font:500 10.5px var(--mono);color:var(--mute);margin-top:2px}
+.prof button.on{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.seg{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}
+.seg button{flex:1 1 auto;min-width:52px;border:1px solid var(--line2);background:var(--panel2);border-radius:8px;padding:6px 8px;cursor:pointer;font-size:12px;font-weight:650;color:var(--ink2)}
+.seg button.on{border-color:var(--accent,var(--good));background:var(--good-soft);color:var(--good)}
+.seg button:disabled{opacity:.45;cursor:default}
+.grp{font:650 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:14px 0 4px;padding-top:10px;border-top:1px solid var(--line)}
+.bud{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;margin-top:8px}
+.bud i{display:block;height:100%;background:var(--good);transition:width .4s}
+.bud.w i{background:var(--warn)}.bud.r i{background:var(--bad,#e5484d)}
+.note{font-size:12px;color:var(--mute);margin-top:8px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:10px 16px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:all .25s;z-index:20;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* log extras */
+.logstats{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:-4px 0 10px}
+.logstats b{color:var(--ink);font-weight:700}
+tr.row{cursor:pointer}
+tr.det td{background:var(--panel2);text-align:left;white-space:normal;padding:10px 14px}
+.det-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 18px;font-size:12px}
+.det-grid div span{display:block;color:var(--mute);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+.flag{font:600 10px var(--mono);padding:1px 6px;border-radius:5px;margin-left:5px}
+.flag.r{background:rgba(255,107,99,.14);color:var(--bad)}.flag.w{background:rgba(247,192,79,.14);color:var(--warn)}
+.k-setting{background:rgba(138,180,255,.13);color:var(--info)}
+.d-up{color:var(--bad)}.d-dn{color:var(--good)}
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
-  <div class="top">
-    <div class="brand"><i></i>tokentrim live</div>
-    <span class="pill" id="status"><span class="dot"></span><span id="statustxt">connecting…</span></span>
-    <span class="sp"></span>
-    <a href="#" id="theme">theme</a>
-  </div>
+<div id="app" class="wrap" hidden>
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#10b981"/><path d="M8 11h16M8 16h11M8 21h6" stroke="#052e1f" stroke-width="3" stroke-linecap="round"/></svg>
+      tokentrim <small id="mode">Live</small>
+    </div>
+    <span class="spacer"></span>
+    <span class="chip" id="sync" hidden></span>
+    <span class="chip"><span class="dot" id="dot"></span><span id="status">connecting…</span></span>
+    <button class="btn icon" id="theme" title="Switch light/dark" aria-label="Switch light or dark theme">◐</button>
+    <button class="btn" id="signout" hidden>Sign out</button>
+  </header>
 
-  <div class="hero">
+  <div class="banner" id="banner"></div>
+
+  <section class="grid g-kpi" aria-label="Today at a glance">
+    <div class="card kpi hero"><div class="lbl">Saved today</div><div class="val num" id="k-saved">–</div><div class="sub" id="k-saved-s">tokens Claude didn't re-read</div></div>
+    <div class="card kpi"><div class="lbl">Limits last</div><div class="val num" id="k-x">–</div><div class="sub" id="k-x-s">longer than without</div></div>
+    <div class="card kpi"><div class="lbl">Re-read today</div><div class="val num" id="k-used">–</div><div class="sub" id="k-used-s">–</div><div class="bar2"><i id="k-used-b" style="width:0"></i></div></div>
+    <div class="card kpi"><div class="lbl">Usage today <span class="dim" title="At Anthropic API list prices. On a Max plan this is limit burn, not a bill.">ⓘ</span></div><div class="val num" id="k-cost">–</div><div class="sub" id="k-cost-s">–</div></div>
+    <div class="card kpi"><div class="lbl">Cache hit</div><div class="val num" id="k-cache">–</div><div class="sub" id="k-cache-s">–</div></div>
+    <div class="card kpi"><div class="lbl"><span class="dot live" id="k-now-dot"></span> Right now</div><div class="val num" id="k-now">–</div><div class="sub" id="k-now-s">saved per minute</div></div>
+  </section>
+
+  <section class="card hero-card" aria-label="Live usage graph">
+    <div class="hero-head">
+      <div class="readout">
+        <div><div class="lab"><span class="dot" id="h-dot"></span><span id="h-l1">Re-reading now</span></div><div class="big num" id="h-used">–</div></div>
+        <div><div class="lab" style="color:var(--would)" id="h-l2">Without tokentrim</div><div class="big num o" id="h-would">–</div></div>
+        <div><div class="lab" style="color:var(--good)" id="h-l3">Saving</div><div class="big num g" id="h-saved">–</div></div>
+        <div><div class="lab" id="h-l4">Usage</div><div class="big num" id="h-cost">–</div></div>
+      </div>
+      <div class="tabs" id="h-tabs" role="tablist"><button data-m="live" class="on">Live</button><button data-m="hour">60 min</button><button data-m="today">Today</button><button data-m="week">7 days</button></div>
+    </div>
+    <div class="chart hero" id="c-hero"><canvas></canvas><div class="tip"></div></div>
+    <div class="legend" id="h-legend" style="margin-top:6px"><span><i style="background:var(--good)"></i>actual, tokens/min</span><span><i style="background:var(--would)"></i>without tokentrim</span><span><i style="background:var(--good-soft);border:1px solid var(--good)"></i>saved</span><span id="h-marks">✂ trim · ⇣ summary · ↻ cache rebuild · ⚙ setting</span></div>
+  </section>
+
+  <section class="grid g-2">
     <div class="card">
-      <div class="lbl">Tokens saved today</div>
-      <div class="big" id="saved">0</div>
-      <div class="sub">≈ <b id="usd">$0</b> at API prices · <b id="pct">0%</b> less re-read · limits last <b id="x">1.0×</b> longer</div>
-      <div class="vs">
-        <div class="vsrow"><span>Without tokentrim</span><div class="track"><div class="fill" id="wbar" style="background:var(--would);width:100%"></div></div><span class="num" id="would">0</span></div>
-        <div class="vsrow"><span>With tokentrim</span><div class="track"><div class="fill" id="ubar" style="background:var(--good);width:0"></div></div><span class="num" id="used">0</span></div>
+      <h2>Recommendations <span class="r mute" id="rec-n">for your usage today</span></h2>
+      <ul class="recs" id="recs"></ul>
+    </div>
+    <div class="card">
+      <h2>Controls <span class="r mute" id="ctl-where"></span></h2>
+      <div class="ctl" id="ctl"></div>
+    </div>
+  </section>
+
+  <section class="grid g-2">
+    <div class="card">
+      <h2>5-hour usage window <span class="r mute" id="w-reset"></span></h2>
+      <div id="w-body"><div class="empty">No usage in the current 5-hour window.</div></div>
+    </div>
+    <div class="card">
+      <h2>Insights <span class="r mute" id="ins-n"></span></h2>
+      <ul class="ins" id="ins"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Live conversations <span class="r mute" id="cv-n"></span></h2>
+    <div class="convs" id="convs"></div>
+  </section>
+
+  <section class="grid g-2b">
+    <div class="card">
+      <h2>When you use Claude <span class="r mute">tokens re-read, by hour, last 7 days</span></h2>
+      <div class="heat" id="heat"></div>
+    </div>
+    <div class="card">
+      <h2>Highlights <span class="r mute">notable events</span></h2>
+      <ul class="feed" id="feed"></ul>
+    </div>
+  </section>
+
+  <section class="grid g-3">
+    <div class="card"><h2>By project <span class="r mute">today</span></h2><div class="rows" id="b-proj"></div></div>
+    <div class="card"><h2>By model <span class="r mute">today</span></h2><div class="rows" id="b-model"></div></div>
+    <div class="card"><h2>What's saving the most <span class="r mute">today</span></h2><div class="rows" id="b-rules"></div></div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>Live usage &amp; savings log <span class="r mute" id="log-n"></span></h2>
+      <div class="logstats" id="log-stats"></div>
+      <div class="toolbar">
+        <div class="seg" id="log-kind"></div>
+        <select class="inp" id="log-conv" aria-label="Filter by conversation"><option value="">All conversations</option></select>
+        <input class="inp" id="log-q" placeholder="Search…" aria-label="Search the log" style="flex:1;min-width:120px">
+        <button class="btn" id="log-pause" title="Freeze the table while you read">Pause</button>
+        <button class="btn" id="log-csv">Export CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Time</th><th>Conversation</th><th>Event</th><th>Model</th><th>Context</th><th>Change</th><th>Without</th><th>Saved</th><th>Output</th><th>Cache write</th><th>Usage $</th><th>Saved $</th></tr></thead>
+          <tbody id="log"></tbody>
+          <tfoot><tr id="log-tot"></tr></tfoot>
+        </table>
       </div>
     </div>
-    <div class="card">
-      <div class="lbl">Right now</div>
-      <div class="gauges" style="margin-top:12px">
-        <div class="g"><span>Saving</span><b id="spm" style="color:var(--good)">0</b><span>tokens / min</span></div>
-        <div class="g"><span>Re-reading</span><b id="upm">0</b><span>tokens / min</span></div>
-        <div class="g"><span>Live conversations</span><b id="nconv">0</b><span id="nagents">0 sub-agents</span></div>
-        <div class="g"><span>Trimmed live today</span><b id="trimmed">0</b><span id="trims">0 actions</span></div>
-      </div>
-    </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <div class="top"><div class="lbl">Last 60 minutes, tokens re-read per minute</div><span class="sp"></span>
-      <div class="legend"><span><i style="background:var(--would)"></i>without tokentrim</span><span><i style="background:var(--good)"></i>with tokentrim</span></div></div>
-    <div class="chart"><canvas id="c60"></canvas></div>
-  </div>
+  <footer class="foot">
+    <div><b>Saved</b>: context Claude would have re-read without tokentrim (trimmed tool output still in the chat, plus history an earlier summary removed, until Claude Code's own summary would have fired) minus what it actually re-read.</div>
+    <div><b>Usage $</b>: the same tokens at Anthropic API list prices (cache reads 0.1×, cache writes 1.25× input). On a Pro or Max plan it measures how fast you burn your limits, not a bill.</div>
+    <div><b>5-hour window</b>: approximation of the window Claude's plan limits reset on, starting at the hour of your first message after the previous one ended. "Heaviest" is your biggest window in the last 7 days.</div>
+    <div id="foot-mode"></div>
+  </footer>
+</div>
 
-  <div class="grid3">
-    <div class="card">
-      <div class="lbl">Live conversations</div>
-      <div class="convs" id="convs"></div>
-    </div>
-    <div style="display:grid;gap:16px;align-content:start">
-      <div class="card"><div class="lbl">Insights</div><div class="ins" id="ins"></div></div>
-      <div class="card"><div class="lbl">What's saving the most today</div><div class="rules" id="rules"></div></div>
-    </div>
-  </div>
-
-  <div class="grid3">
-    <div class="card"><div class="lbl">Live events</div><div class="feed" id="feed"></div></div>
-    <div class="card"><div class="lbl">Today by hour</div><div class="chart"><canvas id="ch"></canvas></div></div>
-  </div>
-
-  <div class="foot">Updates every 2 seconds. "Without tokentrim" replays each step as if nothing had been trimmed or summarised early (same model as <code>tokentrim replay</code>). Only totals and project folder names are shown here.</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="gate" class="card gate" hidden>
+  <svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#10b981"/><path d="M8 11h16M8 16h11M8 21h6" stroke="#052e1f" stroke-width="3" stroke-linecap="round"/></svg>
+  <h1 id="g-h">tokentrim Pro</h1>
+  <p id="g-p"></p>
+  <form id="g-f"><input id="g-k" autocomplete="off" spellcheck="false" aria-label="Key"><button class="cta" type="submit">Open</button></form>
+  <div class="err" id="g-e"></div>
+  <p id="g-x" style="margin-top:14px;font-size:13px"></p>
 </div>
 
 <script>
 (function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var css = function(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); };
-  var store = { get:function(k){ try{return localStorage.getItem(k);}catch(e){return null;} },
-                set:function(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
+"use strict";
+var MODE = window.TT_MODE || "local";
+var $ = function(id){ return document.getElementById(id); };
+var store = { get:function(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+              set:function(k,v){ try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k,v); }catch(e){} } };
 
-  // theme toggle
-  var th = store.get("tt-theme"); if (th) document.documentElement.dataset.theme = th;
-  $("theme").onclick = function(e){ e.preventDefault();
-    var dark = matchMedia("(prefers-color-scheme: dark)").matches;
-    var cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
-    var nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; store.set("tt-theme", nx); last && render(last); };
+// ---------- theme
+var th = store.get("tt-theme"); if (th) document.documentElement.setAttribute("data-theme", th);
+$("theme").onclick = function(){
+  var cur = document.documentElement.getAttribute("data-theme") ||
+            (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  var nx = cur === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", nx); store.set("tt-theme", nx); last && render(last, true);
+};
 
-  // remote access key: #k=... in the link, remembered on this device
-  var m = location.hash.match(/k=([A-Za-z0-9_-]+)/);
-  if (m) { store.set("tt-key", m[1]); history.replaceState(null, "", location.pathname); }
-  var key = store.get("tt-key");
-  var remote = location.hostname !== "localhost" && location.hostname !== "127.0.0.1";
+// ---------- formatting
+function k(n){ n = +n || 0; var a = Math.abs(n);
+  var u = a >= 1e9 ? [1e9,"B"] : a >= 1e6 ? [1e6,"M"] : a >= 1e3 ? [1e3,"k"] : null;
+  if (!u) return String(Math.round(n));
+  var v = n / u[0]; return (a / u[0] >= 100 ? v.toFixed(0) : v.toFixed(1).replace(/\.0$/,"")) + u[1]; }
+function usd(n){ n = +n || 0; return "$" + (Math.abs(n) >= 100 ? Math.round(n).toLocaleString() : n >= 1 ? n.toFixed(2) : n.toFixed(n >= 0.01 ? 2 : 3)); }
+function pct(x){ return Math.round(x * 100) + "%"; }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function hm(ts){ return new Date(ts * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+function hms(ts){ return new Date(ts * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
+function ago(s){ s = Math.max(0, Math.round(s)); return s < 60 ? s + "s ago" : s < 3600 ? Math.round(s/60) + " min ago" : Math.round(s/3600) + " h ago"; }
+function dur(s){ s = Math.max(0, s); var h = Math.floor(s/3600), m = Math.floor(s%3600/60); return h ? h + "h " + m + "m" : m + "m"; }
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-  function fmt(n){ n = +n || 0; var a = Math.abs(n);
-    if (a >= 1e9) return (n/1e9).toFixed(a >= 1e10 ? 1 : 2).replace(/\.?0+$/,"") + "B";
-    if (a >= 1e6) return (n/1e6).toFixed(a >= 1e8 ? 0 : 1).replace(/\.0$/,"") + "M";
-    if (a >= 1e3) return (n/1e3).toFixed(a >= 1e5 ? 0 : 1).replace(/\.0$/,"") + "k";
-    return String(Math.round(n)); }
-  function money(n){ return "$" + (n >= 100 ? Math.round(n).toLocaleString() : (+n).toFixed(2)); }
-  function ago(s){ s = Math.max(0, Math.round(s)); return s < 60 ? s + "s" : s < 3600 ? Math.round(s/60) + "m" : Math.round(s/3600) + "h"; }
-  function hhmm(t){ var d = new Date(t*1000); return d.toTimeString().slice(0,5); }
-  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+// numbers glide to their new value
+var tw = {};
+function tween(id, to, fmt){
+  var el = $(id), from = tw[id] == null ? to : tw[id]; tw[id] = to;
+  if (from === to || document.hidden){ el.textContent = fmt(to); return; }
+  var t0 = performance.now();
+  (function f(t){ var p = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(from + (to - from) * e); if (p < 1) requestAnimationFrame(f); })(t0);
+}
 
-  // smooth number tweening
-  var tw = {};
-  function tween(id, to, f){
-    var t = tw[id] || (tw[id] = {v: 0}); t.from = t.v; t.to = to; t.t0 = performance.now(); t.f = f;
-    if (!t.raf) step(id); }
-  function step(id){ var t = tw[id];
-    t.raf = requestAnimationFrame(function(now){
-      var k = Math.min(1, (now - t.t0) / 1100), e = 1 - Math.pow(1 - k, 3);
-      t.v = t.from + (t.to - t.from) * e; $(id).textContent = t.f(t.v);
-      if (k < 1) step(id); else t.raf = null; }); }
-
-  // canvas helpers
-  function setup(cv){ var r = cv.getBoundingClientRect(), d = devicePixelRatio || 1;
-    cv.width = r.width * d; cv.height = r.height * d; var g = cv.getContext("2d"); g.setTransform(d,0,0,d,0,0); return [g, r.width, r.height]; }
-  function axis(g, w, h, max, pad){
-    g.strokeStyle = css("--line"); g.fillStyle = css("--dim"); g.font = "11px " + css("--mono"); g.lineWidth = 1;
-    for (var i = 0; i <= 3; i++){ var y = pad.t + (h - pad.t - pad.b) * i / 3;
-      g.beginPath(); g.moveTo(pad.l, y); g.lineTo(w - pad.r, y); g.stroke();
-      g.fillText(fmt(max * (1 - i/3)), 0, y + 4); } }
-
-  function chart60(d){
-    var a = setup($("c60")), g = a[0], w = a[1], h = a[2], pad = {l:44, r:4, t:8, b:20};
-    var rows = d.minutes, max = 1; rows.forEach(function(r){ max = Math.max(max, r[2], r[1]); }); max *= 1.12;
-    axis(g, w, h, max, pad);
-    var X = function(i){ return pad.l + (w - pad.l - pad.r) * i / (rows.length - 1); };
-    var Y = function(v){ return h - pad.b - (h - pad.t - pad.b) * v / max; };
-    function area(idx, col){
-      var gr = g.createLinearGradient(0, pad.t, 0, h - pad.b); gr.addColorStop(0, col + "66"); gr.addColorStop(1, col + "05");
-      g.beginPath(); g.moveTo(X(0), Y(0)); rows.forEach(function(r, i){ g.lineTo(X(i), Y(r[idx])); }); g.lineTo(X(rows.length-1), Y(0)); g.closePath();
-      g.fillStyle = gr; g.fill();
-      g.beginPath(); rows.forEach(function(r, i){ i ? g.lineTo(X(i), Y(r[idx])) : g.moveTo(X(i), Y(r[idx])); });
-      g.strokeStyle = col; g.lineWidth = 2; g.stroke(); }
-    area(2, css("--would")); area(1, css("--good"));
-    g.fillStyle = css("--dim"); g.font = "11px " + css("--mono");
-    [0, 15, 30, 45, 59].forEach(function(i){ var t = i === 59 ? "now" : "-" + (59 - i) + "m"; g.fillText(t, Math.min(X(i) - 8, w - 26), h - 4); });
-    var lr = rows[rows.length - 1]; if (lr[1]) { g.fillStyle = css("--good"); g.beginPath(); g.arc(X(rows.length-1), Y(lr[1]), 4, 0, 7); g.fill(); }
+// ---------- charts (canvas, crisp on retina, with hover tooltips)
+function setup(box){
+  var c = box.querySelector("canvas"), r = box.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+  c.width = Math.max(1, r.width * d); c.height = Math.max(1, r.height * d);
+  var x = c.getContext("2d"); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,r.width,r.height);
+  return {x:x, w:r.width, h:r.height};
+}
+function grid(g, max, pad){
+  var x = g.x; x.strokeStyle = css("--line"); x.fillStyle = css("--dim"); x.lineWidth = 1; x.font = "10.5px " + css("--mono");
+  for (var i = 0; i <= 3; i++){ var y = pad.t + (g.h - pad.t - pad.b) * i / 3;
+    x.beginPath(); x.moveTo(pad.l, Math.round(y) + .5); x.lineTo(g.w - pad.r, Math.round(y) + .5); x.stroke();
+    x.fillText(k(max * (1 - i / 3)), 2, y + 3); }
+}
+function hover(box, n, pad, html){
+  var tip = box.querySelector(".tip");
+  box.onmousemove = function(e){
+    var r = box.getBoundingClientRect(), w = r.width - pad.l - pad.r;
+    var i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - r.left - pad.l) / w * (n - 1))));
+    var h = html(i); if (!h){ tip.style.display = "none"; return; }
+    tip.innerHTML = h; tip.style.display = "block";
+    var tx = e.clientX - r.left + 12; if (tx + tip.offsetWidth > r.width) tx = e.clientX - r.left - tip.offsetWidth - 12;
+    tip.style.left = Math.max(0, tx) + "px"; tip.style.top = "6px";
+  };
+  box.onmouseleave = function(){ tip.style.display = "none"; };
+}
+function area(box, pts){   // pts: [[t, used, would]]
+  var g = setup(box), x = g.x, pad = {l:40, r:6, t:8, b:20}, n = pts.length;
+  var max = Math.max(1, Math.max.apply(null, pts.map(function(p){ return p[2]; }))) * 1.1;
+  grid(g, max, pad);
+  var W = g.w - pad.l - pad.r, H = g.h - pad.t - pad.b;
+  function X(i){ return pad.l + W * i / (n - 1); } function Y(v){ return pad.t + H * (1 - v / max); }
+  function path(j, fill, stroke){
+    x.beginPath(); x.moveTo(X(0), Y(0));
+    for (var i = 0; i < n; i++) x.lineTo(X(i), Y(pts[i][j]));
+    x.lineTo(X(n - 1), Y(0)); x.closePath();
+    var gr = x.createLinearGradient(0, pad.t, 0, g.h - pad.b); gr.addColorStop(0, fill); gr.addColorStop(1, "transparent");
+    x.fillStyle = gr; x.fill();
+    x.beginPath(); for (i = 0; i < n; i++) (i ? x.lineTo : x.moveTo).call(x, X(i), Y(pts[i][j]));
+    x.strokeStyle = stroke; x.lineWidth = 1.6; x.stroke();
   }
-
-  function chartHours(d){
-    var a = setup($("ch")), g = a[0], w = a[1], h = a[2], pad = {l:44, r:4, t:8, b:20};
-    var rows = d.hours, max = 1; rows.forEach(function(r){ max = Math.max(max, r[2]); }); max *= 1.1;
-    axis(g, w, h, max, pad);
-    var bw = (w - pad.l - pad.r) / 24, now = new Date().getHours();
-    rows.forEach(function(r, i){
-      var x = pad.l + i * bw + 2, ww = Math.max(2, bw - 4), Y = function(v){ return (h - pad.t - pad.b) * v / max; };
-      g.fillStyle = css("--would") + "55"; g.fillRect(x, h - pad.b - Y(r[2]), ww, Y(r[2]));
-      g.fillStyle = css("--good"); g.fillRect(x, h - pad.b - Y(r[1]), ww, Y(r[1]));
-      if (i % 6 === 0 || i === now){ g.fillStyle = i === now ? css("--ink") : css("--dim"); g.font = "11px " + css("--mono"); g.fillText(i === now ? "now" : i + "h", x, h - 4); } });
+  var wo = css("--would"), us = css("--used");
+  x.globalAlpha = .9; path(2, hexa(wo, .28), wo); path(1, hexa(us, .38), us); x.globalAlpha = 1;
+  x.fillStyle = css("--dim"); x.font = "10.5px " + css("--mono");
+  x.fillText("−60 min", pad.l, g.h - 5); x.fillText("−30", pad.l + W / 2 - 10, g.h - 5); x.fillText("now", g.w - pad.r - 22, g.h - 5);
+  hover(box, n, pad, function(i){ var p = pts[i]; if (!p) return "";
+    return "<b>" + hm(p[0]) + "</b><br><span class=o>without " + k(p[2]) + "</span><br><span style='color:var(--used)'>actual " + k(p[1]) + "</span><br><span class=g>saved " + k(p[2] - p[1]) + "</span>"; });
+}
+function bars(box, rows, label, tipf){   // rows: [used, would]
+  var g = setup(box), x = g.x, pad = {l:40, r:6, t:8, b:20}, n = rows.length;
+  var max = Math.max(1, Math.max.apply(null, rows.map(function(r){ return Math.max(r[0], r[1]); }))) * 1.1;
+  grid(g, max, pad);
+  var W = g.w - pad.l - pad.r, H = g.h - pad.t - pad.b, bw = W / n, gap = Math.max(1, bw * .22);
+  for (var i = 0; i < n; i++){
+    var x0 = pad.l + i * bw + gap / 2, w = bw - gap, hw = H * rows[i][1] / max, hu = H * rows[i][0] / max;
+    x.fillStyle = hexa(css("--would"), .45); rr(x, x0, pad.t + H - hw, w, hw, 3);
+    x.fillStyle = css("--used"); rr(x, x0 + w * .18, pad.t + H - hu, w * .64, hu, 3);
+    var lb = label(i); if (lb){ x.fillStyle = css("--dim"); x.font = "10.5px " + css("--mono"); x.textAlign = "center"; x.fillText(lb, x0 + w / 2, g.h - 5); x.textAlign = "left"; }
   }
+  hover(box, n, {l:pad.l + bw / 2, r:pad.r + bw / 2}, tipf);
+}
+function rr(x, a, b, w, h, r){ if (h <= 0) return; r = Math.min(r, h / 2, w / 2); x.beginPath(); x.moveTo(a, b + h); x.lineTo(a, b + r); x.quadraticCurveTo(a, b, a + r, b); x.lineTo(a + w - r, b); x.quadraticCurveTo(a + w, b, a + w, b + r); x.lineTo(a + w, b + h); x.closePath(); x.fill(); }
+function hexa(c, a){ if (c[0] !== "#") return c; var v = parseInt(c.slice(1), 16); return "rgba(" + (v >> 16 & 255) + "," + (v >> 8 & 255) + "," + (v & 255) + "," + a + ")"; }
 
-  function spark(series, trig){
-    if (series.length < 2) return "";
-    var max = trig; series.forEach(function(p){ max = Math.max(max, p[0], p[1]); }); max *= 1.05;
-    var n = series.length, W = 300, H = 54;
-    var pts = function(k){ return series.map(function(p, i){ return (i * W / (n - 1)).toFixed(1) + "," + (H - p[k] / max * H).toFixed(1); }).join(" "); };
-    var ty = (H - trig / max * H).toFixed(1);
-    return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
-      '<line x1="0" x2="' + W + '" y1="' + ty + '" y2="' + ty + '" stroke="var(--dim)" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>' +
-      '<polygon points="0,' + H + ' ' + pts(1) + ' ' + W + ',' + H + '" fill="var(--would)" opacity=".16"/>' +
-      '<polyline points="' + pts(1) + '" fill="none" stroke="var(--would)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<polygon points="0,' + H + ' ' + pts(0) + ' ' + W + ',' + H + '" fill="var(--good)" opacity=".22"/>' +
-      '<polyline points="' + pts(0) + '" fill="none" stroke="var(--good)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+function spark(series, trigger){
+  if (!series || series.length < 2) return "<svg></svg>";
+  var W = 300, H = 64, n = series.length, max = Math.max(trigger * 1.08, Math.max.apply(null, series.map(function(p){ return p[1]; }))) || 1;
+  function X(i){ return (W * i / (n - 1)).toFixed(1); } function Y(v){ return (H - 2 - (H - 4) * v / max).toFixed(1); }
+  var a = "", b = "";
+  for (var i = 0; i < n; i++){ a += (i ? "L" : "M") + X(i) + " " + Y(series[i][0]); b += (i ? "L" : "M") + X(i) + " " + Y(series[i][1]); }
+  var ty = Y(trigger);
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+    '<path d="' + b + 'L' + W + ' ' + H + 'L0 ' + H + 'Z" fill="var(--would-soft)"/>' +
+    '<path d="' + b + '" fill="none" stroke="var(--would)" stroke-width="1.3" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>' +
+    '<path d="' + a + 'L' + W + ' ' + H + 'L0 ' + H + 'Z" fill="var(--good-soft)"/>' +
+    '<path d="' + a + '" fill="none" stroke="var(--good)" stroke-width="1.8" vector-effect="non-scaling-stroke"/>' +
+    '<line x1="0" x2="' + W + '" y1="' + ty + '" y2="' + ty + '" stroke="var(--warn)" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/></svg>';
+}
+
+function rowsHTML(items, color, total){
+  if (!items.length) return '<div class="empty">Nothing yet today.</div>';
+  return items.map(function(it){ return '<div class="row"><span class="n">' + it[0] + '</span><span class="v">' + it[1] +
+    '</span><span class="b"><i style="width:' + Math.max(2, 100 * it[2] / (total || 1)).toFixed(1) + '%;background:' + color + '"></i></span></div>'; }).join("");
+}
+
+// ---------- hero: live graph that scrolls with time and rises and falls with usage
+var hero = {mode: store.get("tt-hero") || "live", max: 0, raf: 0, lastDraw: 0, hx: null};
+function heroData(s){
+  var m = hero.mode, now = Date.now() / 1000, pts = [], lab = [], i;
+  if (m === "live"){
+    var p = s.pulse || {t0: now - 1800, step: 5, data: []}, st = p.step || 5, d = (p.data || []).slice(), W = Math.round(60 / st);
+    var end = Math.floor(now / st) * st;   // zero-fill buckets the Mac hasn't reported yet, so a quiet minute decays to 0
+    for (var t = p.t0 + d.length * st; t <= end && d.length < 4000; t += st) d.push([0, 0, 0]);
+    var su = 0, sw = 0, sc = 0;
+    for (i = 0; i < d.length; i++){
+      su += d[i][0]; sw += d[i][1]; sc += d[i][2];
+      if (i >= W){ su -= d[i - W][0]; sw -= d[i - W][1]; sc -= d[i - W][2]; }
+      var ti = Math.min(now, p.t0 + (i + 1) * st);
+      if (ti >= now - 1800 && i >= W - 1 && ((d.length - 1 - i) % 3 === 0)) pts.push({t: ti, u: Math.max(0, su), w: Math.max(su, sw), c: Math.max(0, sc)});
+    }
+    return {pts: pts, x0: now - 1800, x1: now, unit: "/min", live: true,
+      ticks: [[now - 1800, "−30 min"], [now - 1200, "−20"], [now - 600, "−10"], [now, "now"]]};
   }
-
-  var seenFeed = {}, prevSteps = {}, last = null;
-  function render(d){
-    last = d;
-    var T = d.today, would = T.would || 0, used = T.used || 0;
-    tween("saved", T.saved || 0, function(v){ return fmt(v); });
-    tween("usd", T.usd || 0, money);
-    $("pct").textContent = would ? Math.round((1 - used / would) * 100) + "%" : "0%";
-    $("x").textContent = (used ? would / used : 1).toFixed(1) + "×";
-    $("would").textContent = fmt(would); $("used").textContent = fmt(used);
-    $("ubar").style.width = (would ? used / would * 100 : 0) + "%";
-    tween("spm", Math.max(0, d.rate.saved_pm), fmt); tween("upm", d.rate.used_pm, fmt);
-    $("nconv").textContent = d.convs.length;
-    $("nagents").textContent = d.convs.reduce(function(s, c){ return s + c.agents; }, 0) + " sub-agents";
-    tween("trimmed", T.trimmed || 0, fmt); $("trims").textContent = (T.trims || 0) + " actions";
-    chart60(d); chartHours(d);
-
-    // conversations
-    $("convs").innerHTML = d.convs.length ? d.convs.map(function(c){
-      var pct = Math.min(100, c.ctx / d.trigger * 100), col = pct > 90 ? "var(--bad)" : pct > 75 ? "var(--warn)" : "var(--good)";
-      var fresh = d.now - c.last < 90, flash = prevSteps[c.id] != null && prevSteps[c.id] !== c.steps;
-      prevSteps[c.id] = c.steps;
-      return '<div class="conv' + (flash ? " flash" : "") + '">' +
-        '<div class="ch"><b>' + esc(c.project) + '</b><span class="t">' + esc(c.title || "#" + c.id) + '</span>' +
-        '<span class="tag' + (fresh ? " live" : "") + '">' + (fresh ? "● working" : "idle " + ago(d.now - c.last)) + '</span>' +
-        (c.model !== "other" ? '<span class="tag">' + esc(c.model) + '</span>' : "") + '</div>' +
-        spark(c.series, d.trigger) +
-        '<div class="meter" title="context now vs where tokentrim summarises"><div class="f" style="width:' + pct + '%;background:' + col + '"></div></div>' +
-        '<div class="cstats"><span><b>' + fmt(c.ctx) + '</b>context now</span><span><b style="color:var(--would)">' + fmt(c.cf) + '</b>without tokentrim</span>' +
-        '<span><b style="color:var(--good)">' + fmt(c.saved) + '</b>saved today</span><span><b>' +
-        (c.to_compact != null ? "~" + c.to_compact : "–") + '</b>steps to summary</span></div></div>';
-    }).join("") : '<div class="empty">No conversation is running. Start one in Claude Code and it shows up here within seconds.</div>';
-    setTimeout(function(){ document.querySelectorAll(".conv.flash").forEach(function(e){ e.classList.remove("flash"); }); }, 700);
-
-    var icon = {good:"✓", warn:"!", tip:"→", info:"i"};
-    $("ins").innerHTML = d.insights.map(function(i){
-      return '<div class="in ' + i.level + '"><span class="ic">' + icon[i.level] + '</span><span>' + esc(i.text) + '</span></div>'; }).join("");
-
-    var rmax = Math.max.apply(null, d.rules.map(function(r){ return r[2]; }).concat([1]));
-    $("rules").innerHTML = d.rules.length ? d.rules.map(function(r){
-      return '<div class="rule"><span>' + esc(r[0]) + ' <span style="color:var(--dim)">×' + r[1] + '</span></span><span class="num">' + fmt(r[2]) + '</span>' +
-        '<div class="track"><div class="fill" style="width:' + (r[2] / rmax * 100) + '%;background:var(--good)"></div></div></div>'; }).join("")
-      : '<div class="empty">Nothing trimmed yet today.</div>';
-
-    var label = {trim:"trimmed", compact:"summarised", jump:"big step"};
-    $("feed").innerHTML = d.feed.length ? d.feed.map(function(f){
-      var k = f.ts + f.kind + f.tokens, isNew = last && Object.keys(seenFeed).length && !seenFeed[k]; seenFeed[k] = 1;
-      return '<div class="ev ' + f.kind + (isNew ? " new" : "") + '"><time>' + hhmm(f.ts) + '</time><span>' + esc(f.text) +
-        (f.project ? ' <span class="p">' + esc(f.project) + '</span>' : "") + '</span><span class="k">' +
-        (f.kind === "jump" ? "+" : "−") + fmt(f.tokens) + '</span></div>'; }).join("")
-      : '<div class="empty">Events appear as tokentrim trims tool results and summarises conversations.</div>';
-    status();
+  if (m === "hour"){
+    (s.minutes || []).forEach(function(r){ pts.push({t: r[0] + 60, u: r[1], w: Math.max(r[1], r[2])}); });
+    var t1 = pts.length ? pts[pts.length - 1].t : now;
+    return {pts: pts, x0: t1 - 3600, x1: t1, unit: "/min", ticks: [[t1 - 3600, "−60 min"], [t1 - 1800, "−30"], [t1, "now"]]};
   }
-
-  function status(){
-    var p = $("status"), t = $("statustxt");
-    if (!last){ return; }
-    var age = Date.now() / 1000 - last.now;
-    p.className = "pill " + (age < 20 ? "on" : "stale");
-    t.textContent = age < 20 ? "live · updated " + ago(age) + " ago" : (remote ? "Mac offline? last update " + ago(age) + " ago" : "last update " + ago(age) + " ago");
+  if (m === "today"){
+    var hrs = s.hours || [], cur = new Date().getHours();
+    for (i = 0; i <= cur && i < hrs.length; i++) pts.push({t: i, u: hrs[i][1], w: Math.max(hrs[i][1], hrs[i][2])});
+    for (i = 0; i <= 24; i += 6) lab.push([i, String(i).padStart(2, "0") + ":00"]);
+    return {pts: pts, x0: 0, x1: Math.max(cur, 1), unit: "/hour", ticks: lab.filter(function(l){ return l[0] <= Math.max(cur, 1); }), hourly: true};
   }
-  setInterval(status, 1000);
-
-  function gate(msg){
-    document.getElementById("app").innerHTML = '<div class="gate"><div class="brand" style="justify-content:center"><i></i>tokentrim live</div>' +
-      '<p style="color:var(--mute)">' + msg + '</p><input id="k" placeholder="access key" autocomplete="off"><button id="go">Open</button></div>';
-    $("go").onclick = function(){ store.set("tt-key", $("k").value.trim()); location.reload(); };
+  var wk = s.week || [];
+  wk.forEach(function(d, j){ pts.push({t: j, u: d.used, w: Math.max(d.used, d.would), c: d.cost, label: d.label + " " + d.day.slice(5), steps: d.steps}); lab.push([j, d.label]); });
+  return {pts: pts, x0: 0, x1: Math.max(1, wk.length - 1), unit: "/day", ticks: lab, daily: true};
+}
+function smooth(x, P, join){   // Catmull-Rom through the points, control points clamped so the curve never overshoots
+  if (!P.length) return;
+  (join ? x.lineTo : x.moveTo).call(x, P[0][0], P[0][1]);
+  for (var i = 0; i < P.length - 1; i++){
+    var p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+    var lo = Math.min(p1[1], p2[1]), hi = Math.max(p1[1], p2[1]);
+    var c1y = Math.max(lo, Math.min(hi, p1[1] + (p2[1] - p0[1]) / 6)), c2y = Math.max(lo, Math.min(hi, p2[1] - (p3[1] - p1[1]) / 6));
+    x.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, c1y, p2[0] - (p3[0] - p1[0]) / 6, c2y, p2[0], p2[1]);
   }
-
-  var busy = false;
-  function poll(){
-    if (busy || document.hidden) return; busy = true;
-    var h = {}; if (key) h.Authorization = "Bearer " + key;
-    fetch("live.json", {headers: h, cache: "no-store"}).then(function(r){
-      if (r.status === 401) { gate("Paste the access key from <code>tokentrim live --link</code>, or open the full link once on this device."); throw 0; }
-      if (r.status === 204) { $("statustxt").textContent = "waiting for your Mac…"; throw 0; }
-      return r.json(); }).then(render).catch(function(){}).then(function(){ busy = false; });
+}
+function drawHero(){
+  if (!last) return;
+  var box = $("c-hero"), D = heroData(last), P = D.pts, g = setup(box), x = g.x;
+  var pad = {l: 46, r: 14, t: 14, b: 24}, W = g.w - pad.l - pad.r, H = g.h - pad.t - pad.b;
+  var top = Math.max(1, P.reduce(function(a, p){ return Math.max(a, p.w, p.u); }, 0)) * 1.15;
+  hero.max = hero.max && D.live ? hero.max + (top - hero.max) * .12 : top;   // rescale gently instead of jumping
+  var max = hero.max;
+  function X(t){ return pad.l + W * (t - D.x0) / ((D.x1 - D.x0) || 1); } function Y(v){ return pad.t + H * (1 - Math.min(v, max) / max); }
+  x.strokeStyle = css("--line"); x.fillStyle = css("--dim"); x.lineWidth = 1; x.font = "10.5px " + css("--mono");
+  for (var i = 0; i <= 4; i++){ var y = Math.round(pad.t + H * i / 4) + .5;
+    x.setLineDash(i === 4 ? [] : [2, 4]); x.beginPath(); x.moveTo(pad.l, y); x.lineTo(g.w - pad.r, y); x.stroke();
+    x.fillText(k(max * (1 - i / 4)), 4, y + 3); }
+  x.setLineDash([]);
+  D.ticks.forEach(function(tk){ var tx = X(tk[0]); x.textAlign = tk[0] === D.x1 ? "right" : tk[0] === D.x0 ? "left" : "center"; x.fillText(tk[1], tx, g.h - 6); });
+  x.textAlign = "left";
+  if (P.length < 2){
+    x.fillStyle = css("--mute"); x.font = "13px " + css("--sans"); x.textAlign = "center";
+    x.fillText(D.live ? "Quiet right now. The line moves the moment Claude Code does something." : "No usage in this range yet.", pad.l + W / 2, pad.t + H / 2);
+    x.textAlign = "left"; hover(box, 0, pad, function(){ return ""; }); return;
   }
-  if (remote && !key) gate("This page is private. Open the link from <code>tokentrim live --link</code> once on this device, or paste its key.");
-  else { poll(); setInterval(poll, 2000); document.addEventListener("visibilitychange", poll); }
-  addEventListener("resize", function(){ last && (chart60(last), chartHours(last)); });
+  var U = P.map(function(p){ return [X(p.t), Y(p.u)]; }), Wp = P.map(function(p){ return [X(p.t), Y(p.w)]; });
+  var good = css("--good"), wo = css("--would");
+  // saved band between the two curves
+  x.beginPath(); smooth(x, Wp); smooth(x, U.slice().reverse(), true); x.closePath(); x.fillStyle = hexa(good, .10); x.fill();
+  // fill under actual
+  var gr = x.createLinearGradient(0, pad.t, 0, pad.t + H); gr.addColorStop(0, hexa(good, .30)); gr.addColorStop(1, hexa(good, 0));
+  x.beginPath(); smooth(x, U); x.lineTo(U[U.length - 1][0], pad.t + H); x.lineTo(U[0][0], pad.t + H); x.closePath(); x.fillStyle = gr; x.fill();
+  // lines with glow
+  x.lineJoin = "round"; x.lineCap = "round";
+  x.save(); x.shadowColor = wo; x.shadowBlur = 10; x.strokeStyle = wo; x.lineWidth = 1.8; x.setLineDash([5, 5]); x.beginPath(); smooth(x, Wp); x.stroke(); x.restore();
+  x.save(); x.shadowColor = good; x.shadowBlur = 14; x.strokeStyle = good; x.lineWidth = 2.6; x.beginPath(); smooth(x, U); x.stroke(); x.restore();
+  // event markers from the log
+  if (!D.hourly && !D.daily){
+    var ic = {trim: "✂", compact: "⇣", rebuild: "↻", setting: "⚙"}, col = {trim: good, compact: css("--violet"), rebuild: css("--bad"), setting: css("--info")}, seen = {};
+    (last.log || []).forEach(function(r){
+      if (!ic[r.kind] || r.ts < D.x0 || r.ts > D.x1) return;
+      var mx = Math.round(X(r.ts)); if (seen[r.kind + (mx >> 3)]) return; seen[r.kind + (mx >> 3)] = 1;
+      x.strokeStyle = hexa(col[r.kind], .35); x.beginPath(); x.moveTo(mx + .5, pad.t + 12); x.lineTo(mx + .5, pad.t + H); x.stroke();
+      x.fillStyle = col[r.kind]; x.font = "11px " + css("--sans"); x.textAlign = "center"; x.fillText(ic[r.kind], mx, pad.t + 8); x.textAlign = "left";
+    });
+  }
+  // the live tip
+  var e = U[U.length - 1];
+  if (D.live){
+    var ph = (performance.now() % 1600) / 1600;
+    x.beginPath(); x.arc(e[0], e[1], 4 + 10 * ph, 0, 7); x.fillStyle = hexa(good, .35 * (1 - ph)); x.fill();
+  }
+  x.beginPath(); x.arc(e[0], e[1], 4, 0, 7); x.fillStyle = good; x.fill(); x.lineWidth = 2; x.strokeStyle = css("--panel"); x.stroke();
+  // crosshair
+  if (hero.hx != null){
+    var best = 0; U.forEach(function(u, j){ if (Math.abs(u[0] - hero.hx) < Math.abs(U[best][0] - hero.hx)) best = j; });
+    var hp = P[best], cx = U[best][0];
+    x.strokeStyle = css("--line2"); x.setLineDash([3, 3]); x.beginPath(); x.moveTo(cx + .5, pad.t); x.lineTo(cx + .5, pad.t + H); x.stroke(); x.setLineDash([]);
+    [[Wp[best], wo], [U[best], good]].forEach(function(q){ x.beginPath(); x.arc(q[0][0], q[0][1], 4.5, 0, 7); x.fillStyle = q[1]; x.fill(); x.strokeStyle = css("--panel"); x.lineWidth = 2; x.stroke(); });
+    var tip = box.querySelector(".tip"), when = D.live || hero.mode === "hour" ? hms(hp.t) : D.hourly ? String(hp.t).padStart(2, "0") + ":00" : hp.label;
+    tip.innerHTML = "<b>" + esc(when) + "</b><br><span class=g>actual " + k(hp.u) + D.unit + "</span><br><span class=o>without " + k(hp.w) + D.unit + "</span><br>saved " + k(hp.w - hp.u) +
+      (hp.w ? " · " + pct(1 - hp.u / hp.w) : "") + (hp.c != null ? "<br>usage " + usd(hp.c) + (D.live ? "/min" : "") : "");
+    tip.style.display = "block";
+    var tx = cx + 14; if (tx + tip.offsetWidth > g.w) tx = cx - tip.offsetWidth - 14;
+    tip.style.left = Math.max(0, tx) + "px"; tip.style.top = "8px";
+  }
+}
+function heroReadout(){
+  if (!last) return;
+  var s = last, m = hero.mode, T = s.today || {}, u = 0, w = 0, c = 0, L;
+  if (m === "live"){
+    var D = heroData(s), p = D.pts[D.pts.length - 1] || {u: 0, w: 0, c: 0};
+    u = p.u; w = p.w; c = p.c; L = ["Re-reading now /min", "Without tokentrim /min", "Saving /min", "Usage /min"];
+  } else if (m === "hour"){
+    (s.minutes || []).forEach(function(r){ u += r[1]; w += Math.max(r[1], r[2]); });
+    var t0 = Date.now() / 1000 - 3600; (s.log || []).forEach(function(r){ if (r.ts >= t0) c += r.cost || 0; });
+    L = ["Re-read, 60 min", "Without, 60 min", "Saved, 60 min", "Usage, 60 min"];
+  } else if (m === "today"){
+    u = T.used || 0; w = Math.max(u, T.would || 0); c = T.cost || 0; L = ["Re-read today", "Without today", "Saved today", "Usage today"];
+  } else {
+    (s.week || []).forEach(function(d){ u += d.used; w += Math.max(d.used, d.would); c += d.cost || 0; }); L = ["Re-read, 7 days", "Without, 7 days", "Saved, 7 days", "Usage, 7 days"];
+  }
+  ["h-l1", "h-l2", "h-l3", "h-l4"].forEach(function(id, i){ $(id).textContent = L[i]; });
+  $("h-dot").className = "dot" + (m === "live" && u > 0 ? " live" : "");
+  tween("h-used", u, k); tween("h-would", w, k);
+  tween("h-saved", Math.max(0, w - u), function(v){ return k(v) + (w ? " · " + pct(Math.max(0, w - u) / w) : ""); });
+  tween("h-cost", c, usd);
+}
+function heroLoop(t){
+  hero.raf = 0;
+  if (document.hidden || !last) return;
+  if (hero.mode === "live" && t - hero.lastDraw > 66){ hero.lastDraw = t; drawHero(); }   // ~15 fps: smooth scroll, little CPU
+  if (hero.mode === "live" || hero.hx != null) hero.raf = requestAnimationFrame(heroLoop);
+}
+function heroKick(){ if (!hero.raf) hero.raf = requestAnimationFrame(heroLoop); }
+(function(){
+  var box = $("c-hero");
+  box.onmousemove = function(e){ hero.hx = e.clientX - box.getBoundingClientRect().left; if (hero.mode !== "live") drawHero(); };
+  box.onmouseleave = function(){ hero.hx = null; box.querySelector(".tip").style.display = "none"; drawHero(); };
+  $("h-tabs").onclick = function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    hero.mode = b.getAttribute("data-m"); hero.max = 0; store.set("tt-hero", hero.mode);
+    [].forEach.call(this.children, function(c){ c.className = c === b ? "on" : ""; c.setAttribute("aria-selected", c === b); });
+    $("h-marks").style.display = hero.mode === "live" || hero.mode === "hour" ? "" : "none";
+    drawHero(); heroReadout(); heroKick();
+  };
+  [].forEach.call($("h-tabs").children, function(c){ c.className = c.getAttribute("data-m") === hero.mode ? "on" : ""; });
+})();
+
+// ---------- toast, clipboard
+var toastT;
+function toast(msg, bad){
+  var t = $("toast"); t.innerHTML = msg; t.style.borderColor = bad ? "var(--bad)" : "";
+  t.className = "toast show"; clearTimeout(toastT); toastT = setTimeout(function(){ t.className = "toast"; }, bad ? 6000 : 3500);
+}
+function copy(text){
+  function fb(){ var a = document.createElement("textarea"); a.value = text; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); } catch (e) {} a.remove(); }
+  (navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(text).catch(fb) : Promise.resolve(fb())).then(function(){
+    toast("Copied <code>" + esc(text.length > 40 ? text.slice(0, 40) + "…" : text) + "</code>. Paste it into Claude Code."); });
+}
+
+// ---------- settings: local POST, or queued through the cloud/remote relay and applied by your Mac
+var pend = {};   // key -> {v, id, at}
+function sendSettings(changes){
+  var keys = Object.keys(changes), at = Date.now();
+  keys.forEach(function(kk){ pend[kk] = {v: changes[kk], id: null, at: at}; });
+  last && renderControls(last);
+  var h = {"Content-Type": "application/json"}, url;
+  if (MODE === "local"){ url = "/settings"; h["X-TokenTrim"] = "1"; }
+  else { url = MODE === "cloud" ? "/api/settings" : "/settings"; h.Authorization = "Bearer " + store.get(cfg.key); }
+  function fail(msg){ keys.forEach(function(kk){ delete pend[kk]; }); last && renderControls(last); toast("Couldn't change that: " + esc(msg), true); }
+  fetch(url, {method: "POST", headers: h, body: JSON.stringify({changes: changes})}).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if (!r.ok || j.ok === false) return fail(j.error || "HTTP " + r.status);
+      if (MODE === "local"){
+        keys.forEach(function(kk){ delete pend[kk]; });
+        if (last && j.controls){ last.controls = j.controls; renderControls(last); }
+        toast(j.changed && j.changed.length ? "Saved on this Mac. " + whenNote(keys) : "Already set that way.");
+        schedule(400);
+      } else {
+        keys.forEach(function(kk){ if (pend[kk]) pend[kk].id = j.id; });
+        last && renderControls(last); toast("Sent. Your Mac applies it on its next sync, usually within seconds.");
+        schedule(1500);
+      }
+    });
+  }).catch(function(){ fail("network error"); });
+}
+function whenNote(keys){
+  var spec = (last && last.controls && last.controls.spec) || {};
+  return keys.some(function(kk){ return spec[kk] && !spec[kk].live; }) ? "Applies to new Claude Code sessions." :
+    keys.every(function(kk){ return PROMPT_KEYS.indexOf(kk) >= 0; }) ? "Takes effect on your next message to Claude." : "Takes effect on Claude's next tool call.";
+}
+function settleSettings(hdr){   // x-settings from the relay: {results:[{id, ok, error}], pending:[id]}
+  if (!hdr) return; var j; try { j = JSON.parse(hdr); } catch (e) { return; }
+  var res = {}; (j.results || []).forEach(function(r){ res[r.id] = r; });
+  var waiting = {}; (j.pending || []).forEach(function(id){ waiting[id] = 1; });
+  var changed = false, done = {};
+  Object.keys(pend).forEach(function(kk){
+    var p = pend[kk]; if (!p.id) return;
+    if (res[p.id]){ done[p.id] = res[p.id]; delete pend[kk]; changed = true; }
+    else if (!waiting[p.id] && Date.now() - p.at > 8000){ delete pend[kk]; changed = true; done[p.id] = {ok: false, error: "expired before your Mac picked it up"}; }
+  });
+  Object.keys(done).forEach(function(id){ var r = done[id];
+    toast(r.ok ? "Your Mac applied the change." : "Your Mac refused it: " + esc(r.error || "unknown"), !r.ok); });
+  if (changed && last) renderControls(last);
+}
+var recSig = "";
+function renderRecs(s){
+  var rs = s.recs || [], sig = JSON.stringify(rs);
+  $("rec-n").textContent = rs.length ? rs.length + " for your usage today" : "";
+  if (sig === recSig) return; recSig = sig;
+  $("recs").innerHTML = rs.length ? rs.map(function(r, i){
+    var a = r.action, btn = "";
+    if (a && a.type === "set") btn = '<button class="btn go" data-i="' + i + '">' + esc(a.label) + '</button>';
+    else if (a && a.type === "copy") btn = '<button class="btn" data-i="' + i + '">' + esc(a.label) + '</button>';
+    return '<li class="rec ' + r.level + '"><span class="lv"></span><div><b>' + esc(r.title) + '</b><p>' + esc(r.detail) + '</p></div><div class="side">' +
+      (r.impact ? '<span class="impact" title="estimated from today\'s own steps">≈ ' + usd(r.impact) + ' today</span>' : "") + btn + '</div></li>';
+  }).join("") : '<li class="rec low"><span class="lv"></span><div><b>Nothing to change right now</b><p>Your setup is already lean for today\'s work. Suggestions appear here as patterns show up.</p></div><div></div></li>';
+}
+$("recs").onclick = function(e){
+  var b = e.target.closest("button[data-i]"); if (!b || !last) return;
+  var r = (last.recs || [])[+b.getAttribute("data-i")]; if (!r || !r.action) return;
+  if (r.action.type === "copy") copy(r.action.text);
+  else { b.disabled = true; b.textContent = "Applying…"; sendSettings(r.action.changes); }
+};
+var CTL_ORDER = ["rule_screenshots", "rule_outline", "rule_bash", "rule_mcp", "rule_images", "mcp_lossless_only", "rule_meter", "guidance"];
+var PROMPT_KEYS = ["model_advisor", "cache_guard", "budget_guard", "budget_usd", "budget_block", "rule_meter"];
+var SMART = ["model_mode", "subagent_model", "effort", "cache_ttl", "model_advisor", "cache_guard", "budget_guard", "budget_usd", "budget_block"];
+var CHOICE_TXT = {off:"Off", auto:"Auto", sonnet:"Sonnet", haiku:"Haiku", medium:"Medium", low:"Low", "1h":"1 hour"};
+function choiceTxt(kk, x){ return kk === "budget_usd" ? "$" + x : (CHOICE_TXT[x] || String(x)); }
+function renderControls(s){
+  var c = s.controls;
+  $("ctl-where").textContent = MODE === "local" ? "changes Claude Code on this Mac" : "relayed to your Mac";
+  if (!c || !c.values){ $("ctl").innerHTML = '<div class="empty">Update tokentrim on your Mac to change settings from here.</div>'; return; }
+  var v = {}, spec = c.spec || {};
+  Object.keys(c.values).forEach(function(kk){ v[kk] = pend[kk] ? pend[kk].v : c.values[kk]; });
+  function st(kk){ return pend[kk] ? '<span class="st" style="color:var(--warn)">' + (pend[kk].id ? "waiting for your Mac…" : "applying…") + '</span>' : ""; }
+  function sw(kk, dis){ return '<button class="sw' + (v[kk] ? " on" : "") + (pend[kk] ? " busy" : "") + '" role="switch" aria-checked="' + !!v[kk] + '" aria-label="' + esc((spec[kk] || {}).label || kk) + '" data-k="' + kk + '"' + (dis ? " disabled" : "") + '></button>'; }
+  function item(kk, cls, dis){ var sp = spec[kk] || {label: kk, help: ""};
+    return '<div class="it' + (cls || "") + '"><div><b>' + esc(sp.label) + '</b><span class="when">' + (sp.live ? "instant" : "new sessions") + '</span>' + st(kk) + '</div>' + sw(kk, dis) + '<p>' + esc(sp.help) + '</p></div>'; }
+  var on = v.enabled !== false, out = item("enabled", " master" + (on ? "" : " off"));
+  var pr = c.profiles || {}, cur = v.profile;
+  out += '<div class="it" style="display:block"><div><b>' + esc((spec.profile || {}).label || "Summary point") + '</b><span class="when">new sessions</span>' + st("profile") + '</div>' +
+    '<p>' + esc((spec.profile || {}).help || "") + (c.window ? " Now: " + k(c.window) + " tokens." : "") + '</p><div class="prof">' +
+    Object.keys(pr).map(function(n){ return '<button data-p="' + n + '" class="' + (cur === n ? "on" : "") + '"' + (c.installed ? "" : " disabled") + '>' + n[0].toUpperCase() + n.slice(1) +
+      '<small>at ' + k(pr[n]) + '</small></button>'; }).join("") + '</div>' + (c.installed ? "" : '<p class="note">Run <code>tokentrim install</code> on your Mac to pick a summary point.</p>') + '</div>';
+  CTL_ORDER.forEach(function(kk){ if (kk in v) out += item(kk, "", !on && kk !== "guidance"); });
+  function choice(kk, dis){ var sp = spec[kk] || {label: kk, help: "", choices: []};
+    return '<div class="it" style="display:block"><div><b>' + esc(sp.label) + '</b><span class="when">' + (sp.live ? "instant" : "new sessions") + '</span>' + st(kk) + '</div><p>' + esc(sp.help) + '</p>' +
+      '<div class="seg" role="radiogroup" aria-label="' + esc(sp.label) + '">' + (sp.choices || []).map(function(x){ return '<button role="radio" aria-checked="' + (v[kk] === x) + '" data-c="' + kk + '" data-v="' + esc(JSON.stringify(x)) + '" class="' + (v[kk] === x ? "on" : "") + '"' + (dis ? " disabled" : "") + '>' + esc(choiceTxt(kk, x)) + '</button>'; }).join("") + '</div>' + (kk === "budget_usd" ? budget() : "") + (sup[kk] ? '<p class="note" style="color:var(--warn)">' + esc(sup[kk]) + '</p>' : "") + '</div>'; }
+  var sup = c.support || {};
+  function budget(){ var spent = (s.today || {}).cost || 0, cap = v.budget_usd || 0, f = cap ? spent / cap : 0;
+    return '<div class="bud' + (f >= 1 ? " r" : f >= 0.8 ? " w" : "") + '"><i style="width:' + Math.min(100, 100 * f).toFixed(1) + '%"></i></div><p class="note">Today ' + usd(spent) + ' of ' + usd(cap) + (v.budget_guard ? "" : " · guard off") + '</p>'; }
+  var smart = SMART.filter(function(kk){ return kk in v; });
+  if (smart.length){
+    out += '<div class="grp">Smart features</div>';
+    smart.forEach(function(kk){
+      var sp = spec[kk] || {}, needsInstall = !sp.live;
+      if (kk === "budget_block" && !v.budget_guard) return;
+      if (kk === "budget_usd" && !v.budget_guard) return;
+      var dead = sup[kk] && sup[kk].indexOf("Needs") === 0 && v[kk] === "off";   // no Claude Code here reads it: don't offer it
+      out += sp.kind === "choice" ? choice(kk, !on || (needsInstall && !c.installed) || dead) : item(kk, "", !on);
+    });
+    if (c.claude && (c.claude.model || c.claude.effort)) out += '<p class="note">Claude Code now: model <code>' + esc(c.claude.model || "default") + '</code>, effort <code>' + esc(c.claude.effort || "default") + '</code>' + (c.ttl ? ' · cache lasts ' + (c.ttl >= 3600 ? "1 hour" : "5 min") : "") + '.</p>';
+    else if (c.ttl) out += '<p class="note">Your prompt cache lasts ' + (c.ttl >= 3600 ? "1 hour" : "5 minutes") + ' (measured from your breaks today).</p>';
+  }
+  out += '<p class="note">Instant switches apply on Claude\'s next tool call (guards and alerts: on your next message). “New sessions” settings apply when you next start Claude Code. Every change is logged below.</p>';
+  $("ctl").innerHTML = out;
+}
+$("ctl").onclick = function(e){
+  if (!last || !last.controls) return;
+  var b = e.target.closest("button"); if (!b || b.disabled) return;
+  var kk = b.getAttribute("data-k"), p = b.getAttribute("data-p"), cc = b.getAttribute("data-c"), ch = {};
+  if (kk){ if (pend[kk]) return; ch[kk] = !(kk in pend ? pend[kk].v : last.controls.values[kk]); }
+  else if (p){ if (pend.profile || last.controls.values.profile === p) return; ch.profile = p; }
+  else if (cc){ var cv; try { cv = JSON.parse(b.getAttribute("data-v")); } catch (x) { return; }
+    if (pend[cc] || last.controls.values[cc] === cv) return; ch[cc] = cv; }
+  else return;
+  sendSettings(ch);
+};
+
+// ---------- render
+var last = null, lastHeat = "", logState = {kind:"all", conv:"", q:"", paused:false, seen:{}, first:true};
+var KINDS = [["all","All"],["step","Steps"],["trim","Trims"],["compact","Summaries"],["rebuild","Cache rebuilds"],["agent","Sub-agents"],["setting","Settings"]];
+var open = {};
+
+function render(s, force){
+  last = s;
+  var T = s.today || {}, used = T.used || 0, would = Math.max(T.would || 0, used);
+  tween("k-saved", T.saved || 0, k);
+  $("k-saved-s").textContent = usd(T.usd) + " at API prices · " + (T.trims || 0) + " trims";
+  $("k-x").textContent = used ? (would / used).toFixed(1) + "×" : "–";
+  $("k-x-s").textContent = would ? pct(1 - used / would) + " less re-read than without" : "longer than without";
+  tween("k-used", used, k);
+  $("k-used-s").textContent = "without tokentrim: " + k(would);
+  $("k-used-b").style.width = (would ? 100 * used / would : 0).toFixed(1) + "%";
+  tween("k-cost", T.cost || 0, usd);
+  $("k-cost-s").textContent = "without: " + usd(T.would_cost) + " · " + (T.steps || 0) + " steps";
+  $("k-cache").textContent = T.cache_hit == null ? "–" : (T.cache_hit * 100).toFixed(1) + "%";
+  $("k-cache-s").textContent = "avg context " + k(T.avg_ctx) + "/step";
+  var r = s.rate || {};
+  tween("k-now", Math.max(0, r.saved_pm || 0), function(v){ return k(v) + "/min"; });
+  $("k-now-s").textContent = "saved · re-reading " + k(r.used_pm) + "/min";
+  $("k-now-dot").className = "dot" + (r.used_pm > 0 ? " live" : "");
+
+  renderWindow(s.window);
+  var ins = s.insights || [];
+  $("ins-n").textContent = ins.length ? ins.length + " live" : "";
+  $("ins").innerHTML = ins.length ? ins.map(function(i){ return '<li class="' + i.level + '"><span class="tag">' + i.level + '</span><span>' + esc(i.text) + '</span></li>'; }).join("")
+                                  : '<li class="info"><span class="tag">info</span><span>Insights appear as you work.</span></li>';
+
+  drawHero(); heroReadout(); heroKick();
+  renderRecs(s);
+  renderControls(s);
+  renderHeat(s);
+  renderConvs(s);
+
+  var pj = s.projects || [], pt = pj.reduce(function(a, p){ return a + p[1]; }, 0);
+  $("b-proj").innerHTML = rowsHTML(pj.map(function(p){ return [esc(p[0]), k(p[1]) + " · " + usd(p[3]) + ' · <span class="g">' + k(p[2]) + ' saved</span>', p[1]]; }), "var(--used)", pt);
+  var md = s.models || [], mt = md.reduce(function(a, m){ return a + m[2]; }, 0);
+  $("b-model").innerHTML = rowsHTML(md.map(function(m){ return [esc(m[0][0].toUpperCase() + m[0].slice(1)), usd(m[2]) + " · " + k(m[1]) + " · " + m[3] + " steps", m[2]]; }), "var(--violet)", mt);
+  var ru = s.rules || [], rt = ru.reduce(function(a, x){ return a + x[2]; }, 0);
+  $("b-rules").innerHTML = rowsHTML(ru.map(function(x){ return [esc(x[0]), k(x[2]) + " · " + x[1] + "×", x[2]]; }), "var(--good)", rt) +
+    ((T.compactions || 0) ? '<div class="row"><span class="n">Early summaries</span><span class="v">' + T.compactions + ' today</span></div>' : "");
+
+  var ic = {trim:"✂", compact:"⇣", jump:"↑", rebuild:"↻", setting:"⚙"};
+  $("feed").innerHTML = (s.feed || []).map(function(f){ return '<li><span class="w">' + hm(f.ts) + '</span><span>' + (ic[f.kind] || "•") + '</span><span class="s" title="' + esc(f.text) + '">' +
+    (f.project ? '<span class="dim">' + esc(f.project) + ' · </span>' : "") + esc(f.text) + '</span></li>'; }).join("") || '<li><span></span><span></span><span class="dim">Nothing notable yet.</span></li>';
+
+  if (!logState.paused || force) renderLog(s.log || []);
+  else { var n = (s.log || []).filter(function(r){ return !logState.seen[key(r)]; }).length; $("log-pause").textContent = n ? "Resume (" + n + " new)" : "Resume"; }
+
+  var sy = s.sync || {}, names = Object.keys(sy);
+  if (MODE === "local" && names.length){
+    var bad = names.filter(function(n){ return !sy[n].ok; });
+    $("sync").hidden = false;
+    $("sync").innerHTML = '<span class="dot ' + (bad.length ? "bad" : "live") + '"></span>' + (bad.length ? (bad[0] === "cloud" ? "Pro cloud: " : "Remote: ") + esc(sy[bad[0]].error) :
+      (sy.cloud ? "Pro cloud" : "Remote") + " synced " + ago(Date.now() / 1000 - Math.max.apply(null, names.map(function(n){ return sy[n].at || 0; }))));
+  }
+}
+
+function renderWindow(w){
+  if (!w){ $("w-reset").textContent = ""; $("w-body").innerHTML = '<div class="empty">No usage in the current 5-hour window. The next one starts with your next message.</div>'; return; }
+  var now = Date.now() / 1000, left = w.end - now, scale = Math.max(w.peak || 0, w.projected || 0, w.would_cost || 0, w.cost) * 1.08 || 1;
+  $("w-reset").textContent = "resets " + hm(w.end) + " · " + dur(left) + " left";
+  var hot = w.peak && w.projected > w.peak * .9;
+  $("w-body").innerHTML =
+    '<div class="win-top"><div><div class="mute" style="font-size:12px">used so far</div><div class="win-big num">' + usd(w.cost) + '</div></div>' +
+    '<div><div class="mute" style="font-size:12px">projected by reset</div><div class="num" style="font-size:20px;font-weight:700;color:' + (hot ? "var(--warn)" : "var(--ink)") + '">' + usd(w.projected) + '</div></div>' +
+    '<div><div class="mute" style="font-size:12px">without tokentrim</div><div class="num o" style="font-size:20px;font-weight:700">' + usd(w.would_cost) + '</div></div></div>' +
+    '<div class="track"><div class="proj" style="left:' + (100 * w.cost / scale).toFixed(2) + '%;width:' + (100 * Math.max(0, w.projected - w.cost) / scale).toFixed(2) + '%"></div>' +
+    '<div class="fill" style="width:' + (100 * w.cost / scale).toFixed(2) + '%"></div>' +
+    (w.peak ? '<div class="peak" style="left:' + (100 * w.peak / scale).toFixed(2) + '%"><b>heaviest ' + usd(w.peak) + '</b></div>' : "") + '</div>' +
+    '<div class="track ghost"><div class="fill" style="width:' + (100 * w.would_cost / scale).toFixed(2) + '%"></div></div>' +
+    '<div class="legend"><span><i style="background:var(--used)"></i>used</span><span><i style="background:rgba(90,169,255,.35)"></i>at this pace</span><span><i style="background:var(--would)"></i>without tokentrim</span>' + (w.peak ? '<span><i style="background:var(--warn)"></i>your heaviest window, 7 days</span>' : "") + '</div>' +
+    '<div class="stats"><div class="stat"><b class="num">' + usd(w.rate) + '/min</b><span>pace, last 30 min</span></div>' +
+    '<div class="stat"><b class="num">' + k(w.used) + '</b><span>tokens re-read</span></div>' +
+    '<div class="stat"><b class="num g">' + k(Math.max(0, w.would - w.used)) + '</b><span>saved this window</span></div>' +
+    '<div class="stat"><b class="num">' + w.steps + '</b><span>steps · started ' + hm(w.start) + '</span></div></div>';
+}
+
+function renderHeat(s){
+  var h = s.heat || [], days = s.heat_days || [], sig = JSON.stringify(h);
+  if (sig === lastHeat) return; lastHeat = sig;
+  var max = 0; h.forEach(function(r){ r.forEach(function(v){ if (v > max) max = v; }); });
+  var out = '<span></span>'; for (var i = 0; i < 24; i++) out += '<span class="h">' + (i % 6 === 0 ? i : "") + '</span>';
+  h.forEach(function(r, d){
+    out += '<span>' + esc(days[d] || "") + '</span>';
+    r.forEach(function(v, i){ var a = v && max ? .12 + .88 * Math.log(1 + v) / Math.log(1 + max) : 0;
+      out += '<span class="c" title="' + esc(days[d]) + " " + String(i).padStart(2, "0") + ':00 · ' + k(v) + '" style="' + (a ? "background:" + hexa(css("--good"), a.toFixed(2)) + ";border-color:transparent" : "") + '"></span>'; });
+  });
+  $("heat").innerHTML = out;
+}
+
+function renderConvs(s){
+  var cs = s.convs || [], trig = s.trigger || 150000;
+  $("cv-n").textContent = cs.length ? cs.length + " active in the last 20 min · summary point " + k(trig) : "";
+  $("convs").innerHTML = cs.length ? cs.map(function(c){
+    var f = Math.min(1, c.ctx / trig), cls = f > .9 ? "r" : f > .75 ? "w" : "";
+    var tc = c.to_compact == null ? "–" : c.to_compact < 2 ? "now" : "~" + c.to_compact;
+    return '<div class="conv"><div class="t"><b title="' + esc(c.title || c.label) + '">' + esc(c.label) + '</b><span class="spacer"></span>' +
+      (c.model && c.model !== "other" ? '<span class="badge">' + esc(c.model) + '</span>' : "") +
+      (c.compactions ? '<span class="badge g">' + c.compactions + '× summarised</span>' : "") + '</div>' +
+      spark(c.series, trig) +
+      '<div class="meter ' + cls + '"><i style="width:' + (100 * f).toFixed(1) + '%"></i></div>' +
+      '<div class="kv"><div><b class="num">' + k(c.ctx) + '</b><span>context now</span></div><div><b class="num g">' + k(c.saved) + '</b><span>saved today</span></div>' +
+      '<div><b class="num">' + usd(c.cost) + '</b><span>usage today</span></div><div><b class="num">' + tc + '</b><span>steps to summary</span></div></div>' +
+      '<div class="mute" style="font-size:11.5px;margin-top:7px">' + c.steps + ' steps' + (c.agents ? " · " + c.agents + " sub-agents" : "") + ' · +' + k(c.growth) + '/step · ' + ago(Date.now() / 1000 - c.last) + '</div></div>';
+  }).join("") : '<div class="empty">No conversation active in the last 20 minutes. Start one in Claude Code and it appears here within seconds.</div>';
+}
+
+// ---------- log
+function key(r){ return r.ts + "|" + r.kind + "|" + r.sid + "|" + (r.saved || 0); }
+function kindLabel(r){
+  if (r.kind === "trim") return '<span class="k k-trim">trim</span> <span class="mute">' + esc(r.rule) + '</span>';
+  if (r.kind === "compact") return '<span class="k k-compact">summary</span>';
+  if (r.kind === "rebuild") return '<span class="k k-rebuild">cache rebuild</span> <span class="mute">after ' + Math.round((r.gap || 0) / 60) + ' min</span>';
+  if (r.kind === "agent") return '<span class="k k-agent">sub-agent</span>' + flags(r);
+  if (r.kind === "setting") return '<span class="k k-setting">setting</span> <span class="mute">' + esc(r.rule) + '</span>';
+  return '<span class="k k-step">step</span>' + flags(r);
+}
+function flags(r){   // things worth a second look
+  var f = "";
+  if (r.dctx > 20000) f += '<span class="flag w" title="context grew a lot in one step">+' + k(r.dctx) + ' jump</span>';
+  if (r.since > 300 && r.cw > 20000) f += '<span class="flag r" title="idle past the 5-minute cache, so context was written again">cold cache</span>';
+  if (r.cost > 0.5) f += '<span class="flag w" title="one of your more expensive steps">' + usd(r.cost) + '</span>';
+  return f;
+}
+function gapTxt(s){ return s == null ? "–" : s < 60 ? s + "s" : s < 3600 ? Math.round(s / 60) + " min" : (s / 3600).toFixed(1) + " h"; }
+function detail(r){
+  var why;
+  if (r.kind === "trim") why = "The " + esc(r.rule) + " rule cut a " + esc((r.tool || "").replace(/^mcp__[^_]+__/, "")) + " result from " + k(r.before) + " to " + k(r.after) + " tokens. Claude re-reads that " + k(r.saved) + " less on every later step.";
+  else if (r.kind === "setting") why = "Changed from the " + esc(r.tool || "local") + " dashboard.";
+  else if (r.kind === "compact") why = "Claude Code summarised earlier turns. Context dropped to " + k(r.ctx) + "; without tokentrim's earlier summary point it would still be " + k(r.cf) + ".";
+  else if (r.kind === "rebuild") why = "The prompt cache expired after " + gapTxt(r.gap || r.since) + " idle, so " + k(r.cw) + " tokens were written again at 1.25× price. Coming back within 5 minutes avoids this.";
+  else why = "Claude re-read " + k(r.cr) + " cached tokens" + (r.cw ? ", wrote " + k(r.cw) + " new to cache" : "") + " and produced " + k(r.out) + ". Without tokentrim the context would be " + k(r.cf) + ".";
+  function c(l, v){ return '<div><span>' + l + '</span>' + v + '</div>'; }
+  return '<tr class="det"><td colspan="12"><p style="margin:0 0 8px">' + why + '</p><div class="det-grid">' +
+    c("Time", new Date(r.ts * 1000).toLocaleString()) + c("Conversation", esc(r.conv)) + (r.model ? c("Model", esc(r.model)) : "") +
+    (r.kind !== "trim" && r.kind !== "setting" ? c("Cache read", k(r.cr)) + c("Cache write", k(r.cw)) + c("Fresh input", k(r.inp)) + c("Output", k(r.out)) +
+      c("Context change", r.dctx == null ? "–" : (r.dctx > 0 ? "+" : "") + k(r.dctx)) + c("Since last step", gapTxt(r.since)) + c("Usage", usd(r.cost)) + c("Saved", usd(r.save_usd)) : "") +
+    '</div></td></tr>';
+}
+function filtered(rows){
+  var q = logState.q.toLowerCase();
+  return rows.filter(function(r){
+    if (logState.kind !== "all" && r.kind !== logState.kind) return false;
+    if (logState.conv && r.conv !== logState.conv) return false;
+    if (q && (r.conv + " " + (r.model || "") + " " + (r.rule || "") + " " + r.kind).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+function renderLog(rows){
+  var counts = {all: rows.length};
+  rows.forEach(function(r){ counts[r.kind] = (counts[r.kind] || 0) + 1; });
+  $("log-kind").innerHTML = KINDS.map(function(x){ return '<button data-k="' + x[0] + '" class="' + (logState.kind === x[0] ? "on" : "") + '">' + x[1] + '<span class="c">' + (counts[x[0]] || 0) + '</span></button>'; }).join("");
+  var convs = {}; rows.forEach(function(r){ convs[r.conv] = 1; });
+  var sel = $("log-conv"), want = ['<option value="">All conversations</option>'].concat(Object.keys(convs).sort().map(function(c){ return '<option' + (c === logState.conv ? " selected" : "") + ">" + esc(c) + "</option>"; })).join("");
+  if (sel.innerHTML !== want && document.activeElement !== sel) sel.innerHTML = want;
+  var fr = filtered(rows).slice().reverse(), tot = {saved:0, cost:0, save_usd:0, out:0, cw:0};
+  var html = fr.map(function(r){
+    var isNew = !logState.first && !logState.seen[key(r)];
+    tot.saved += r.saved || 0; tot.cost += r.cost || 0; tot.save_usd += r.save_usd || 0; tot.out += r.out || 0; tot.cw += r.cw || 0;
+    var trim = r.kind === "trim";
+    var kk = key(r), dc = r.dctx == null || trim || r.kind === "setting" ? "–" : '<span class="' + (r.dctx > 0 ? "d-up" : r.dctx < 0 ? "d-dn" : "") + '">' + (r.dctx > 0 ? "+" : r.dctx < 0 ? "−" : "") + k(Math.abs(r.dctx)) + '</span>';
+    return '<tr data-key="' + esc(kk) + '" class="row' + (isNew ? ' new' : "") + '"><td class="mono mute">' + hms(r.ts) + '</td><td class="conv-c" title="' + esc(r.conv) + '">' + esc(r.conv) + '</td><td>' + kindLabel(r) + '</td><td>' + esc(trim ? (r.tool || "").replace(/^mcp__[^_]+__/, "") : r.model === "other" ? "–" : r.model) + '</td>' +
+      '<td class="num">' + (trim ? k(r.before) + " → " + k(r.after) : r.kind === "setting" ? "–" : k(r.ctx)) + '</td><td class="num">' + dc + '</td><td class="num o">' + (trim || r.kind === "setting" ? "–" : k(r.cf)) + '</td><td class="num g">' + (r.saved ? k(r.saved) : "–") + '</td>' +
+      '<td class="num">' + (r.out ? k(r.out) : "–") + '</td><td class="num">' + (r.cw ? k(r.cw) : "–") + '</td><td class="num">' + (r.cost ? usd(r.cost) : "–") + '</td><td class="num g">' + (r.save_usd ? usd(r.save_usd) : "–") + '</td></tr>' + (open[kk] ? detail(r) : "");
+  }).join("");
+  $("log").innerHTML = html || '<tr><td colspan="12" style="text-align:center" class="mute">No rows match.</td></tr>';
+  $("log-tot").innerHTML = '<td colspan="4">' + fr.length + ' rows shown</td><td></td><td></td><td></td><td class="num g">' + k(tot.saved) + '</td><td class="num">' + k(tot.out) + '</td><td class="num">' + k(tot.cw) + '</td><td class="num">' + usd(tot.cost) + '</td><td class="num g">' + usd(tot.save_usd) + '</td>';
+  $("log-n").textContent = rows.length + " events today · newest first · click a row for detail";
+  var now = Date.now() / 1000, steps = rows.filter(function(r){ return r.kind === "step" || r.kind === "agent" || r.kind === "rebuild"; });
+  var recent = steps.filter(function(r){ return r.ts > now - 300; }).length, big = steps.reduce(function(a, r){ return r.cost > (a ? a.cost : 0) ? r : a; }, null);
+  var cold = rows.filter(function(r){ return r.kind === "rebuild"; }), coldUsd = cold.reduce(function(a, r){ return a + (r.cost || 0); }, 0);
+  var avg = steps.length ? steps.reduce(function(a, r){ return a + (r.cost || 0); }, 0) / steps.length : 0;
+  $("log-stats").innerHTML = '<span>pace <b>' + (recent / 5).toFixed(1) + '</b> steps/min</span><span>avg step <b>' + usd(avg) + '</b></span>' +
+    (big ? '<span>priciest step <b>' + usd(big.cost) + '</b> in ' + esc(big.conv) + ' at ' + hm(big.ts) + '</span>' : "") +
+    '<span>cold-cache rebuilds <b>' + cold.length + '</b>' + (cold.length ? " · " + usd(coldUsd) : "") + '</span>' +
+    '<span>trims <b>' + rows.filter(function(r){ return r.kind === "trim"; }).length + '</b></span>';
+  logState.seen = {}; rows.forEach(function(r){ logState.seen[key(r)] = 1; }); logState.first = false;
+  $("log-pause").textContent = "Pause"; $("log-pause").className = "btn";
+}
+$("log").onclick = function(e){ var tr = e.target.closest("tr.row"); if (!tr || !last) return; var kk = tr.getAttribute("data-key"); if (open[kk]) delete open[kk]; else open[kk] = 1; renderLog(last.log || []); };
+$("log-kind").onclick = function(e){ var b = e.target.closest("button"); if (!b) return; logState.kind = b.getAttribute("data-k"); last && renderLog(last.log || []); };
+$("log-conv").onchange = function(){ logState.conv = this.value; last && renderLog(last.log || []); };
+$("log-q").oninput = function(){ logState.q = this.value; last && renderLog(last.log || []); };
+$("log-pause").onclick = function(){ logState.paused = !logState.paused; if (!logState.paused && last) renderLog(last.log || []); else { this.textContent = "Resume"; this.className = "btn on"; } };
+$("log-csv").onclick = function(){
+  if (!last) return;
+  var cols = ["time","conversation","event","rule","model","context","context_change","since_s","without","saved","cache_read","cache_write","input","output","usage_usd","saved_usd"];
+  var lines = [cols.join(",")].concat(filtered(last.log || []).map(function(r){
+    return [new Date(r.ts * 1000).toISOString(), r.conv, r.kind, r.rule || "", r.model || r.tool || "", r.kind === "trim" ? r.before : r.ctx, r.dctx == null ? "" : r.dctx, r.since == null ? "" : r.since, r.cf || "", r.saved || 0, r.cr || "", r.cw || "", r.inp || "", r.out || "", r.cost || "", r.save_usd || ""]
+      .map(function(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(",");
+  }));
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([lines.join("\n")], {type:"text/csv"}));
+  a.download = "tokentrim-log-" + new Date().toISOString().slice(0, 10) + ".csv"; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+};
+
+// ---------- connection: modes, sign-in, polling with backoff
+var cfg = {
+  local:  {url:"/live.json", key:null, label:"This Mac"},
+  remote: {url:"/live.json", key:"tt-key", label:"Remote"},
+  cloud:  {url:"/api/live", key:"tt-view", label:"Pro cloud"}
+}[MODE] || {url:"/live.json", key:null, label:"This Mac"};
+$("mode").textContent = MODE === "cloud" ? "Pro · Live" : "Live";
+$("foot-mode").innerHTML = MODE === "local" ? "<b>Privacy</b>: this page reads transcripts on this Mac only. <code>tokentrim live --cloud</code> (Pro) opens it from any device, totals only."
+  : "<b>Privacy</b>: your Mac sends totals and project folder names only. No prompts, code or file contents ever leave it.";
+
+var hm1 = location.hash.match(/[#&]k=([A-Za-z0-9_-]+)/), hm2 = location.hash.match(/[#&]v=([0-9a-f]{32}\.[A-Za-z0-9_-]+)/);
+if (hm1) store.set("tt-key", hm1[1]);
+if (hm2) store.set("tt-view", hm2[1]);
+if (hm1 || hm2) history.replaceState(null, "", location.pathname);
+
+function gate(msg){
+  $("app").hidden = true; $("gate").hidden = false; $("g-e").textContent = msg || "";
+  if (MODE === "cloud"){
+    $("g-h").textContent = "tokentrim Pro · Live";
+    $("g-p").textContent = "Sign in with your Pro license key to see your real-time savings from any device. The key only proves your subscription; your Mac sends totals, never prompts or code.";
+    $("g-k").placeholder = "Pro license key"; $("g-k").type = "password";
+    $("g-x").innerHTML = 'No key yet? <a href="' + esc(window.TT_BUY || "https://suncal.github.io/tokentrim/") + '" target="_blank" rel="noopener">Get tokentrim Pro</a>. Then run <code>tokentrim live --cloud</code> on your Mac.';
+  } else {
+    $("g-h").textContent = "tokentrim live";
+    $("g-p").innerHTML = "Paste the access key from <code>tokentrim live --link</code>, or open the full link once on this device.";
+    $("g-k").placeholder = "Access key"; $("g-x").textContent = "";
+  }
+  setTimeout(function(){ $("g-k").focus(); }, 50);
+}
+$("g-f").onsubmit = function(e){
+  e.preventDefault(); var v = $("g-k").value.trim(); if (!v) return;
+  if (MODE !== "cloud"){ store.set("tt-key", v); return start(); }
+  var m = v.match(/v=([0-9a-f]{32}\.[A-Za-z0-9_-]+)/); if (m){ store.set("tt-view", m[1]); return start(); }
+  $("g-e").textContent = "Checking your license…";
+  fetch("/api/link", {method:"POST", headers:{Authorization:"Bearer " + v}}).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if (r.status === 402){ $("g-e").innerHTML = "This license isn't active (" + esc(j.error || "not granted") + "). " + (j.buy ? '<a href="' + esc(j.buy) + '" target="_blank" rel="noopener">Get Pro</a>' : ""); return; }
+      if (!r.ok || !j.view){ $("g-e").textContent = j.error || "Couldn't sign in (HTTP " + r.status + ")."; return; }
+      store.set("tt-view", j.view); $("g-k").value = ""; start();
+    });
+  }).catch(function(){ $("g-e").textContent = "Network error. Try again."; });
+};
+$("signout").onclick = function(){ store.set(cfg.key, null); location.reload(); };
+
+var fails = 0, timer = null, pushedAt = 0, gotAt = 0, inflight = false;
+function setStatus(){
+  if (!gotAt){ return; }
+  var age = MODE === "local" ? Date.now() / 1000 - last.now : (Date.now() - pushedAt) / 1000;
+  var dot = $("dot"), st = $("status"), bn = $("banner");
+  if (fails && Date.now() - gotAt > 15000){ dot.className = "dot bad"; st.textContent = "reconnecting… last data " + ago((Date.now() - gotAt) / 1000); }
+  else if (age > 90){ dot.className = "dot warn"; st.textContent = cfg.label + " · last sync " + ago(age); }
+  else { dot.className = "dot live"; st.textContent = cfg.label + " · live"; }
+  if (MODE !== "local" && age > 300){ bn.style.display = "block"; bn.textContent = "Your Mac hasn't synced for " + ago(age).replace(" ago", "") + ". It may be asleep, or `tokentrim serve` isn't running. Showing the last numbers it sent."; }
+  else if (MODE === "local" && fails && Date.now() - gotAt > 15000){ bn.style.display = "block"; bn.textContent = "Can't reach tokentrim on this Mac. Is `tokentrim serve` running? (`tokentrim serve --install` keeps it on.)"; }
+  else bn.style.display = "none";
+}
+function schedule(ms){ clearTimeout(timer); timer = setTimeout(poll, ms); }
+function poll(){
+  if (inflight) return; inflight = true;
+  var h = {}, key = cfg.key && store.get(cfg.key);
+  if (cfg.key && !key){ inflight = false; return gate(); }
+  if (key) h.Authorization = "Bearer " + key;
+  var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function(){ ctl && ctl.abort(); }, 9000);
+  fetch(cfg.url, {headers:h, cache:"no-store", signal: ctl && ctl.signal}).then(function(r){
+    if (r.status === 401){ store.set(cfg.key, null); gate(MODE === "cloud" ? "Your sign-in expired or the link was replaced. Sign in again." : "That key didn't work."); throw "stop"; }
+    if (r.status === 402){ return r.json().then(function(j){ gate((j.error || "Pro is not active.") + " Renew to keep your live dashboard."); throw "stop"; }); }
+    if (r.status === 204){ $("app").hidden = false; $("gate").hidden = true; $("status").textContent = MODE === "local" ? "reading your week…" : "signed in · waiting for your Mac (run tokentrim live --cloud)"; $("dot").className = "dot warn"; fails = 0; throw "wait"; }
+    if (!r.ok) throw "http " + r.status;
+    pushedAt = +(r.headers.get("x-pushed-at") || Date.now());
+    settleSettings(r.headers.get("x-settings"));
+    return r.json();
+  }).then(function(s){
+    clearTimeout(to); inflight = false; fails = 0; gotAt = Date.now();
+    $("gate").hidden = true; $("app").hidden = false; $("signout").hidden = MODE === "local";
+    if (!last || s.version !== last.version || s.now !== last.now) render(s); else last = s;
+    setStatus(); schedule(document.hidden ? 15000 : 2000);
+  }).catch(function(e){
+    clearTimeout(to); inflight = false;
+    if (e === "stop") return;
+    if (e === "wait"){ schedule(3000); return; }
+    fails++; setStatus(); schedule(Math.min(30000, 2000 * Math.pow(2, Math.min(fails, 4))));
+  });
+}
+function start(){ $("gate").hidden = true; fails = 0; poll(); }
+document.addEventListener("visibilitychange", function(){ if (!document.hidden){ schedule(0); heroKick(); } });
+window.addEventListener("online", function(){ schedule(0); });
+var rz; window.addEventListener("resize", function(){ clearTimeout(rz); rz = setTimeout(function(){ last && render(last, true); }, 150); });
+setInterval(function(){ if (last){ setStatus(); if (last.window) $("w-reset").textContent = "resets " + hm(last.window.end) + " · " + dur(last.window.end - Date.now() / 1000) + " left"; } }, 1000);
+if (cfg.key && !store.get(cfg.key)) gate(); else start();
 })();
 </script>
 </body>
