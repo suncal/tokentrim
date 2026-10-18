@@ -43,7 +43,7 @@ nav .wrap{display:flex;align-items:center;gap:28px;height:64px}
 .logo{display:flex;align-items:center;gap:10px;font:700 18px var(--sans);text-decoration:none;letter-spacing:-.02em}
 .logo i{display:grid;gap:4px;width:22px}.logo i b{display:block;height:4px;border-radius:2px;background:var(--orange)}.logo i b+b{width:45%;background:var(--green)}
 nav .links{display:flex;gap:24px;margin-left:auto;font-size:15px;color:var(--soft)}
-nav .links a{text-decoration:none}nav .links a:hover{color:var(--ink)}
+nav .links a{text-decoration:none;white-space:nowrap}nav .links a:hover{color:var(--ink)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 20px;border-radius:10px;font:600 15px var(--sans);text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s,background .15s,border-color .15s;white-space:nowrap}
 .btn:active{transform:translateY(1px)}
 .btn.primary{background:var(--green);color:#052e16}.btn.primary:hover{background:#6ee7a0}
@@ -177,6 +177,7 @@ footer a{text-decoration:none}footer a:hover{color:var(--ink)}
   .stats div:nth-child(n+3){border-top:1px solid var(--line)}
   .rule{grid-template-columns:1fr;gap:4px}.rule span{text-align:left}
 }
+@media (max-width:900px){nav .links a[href="#honest"]{display:none}}
 @media (max-width:640px){
   body{font-size:16px}
   section{padding:72px 0}
@@ -208,6 +209,7 @@ footer a{text-decoration:none}footer a:hover{color:var(--ink)}
     <a class="logo" href="#top"><i><b></b><b></b></i>tokentrim</a>
     <div class="links">
       <a href="#how">How it works</a>
+      <a href="#control">Live control</a>
       <a href="#honest">The numbers</a>
       <a href="#pricing" class="keep">Pricing</a>
       <a href="https://github.com/suncal/tokentrim">GitHub</a>
@@ -298,6 +300,23 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
   </div>
 </section>
 
+<section id="control">
+  <div class="wrap">
+    <p class="eyebrow">Live control</p>
+    <h2>A live dashboard that changes Claude Code for you.</h2>
+    <p class="lede">Watch usage rise and fall minute by minute, with recommendations based on your own sessions. Each one has an Apply button. Switch a setting off and your own value comes back.</p>
+    <div class="rules reveal">
+      <div class="rule"><b>Smart model</b><p>Opus while planning, Sonnet while doing the work (Claude Code's opusplan), or Sonnet for everything. One click.</p><span>new sessions</span></div>
+      <div class="rule"><b>Cheaper sub-agents</b><p>Explore and Task sub-agents run on Sonnet or Haiku. Your main conversation keeps its model.</p><span>new sessions</span></div>
+      <div class="rule"><b>Thinking effort</b><p>Medium or low effort spends fewer thinking tokens on routine work.</p><span>new sessions</span></div>
+      <div class="rule"><b>Daily budget, hard stop</b><p>A dollar cap per day across every session. A note at 80%, and new prompts held once you pass it. Start a message with ++ to send it anyway.</p><span>next message</span></div>
+      <div class="rule"><b>Cold-cache alert</b><p>Back after the prompt cache expired? It tells you what your next message will re-write, and when /clear is cheaper.</p><span>next message</span></div>
+      <div class="rule"><b>Model advisor</b><p>Quick chores like renames, formatting or git running on Opus get a short note that Sonnet does them for less.</p><span>next message</span></div>
+    </div>
+    <p class="fine" style="margin-top:14px">The page shows which Claude Code versions on your machine read each setting, so nothing silently does nothing.</p>
+  </div>
+</section>
+
 <section id="honest">
   <div class="wrap honest">
     <div>
@@ -320,7 +339,7 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
   <div class="wrap">
     <p class="eyebrow">Pricing</p>
     <h2>The token cutting is free. Pro keeps the savings going.</h2>
-    <p class="lede">Pro is for when you'd rather get a Monday report and a budget alert than remember to check a dashboard.</p>
+    <p class="lede">Pro puts the live dashboard on any device with nothing to host, and keeps watch for you with a Monday report and budget alerts.</p>
 
     <div class="plans">
       <div class="plan reveal">
@@ -330,10 +349,11 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
         <ul>
           <li>All hooks and 3 strength profiles</li>
           <li>Audit and replay on your sessions</li>
-          <li>Live plain-English dashboard</li>
+          <li>Live dashboard and one-click smart settings</li>
+          <li>Daily budget guard, cold-cache alert, model advisor</li>
           <li>Shareable savings card</li>
-          <li class="off">Weekly digest</li>
-          <li class="off">Budget alerts</li>
+          <li class="off">Hosted dashboard on your phone</li>
+          <li class="off">Weekly digest and budget</li>
         </ul>
         <a class="btn ghost" href="https://github.com/suncal/tokentrim">Install from GitHub</a>
       </div>
@@ -345,8 +365,10 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
         <p class="why">Pay once, keep it. Only for the first 500 buyers. After that, Pro is monthly only.</p>
         <ul>
           <li>Everything in Free</li>
+          <li>Hosted live dashboard on any device: sign in with your key</li>
+          <li>Change your settings from your phone</li>
           <li>Monday digest in plain English</li>
-          <li>Weekly token budget, alert at 80%</li>
+          <li>Weekly token budget, checked daily, alert at 80%</li>
           <li>Slack weekly totals (totals only)</li>
           <li>Up to 3 machines</li>
           <li>All future Pro updates</li>
@@ -360,8 +382,10 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
         <p class="why">Same Pro features, billed monthly. Cancel any time.</p>
         <ul>
           <li>Everything in Free</li>
+          <li>Hosted live dashboard on any device: sign in with your key</li>
+          <li>Change your settings from your phone</li>
           <li>Monday digest in plain English</li>
-          <li>Weekly token budget, alert at 80%</li>
+          <li>Weekly token budget, checked daily, alert at 80%</li>
           <li>Slack weekly totals (totals only)</li>
           <li>Up to 3 machines</li>
         </ul>
@@ -377,7 +401,8 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
     <p class="eyebrow">Questions</p>
     <h2>Before you install</h2>
     <div class="faq">
-      <details><summary>Does anything leave my machine?</summary><p>No. The free tool reads transcripts Claude Code already stores locally and never sends them anywhere. Pro's license check sends only your key and a machine label. Slack posting is opt-in and sends weekly totals only, never prompts, code or conversation titles.</p></details>
+      <details><summary>Does anything leave my machine?</summary><p>No. The free tool reads transcripts Claude Code already stores locally and never sends them anywhere. Pro's license check sends only your key and a machine label. The hosted Pro dashboard receives totals and project folder names only, never prompts or code. Slack posting is opt-in and sends weekly totals only.</p></details>
+      <details><summary>Can it pick the best model for each message?</summary><p>Not per message: Claude Code has no switch for that. Smart model uses Claude Code's own opusplan (Opus plans, Sonnet does the work), and pairs well with cheaper sub-agents, lower effort and the model advisor. Model changes apply to new sessions; <code>/model</code> in a session still wins.</p></details>
       <details><summary>I'm on a Pro or Max plan, not paying per token. Does this help?</summary><p>Yes, and it's the main reason most people use it. Plan limits are spent on the same tokens, so re-reading less means hitting the 5-hour and weekly limits later. On the author's usage, limits lasted 3.9× longer.</p></details>
       <details><summary>Will Claude forget things?</summary><p>It summarises earlier, so very old detail in a long conversation gets condensed sooner. The default profile behaves close to how Claude Code worked with a 200k window. If you notice it, switch to <code>balanced</code> with one command.</p></details>
       <details><summary>How do I undo it?</summary><p><code>tokentrim uninstall</code> removes exactly what install added. Your settings were backed up before install, your own hooks are left alone, and one config flag turns every hook off instantly.</p></details>
