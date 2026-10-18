@@ -6,7 +6,10 @@ PATH = os.path.expanduser("~/.config/tokentrim/config.json")
 
 DEFAULTS = {
     "enabled": True,
-    "screenshot_scale": 0.5,         # browser screenshots: 0.5 = a quarter of the tokens
+    "screenshot_scale": 0.4,         # browser screenshots: 0.4 = ~16% of the tokens; UI text stays legible
+    "zoom_scale": 0.6,               # zoom is for detail, so it keeps more resolution
+    "batch_extra_scale": 0.25,       # screenshots in a browser_batch other than the last one
+    "dedupe_screenshots": True,      # deny a screenshot when nothing happened since the last one
     "image_max_px": 1024,            # images opened with Read are downscaled to this long edge
     "read_outline_bytes": 40_000,    # whole-file Reads above this get an outline first
     "outline_max_lines": 120,

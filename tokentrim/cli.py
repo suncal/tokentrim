@@ -6,6 +6,7 @@
   tokentrim install [--profile P] add hooks + compaction window to ~/.claude/settings.json
   tokentrim uninstall             remove exactly what install added
   tokentrim status                what is installed, and recent hook activity
+  tokentrim dashboard [--no-open] full usage + savings dashboard (dashboard.html)
 """
 import json
 import os
@@ -41,7 +42,7 @@ def _hook_cmd(event):
 
 def _entries():
     return {
-        "PreToolUse": {"matcher": "Read|mcp__.*__computer|mcp__.*__browser_batch",
+        "PreToolUse": {"matcher": "Read|mcp__.*(Claude_Browser|claude-in-chrome|Claude_in_Chrome|Claude_Preview).*",
                        "hooks": [{"type": "command", "command": _hook_cmd("pre"), "timeout": 20}]},
         "PostToolUse": {"matcher": "Bash|mcp__.*",
                         "hooks": [{"type": "command", "command": _hook_cmd("post"), "timeout": 10}]},
@@ -90,6 +91,7 @@ def install(profile="strong", guidance=True):
     env["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = str(PROFILES[profile])
     marker["profile"] = profile
     marker["installed"] = time.strftime("%Y-%m-%d")
+    marker.setdefault("installed_ts", time.time())
     _save_settings(s)
     print("  hooks      -> PreToolUse, PostToolUse, UserPromptSubmit")
     print("  compaction -> CLAUDE_CODE_AUTO_COMPACT_WINDOW=%d (%s)" % (PROFILES[profile], profile))
@@ -203,6 +205,9 @@ def main(argv=None):
         uninstall()
     elif cmd == "status":
         status()
+    elif cmd == "dashboard":
+        from .dashboard import write
+        write(open_it="--no-open" not in argv)
     elif cmd == "fixed":
         fixed()
     else:

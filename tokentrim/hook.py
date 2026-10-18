@@ -21,8 +21,6 @@ from . import config, filters, outline
 
 STATE = os.path.expanduser("~/.cache/tokentrim")
 IMG_EXT = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".tiff", ".bmp")
-SCREENSHOT_TOOLS = re.compile(r"^mcp__.*(Claude_Browser|claude-in-chrome|Claude_in_Chrome|Claude_Preview).*__computer$")
-BATCH_TOOLS = re.compile(r"^mcp__.*(Claude_Browser|claude-in-chrome|Claude_in_Chrome|Claude_Preview).*__browser_batch$")
 
 
 def _out(obj):
@@ -42,6 +40,21 @@ def _deny(reason):
                                  "permissionDecisionReason": reason}})
 
 
+SESSION = ""
+SHOT_TOKENS = 1600  # a full-size browser screenshot (~1456x816 viewport), before any scaling
+
+
+def _saving(rule, tool, before, after, est=False):
+    """One line per action in savings.jsonl: what the result would have cost, and what it cost."""
+    try:
+        os.makedirs(STATE, exist_ok=True)
+        with open(os.path.join(STATE, "savings.jsonl"), "a") as fh:
+            fh.write(json.dumps({"ts": time.time(), "session": SESSION, "rule": rule, "tool": tool,
+                                 "before": int(before), "after": int(after), "est": est}) + "\n")
+    except OSError:
+        pass
+
+
 def _log(kind, note):
     try:
         os.makedirs(STATE, exist_ok=True)
@@ -53,35 +66,85 @@ def _log(kind, note):
 
 # ---------------------------------------------------------------- screenshots
 
-def _scale_screenshot(inp, cfg):
+BROWSER_TOOLS = re.compile(r"^mcp__.*(Claude_Browser|claude-in-chrome|Claude_in_Chrome|Claude_Preview).*__(\w+)$")
+# Browser tools that only look at the page; anything else may change what a screenshot would show.
+READ_ONLY = {"find", "read_page", "get_page_text", "read_console_messages", "read_network_requests",
+             "tabs_context", "tabs_context_mcp", "preview_list", "preview_logs", "list_connected_browsers",
+             "shortcuts_list", "gif_creator"}
+
+
+def _scale_screenshot(inp, cfg, scale=None):
     if inp.get("action") in ("screenshot", "zoom") and "scale" not in inp:
         if inp.get("save_to_disk"):
             return None  # an image meant for the user keeps full size
         new = dict(inp)
-        new["scale"] = cfg["screenshot_scale"]
+        new["scale"] = scale or (cfg["zoom_scale"] if inp.get("action") == "zoom" else cfg["screenshot_scale"])
         return new
     return None
 
 
-def rule_screenshot(tool, inp, cfg):
-    if cfg["screenshot_scale"] >= 1:
+def _page_state(session, value=None):
+    """'shot' if the last page-touching browser call this session was a screenshot, else 'act'."""
+    path = os.path.join(STATE, "browser", hashlib.sha1(session.encode()).hexdigest()[:16])
+    if value is None:
+        try:
+            with open(path) as fh:
+                return fh.read()
+        except OSError:
+            return "act"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as fh:
+        fh.write(value)
+
+
+def _is_shot(inp):
+    return isinstance(inp, dict) and inp.get("action") == "screenshot"
+
+
+def rule_screenshot(tool, inp, cfg, session=""):
+    m = BROWSER_TOOLS.match(tool)
+    if not m:
         return
-    if SCREENSHOT_TOOLS.match(tool):
-        new = _scale_screenshot(inp, cfg)
+    name = m.group(2)
+    if name in READ_ONLY:
+        return
+    if name == "computer":
+        if not _is_shot(inp):
+            if inp.get("action") != "zoom":
+                _page_state(session, "act")
+        else:
+            explicit = "scale" in inp or inp.get("save_to_disk")
+            if cfg["dedupe_screenshots"] and not explicit and session and _page_state(session) == "shot":
+                _saving("screenshot_dedupe", tool, SHOT_TOKENS, 60, est=True)
+                _deny("tokentrim: nothing changed since your last screenshot (no click, typing, scroll, "
+                      "navigation or wait in between). Use the image you already have, or read_page / "
+                      "get_page_text for text. If you really need a fresh one, call again with scale set.")
+            _page_state(session, "shot")
+        new = _scale_screenshot(inp, cfg) if cfg["screenshot_scale"] < 1 else None
         if new:
+            _saving("screenshot_scale", tool, SHOT_TOKENS, SHOT_TOKENS * new["scale"] ** 2, est=True)
             _rewrite(new, "%s %s scale=%s" % (tool.split("__")[1], inp.get("action"), new["scale"]))
-    elif BATCH_TOOLS.match(tool):
-        changed = False
-        actions = []
-        for item in inp.get("actions") or []:
-            if isinstance(item, dict) and item.get("name") == "computer" and isinstance(item.get("input"), dict):
-                new = _scale_screenshot(item["input"], cfg)
+    elif name == "browser_batch":
+        items = [i for i in (inp.get("actions") or []) if isinstance(i, dict)]
+        shots = [k for k, i in enumerate(items) if i.get("name") == "computer" and _is_shot(i.get("input"))]
+        changed, actions = False, []
+        for k, item in enumerate(inp.get("actions") or []):
+            if k in shots and cfg["screenshot_scale"] < 1:
+                # only the batch's last screenshot is what Claude acts on; earlier ones are progress checks
+                scale = cfg["screenshot_scale"] if k == shots[-1] else cfg["batch_extra_scale"]
+                new = _scale_screenshot(item["input"], cfg, scale)
                 if new:
                     item = dict(item, input=new)
                     changed = True
+                    _saving("screenshot_scale", tool, SHOT_TOKENS, SHOT_TOKENS * scale ** 2, est=True)
             actions.append(item)
+        last = items[-1] if items else {}
+        if session:
+            _page_state(session, "shot" if last.get("name") == "computer" and _is_shot(last.get("input")) else "act")
         if changed:
-            _rewrite(dict(inp, actions=actions), "browser_batch screenshots scale=%s" % cfg["screenshot_scale"])
+            _rewrite(dict(inp, actions=actions), "browser_batch %d screenshots scaled" % len(shots))
+    elif session:
+        _page_state(session, "act")
 
 
 # ---------------------------------------------------------------- images via Read
@@ -95,6 +158,11 @@ def _image_dims(path):
         return (int(w.group(1)), int(h.group(1))) if w and h else None
     except (OSError, subprocess.SubprocessError):
         return None
+
+
+def _img_tokens(w, h):
+    k = min(1.0, 1568.0 / max(w, h), (1150000.0 / (w * h)) ** 0.5)
+    return w * k * h * k / 750
 
 
 def rule_read_image(tool, inp, cfg):
@@ -116,6 +184,8 @@ def rule_read_image(tool, inp, cfg):
         if r.returncode != 0 or not os.path.exists(small):
             return
     new = dict(inp, file_path=small)
+    k = max_px / float(max(dims))
+    _saving("read_image", tool, _img_tokens(*dims), _img_tokens(dims[0] * k, dims[1] * k))
     _rewrite(new, "Read image %s %dx%d -> max %dpx" % (os.path.basename(path), dims[0], dims[1], max_px))
 
 
@@ -141,10 +211,13 @@ def rule_read_text(tool, inp, cfg, session):
     if size < cfg["read_outline_bytes"]:
         return
     if _seen(session, path):
-        return  # Claude asked again: it really wants the whole file
+        # Claude asked again: it really wants the whole file. The outline it saw was extra cost.
+        _saving("read_outline_retry", tool, 0, size / 4.0)
+        return
     ol = outline.outline(path, max_lines=cfg["outline_max_lines"])
     if not ol:
         return
+    _saving("read_outline", tool, size / 4.0, len(ol) / 4.0 + 80)
     _deny(
         "tokentrim: %s is %s KB (~%s tokens). Here is its outline instead. "
         "Read just the part you need with offset/limit. If you genuinely need the whole "
@@ -172,6 +245,7 @@ def rule_post_bash(tool, resp, cfg):
     new["stderr"] = filters.shrink_command_output(err, max(limit // 3, 1500))
     before, after = len(out) + len(err), len(new["stdout"]) + len(new["stderr"])
     if after < before:
+        _saving("bash_trim", tool, before / 4.0, after / 4.0)
         _post(new, "Bash %d -> %d chars" % (before, after))
 
 
@@ -210,7 +284,9 @@ def rule_post_mcp(tool, resp, cfg):
     else:
         return
     if changed:
-        _post(new, "%s %d -> %d chars" % (tool, before, len(json.dumps(new, ensure_ascii=False))))
+        after = len(json.dumps(new, ensure_ascii=False))
+        _saving("mcp_shrink", tool, before / 4.0, after / 4.0)
+        _post(new, "%s %d -> %d chars" % (tool, before, after))
 
 
 # ---------------------------------------------------------------- context meter
@@ -266,6 +342,8 @@ def main():
     event_name = sys.argv[1] if len(sys.argv) > 1 else "pre"
     try:
         event = json.load(sys.stdin)
+        global SESSION
+        SESSION = event.get("session_id") or ""
         cfg = config.load()
         if not cfg.get("enabled", True):
             return
@@ -274,7 +352,7 @@ def main():
             inp = event.get("tool_input") or {}
             if not isinstance(inp, dict):
                 return
-            rule_screenshot(tool, inp, cfg)
+            rule_screenshot(tool, inp, cfg, event.get("session_id") or "")
             rule_read_image(tool, inp, cfg)
             rule_read_text(tool, inp, cfg, event.get("session_id") or "")
         elif event_name == "post":

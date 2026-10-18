@@ -55,6 +55,14 @@ class Filters(unittest.TestCase):
         self.assertEqual(filters.shrink_json_text("hello {"), "hello {")
 
 
+class Buckets(unittest.TestCase):
+    def test_secrets_never_become_labels(self):
+        from tokentrim.audit import _bucket
+        self.assertEqual(_bucket("Bash", {"command": 'KEY="abc123==" curl -s x'}), "Bash:curl")
+        self.assertEqual(_bucket("Bash", {"command": "cd /tmp && grep x y"}), "Bash:grep")
+        self.assertEqual(_bucket("Bash", {"command": "TOKEN=sk-live-zzz"}), "Bash:other")
+
+
 class Outline(unittest.TestCase):
     def test_python(self):
         with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
@@ -71,7 +79,24 @@ class Hooks(unittest.TestCase):
     def test_screenshot_gets_scaled(self):
         out = run_hook("pre", {"tool_name": "mcp__Claude_Browser__computer",
                                "tool_input": {"action": "screenshot"}}, self.home)
-        self.assertEqual(out["hookSpecificOutput"]["updatedInput"]["scale"], 0.5)
+        self.assertEqual(out["hookSpecificOutput"]["updatedInput"]["scale"], 0.4)
+
+    def test_repeat_screenshot_denied_until_action(self):
+        shot = {"tool_name": "mcp__Claude_Browser__computer", "session_id": "d",
+                "tool_input": {"action": "screenshot"}}
+        run_hook("pre", shot, self.home)
+        out = run_hook("pre", shot, self.home)
+        self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "deny")
+        run_hook("pre", {"tool_name": "mcp__Claude_Browser__find", "session_id": "d",
+                         "tool_input": {"query": "x"}}, self.home)  # read-only: still denied
+        out = run_hook("pre", shot, self.home)
+        self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "deny")
+        run_hook("pre", {"tool_name": "mcp__Claude_Browser__navigate", "session_id": "d",
+                         "tool_input": {"url": "x"}}, self.home)
+        out = run_hook("pre", shot, self.home)
+        self.assertEqual(out["hookSpecificOutput"]["updatedInput"]["scale"], 0.4)
+        explicit = dict(shot, tool_input={"action": "screenshot", "scale": 0.5})
+        self.assertIsNone(run_hook("pre", explicit, self.home))  # escape hatch
 
     def test_explicit_scale_and_saved_screenshots_untouched(self):
         self.assertIsNone(run_hook("pre", {"tool_name": "mcp__claude-in-chrome__computer",
@@ -88,8 +113,16 @@ class Hooks(unittest.TestCase):
                            {"name": "computer", "input": {"action": "screenshot"}}]}
         out = run_hook("pre", {"tool_name": "mcp__Claude_Browser__browser_batch", "tool_input": inp}, self.home)
         acts = out["hookSpecificOutput"]["updatedInput"]["actions"]
-        self.assertEqual(acts[1]["input"]["scale"], 0.5)
+        self.assertEqual(acts[1]["input"]["scale"], 0.4)
         self.assertEqual(acts[0], inp["actions"][0])
+
+    def test_batch_earlier_screenshots_smaller(self):
+        inp = {"actions": [{"name": "computer", "input": {"action": "screenshot"}},
+                           {"name": "computer", "input": {"action": "left_click", "coordinate": [1, 1]}},
+                           {"name": "computer", "input": {"action": "screenshot"}}]}
+        out = run_hook("pre", {"tool_name": "mcp__claude-in-chrome__browser_batch", "tool_input": inp}, self.home)
+        acts = out["hookSpecificOutput"]["updatedInput"]["actions"]
+        self.assertEqual((acts[0]["input"]["scale"], acts[2]["input"]["scale"]), (0.25, 0.4))
 
     def test_big_read_outline_then_allowed(self):
         path = os.path.join(self.home, "big.py")

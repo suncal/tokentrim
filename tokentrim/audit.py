@@ -11,6 +11,7 @@ times. So we weight each tool result by how many later calls re-read it.
 import glob
 import json
 import os
+import re
 from collections import defaultdict
 
 IMG_TOKENS = 1600  # a ~1280x800 screenshot is ~1.4-1.6k tokens
@@ -38,8 +39,17 @@ def _text_of(content):
 
 def _bucket(name, inp):
     if name == "Bash":
-        cmd = (inp or {}).get("command", "").strip().split()
-        return "Bash:" + (os.path.basename(cmd[0]) if cmd else "?")
+        words = (inp or {}).get("command", "").strip().split()
+        # skip VAR=value prefixes (they can hold secrets) and `cd dir &&` hops
+        while words and ("=" in words[0] or words[0] in ("cd", "&&", "env", "time", "sudo")):
+            if words[0] == "cd" and len(words) > 2 and words[2] == "&&":
+                words = words[3:]
+            elif words[0] == "cd":
+                break
+            else:
+                words = words[1:]
+        word = os.path.basename(words[0]) if words else "?"
+        return "Bash:" + (word if re.match(r"^[\w.+-]{1,24}$", word) else "other")
     if name.startswith("mcp__"):
         parts = name.split("__")
         server = parts[1] if len(parts) > 1 else "?"

@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tokentrim dashboard</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14171c;--mute:#5f6b7a;--line:#e3e7ec;--accent:#2f6fed;--good:#13865a;--bad:#c2410c;
+--c1:#2f6fed;--c2:#e8833a;--c3:#13865a;--c4:#9b5de5;--c5:#c2410c;--c6:#0ea5b7;--chip:#eef2f7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1116;--card:#161a21;--ink:#e6e9ee;--mute:#8e99a8;--line:#262c36;--accent:#6c9cff;--good:#3fcf8e;--bad:#ff8a4c;
+--c1:#6c9cff;--c2:#f2a65a;--c3:#3fcf8e;--c4:#b98cff;--c5:#ff8a4c;--c6:#4fd1e0;--chip:#1f2530}}
+:root[data-theme="dark"]{--bg:#0e1116;--card:#161a21;--ink:#e6e9ee;--mute:#8e99a8;--line:#262c36;--accent:#6c9cff;--good:#3fcf8e;--bad:#ff8a4c;
+--c1:#6c9cff;--c2:#f2a65a;--c3:#3fcf8e;--c4:#b98cff;--c5:#ff8a4c;--c6:#4fd1e0;--chip:#1f2530}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:1240px;margin:0 auto;padding:10px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.brand{font-weight:700;font-size:16px}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{color:var(--mute);text-decoration:none;padding:4px 9px;border-radius:6px;font-size:13px}
+nav a:hover{background:var(--chip);color:var(--ink)}
+.right{margin-left:auto;color:var(--mute);font-size:12px;display:flex;gap:10px;align-items:center}
+button,select,input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+button{cursor:pointer}
+main{max-width:1240px;margin:0 auto;padding:16px}
+section{margin:0 0 22px}
+h2{font-size:17px;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 12px;font-size:13px}
+.grid{display:grid;gap:12px}
+.k6{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.k2{grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.kpi .v{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.kpi .l{color:var(--mute);font-size:12px}
+.kpi .d{font-size:12px;margin-top:2px}
+.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mute);font-weight:600;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--card)}
+tbody tr:hover{background:var(--chip)}
+.scroll{overflow:auto;max-height:520px}
+.wrapcell{white-space:normal;min-width:220px;max-width:380px;text-align:left}
+.hbar{height:8px;border-radius:4px;background:var(--accent);opacity:.8}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:6px 0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+svg text{fill:var(--mute);font-size:11px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);padding:6px 8px;border-radius:6px;font-size:12px;display:none;z-index:9;max-width:320px}
+.chip{display:inline-block;background:var(--chip);border-radius:999px;padding:1px 8px;font-size:12px;color:var(--mute)}
+.note{font-size:12px;color:var(--mute);margin-top:8px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.split{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:8px 0}
+.split div{height:100%}
+@media (max-width:640px){.kpi .v{font-size:18px}.right{margin-left:0}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <div class="brand">tokentrim</div>
+  <nav>
+    <a href="#overview">Overview</a><a href="#beforeafter">Before / after</a><a href="#timeline">Timeline</a>
+    <a href="#where">Where it goes</a><a href="#savings">Savings</a><a href="#models">Models &amp; projects</a>
+    <a href="#sessions">Sessions</a><a href="#floor">Fixed floor</a>
+  </nav>
+  <div class="right"><span id="gen"></span><button id="theme" title="Toggle theme">◐</button></div>
+</div></header>
+<main>
+
+<section id="overview">
+  <h2>Overview</h2>
+  <p class="sub" id="ov-sub"></p>
+  <div class="grid k6" id="kpis"></div>
+</section>
+
+<section id="beforeafter">
+  <h2>Before vs after tokentrim</h2>
+  <p class="sub" id="ba-sub"></p>
+  <div class="card"><div class="scroll" style="max-height:none"><table id="ba"></table></div>
+  <div class="note" id="ba-note"></div></div>
+</section>
+
+<section id="timeline">
+  <h2>Daily usage</h2>
+  <p class="sub">Every API call, main sessions and sub-agents. The dashed line marks when tokentrim was installed.</p>
+  <div class="card">
+    <div class="controls">
+      <label>Show <select id="tl-mode">
+        <option value="type">tokens by type</option><option value="model">tokens by model</option>
+        <option value="ctx">average context per call</option><option value="calls">API calls</option>
+        <option value="cost">API-equivalent cost</option></select></label>
+      <label>Range <select id="tl-range"><option value="0">all</option><option value="90">90 days</option><option value="30" selected>30 days</option><option value="14">14 days</option></select></label>
+    </div>
+    <div id="tl-legend" class="legend"></div>
+    <div id="tl"></div>
+  </div>
+</section>
+
+<section id="where">
+  <h2>Where your tokens go</h2>
+  <p class="sub">Each thing that enters the context is paid for again on every later call until compaction. These are the lifetime costs.</p>
+  <div class="grid k2">
+    <div class="card">
+      <b>Share of all cache reads</b>
+      <div class="split" id="attr"></div><div class="legend" id="attr-legend"></div>
+      <div class="note">“Not attributable” is mostly Claude’s reasoning (thinking) kept during a turn, system reminders and other overhead.</div>
+    </div>
+    <div class="card"><b>Biggest sources</b><div class="scroll" style="max-height:360px"><table id="src"></table></div></div>
+  </div>
+</section>
+
+<section id="savings">
+  <h2>What tokentrim saved</h2>
+  <p class="sub" id="sv-sub"></p>
+  <div class="grid k6" id="sv-kpis"></div>
+  <div class="grid k2" style="margin-top:12px">
+    <div class="card"><b>By rule</b><div class="scroll" style="max-height:none"><table id="sv-rules"></table></div>
+      <div class="note">“Direct” is what the result would have cost once. “Lifetime” multiplies that by the later calls that would have re-read it (measured per session from your transcripts). Screenshot sizes are estimates (~1,600 tokens for a full-size one).</div></div>
+    <div class="card"><b>Projected: your past sessions with tokentrim</b><div id="rp"></div>
+      <div class="note">Replay of every recorded session through the rules plus each compaction window. Assumes compaction fires at ~75% of the window (measured).</div></div>
+  </div>
+  <div class="card" style="margin-top:12px"><b>Daily measured savings</b><div id="sv-daily"></div></div>
+  <div class="card" style="margin-top:12px"><b>Recent actions</b> <span class="chip" id="sv-count"></span>
+    <div class="scroll"><table id="sv-recent"></table></div></div>
+</section>
+
+<section id="models">
+  <h2>Models &amp; projects</h2>
+  <p class="sub">API-equivalent cost uses the prices below (editable, per million tokens). On a subscription you don’t pay this; it shows relative burn against your usage limits.</p>
+  <div class="card controls" id="prices"></div>
+  <div class="grid k2">
+    <div class="card"><b>By model</b><div class="scroll"><table id="mdl"></table></div></div>
+    <div class="card"><b>By project</b><div class="scroll"><table id="prj"></table></div></div>
+  </div>
+</section>
+
+<section id="sessions">
+  <h2>Sessions</h2>
+  <p class="sub">Click a session to see its context grow and compact. Sub-agent tokens are included in the totals column.</p>
+  <div class="card">
+    <div class="controls">
+      <input id="q" placeholder="Search title or project" style="flex:1;min-width:180px">
+      <select id="sf"><option value="all">all sessions</option><option value="after">since tokentrim</option><option value="before">before tokentrim</option><option value="long">300+ calls</option></select>
+    </div>
+    <div id="chart-session" style="display:none"><div id="cs-title" style="font-weight:600;margin-bottom:4px"></div><div id="cs"></div></div>
+    <div class="scroll"><table id="ss"></table></div>
+  </div>
+</section>
+
+<section id="floor">
+  <h2>Fixed floor</h2>
+  <p class="sub" id="fl-sub"></p>
+  <div class="card"><table id="fl"></table>
+    <div class="note">The rest of the floor (system prompt, tool schemas, connector tool names, app instructions) is set by Claude Code and your connected MCP servers.</div></div>
+</section>
+
+</main>
+<div class="tip" id="tip"></div>
+<script>
+const D = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt = n => { n = +n || 0; const a = Math.abs(n);
+  return a >= 1e9 ? (n/1e9).toFixed(2)+'B' : a >= 1e6 ? (n/1e6).toFixed(1)+'M' : a >= 1e4 ? (n/1e3).toFixed(0)+'k' : a >= 1e3 ? (n/1e3).toFixed(1)+'k' : Math.round(n).toLocaleString(); };
+const full = n => Math.round(+n||0).toLocaleString();
+const pct = (x, d=1) => (100*x).toFixed(d)+'%';
+const date = ts => ts ? new Date(ts*1000).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tip = $('#tip');
+function showTip(e, html){ tip.innerHTML = html; tip.style.display='block';
+  const x = Math.min(e.clientX+12, innerWidth-tip.offsetWidth-8); tip.style.left = x+'px'; tip.style.top = (e.clientY+14)+'px'; }
+document.addEventListener('mouseout', e => { if (e.target.closest && e.target.closest('[data-tip]')) tip.style.display='none'; });
+document.addEventListener('mousemove', e => { const t = e.target.closest && e.target.closest('[data-tip]'); if (t) showTip(e, t.dataset.tip); });
+
+// theme
+try { const t = localStorage.getItem('tt-theme'); if (t) document.documentElement.dataset.theme = t; } catch(e){}
+$('#theme').onclick = () => { const cur = document.documentElement.dataset.theme ||
+  (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const nx = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = nx;
+  try { localStorage.setItem('tt-theme', nx); } catch(e){} renderAll(); };
+
+// prices (per million tokens): input, output; cache read = 0.1x input, cache write = 1.25x input
+let PRICES = {opus:[5,25], sonnet:[3,15], haiku:[1,5], other:[3,15]};
+try { const p = JSON.parse(localStorage.getItem('tt-prices')||'null'); if (p) PRICES = p; } catch(e){}
+const fam = m => /opus/i.test(m) ? 'opus' : /sonnet/i.test(m) ? 'sonnet' : /haiku/i.test(m) ? 'haiku' : 'other';
+const cost = (m, cr, cw, inp, out) => { const [i,o] = PRICES[fam(m)]; return (cr*0.1*i + cw*1.25*i + inp*i + out*o)/1e6; };
+const money = x => '$' + (x >= 1000 ? Math.round(x).toLocaleString() : x.toFixed(2));
+
+// ---------- totals
+const S = D.sessions;
+function totals(list){ const t = {calls:0, cr:0, cw:0, inp:0, out:0, subcalls:0};
+  for (const s of list){ t.calls += s.calls; t.cr += s.cr + s.sub[1]; t.cw += s.cw + s.sub[2]; t.inp += s.inp + s.sub[3]; t.out += s.out + s.sub[4]; t.subcalls += s.sub[0]; }
+  return t; }
+function dailyCost(){ let c = 0; for (const [d, ms] of Object.entries(D.daily)) for (const [m, r] of Object.entries(ms)) c += cost(m, r[0], r[1], r[2], r[3]); return c; }
+
+function kpi(v, l, d='', cls=''){ return `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div>${d ? `<div class="d ${cls}">${d}</div>` : ''}</div>`; }
+
+function renderOverview(){
+  const t = totals(S), all = t.cr + t.cw + t.inp + t.out;
+  const first = Math.min(...S.map(s => s.start || Infinity)), last = Math.max(...S.map(s => s.end || 0));
+  $('#gen').textContent = 'built ' + date(D.generated) + ' · ' + D.build_seconds_ + 's';
+  $('#ov-sub').textContent = `${S.length} sessions, ${date(first)} → ${date(last)}. ` +
+    (D.install_ts ? `tokentrim installed ${date(D.install_ts)} (profile: ${D.profile || '?'}, compaction window ${fmt(D.window)}).` : 'tokentrim is not installed.');
+  const ctxAvg = (t.cr + t.cw + t.inp) / Math.max(t.calls + t.subcalls, 1);
+  const sv = Object.values(D.savings.by_rule).reduce((a, r) => a + r.life, 0);
+  $('#kpis').innerHTML = [
+    kpi(fmt(all), 'total tokens', 'all input + output'),
+    kpi(fmt(t.cr), 'cache reads', pct(t.cr / Math.max(all, 1)) + ' of everything'),
+    kpi(fmt(t.cw), 'cache writes', 'context written to cache'),
+    kpi(fmt(t.inp), 'fresh input'),
+    kpi(fmt(t.out), 'output', pct(t.out / Math.max(all, 1)) + ' of everything'),
+    kpi(full(t.calls + t.subcalls), 'API calls', fmt(t.subcalls) + ' by sub-agents'),
+    kpi(fmt(ctxAvg), 'avg context per call', 're-sent every step'),
+    kpi(money(dailyCost()), 'API-equivalent cost', 'at the prices below'),
+    kpi(fmt(sv), 'saved by tokentrim (measured)', D.savings.total_events + ' hook actions', 'good'),
+  ].join('');
+}
+
+function renderBA(){
+  const b = D.phase.before, a = D.phase.after;
+  $('#ba-sub').textContent = D.install_ts ? `Split by API call time at ${date(D.install_ts)}.` : 'Install tokentrim to see this.';
+  const rows = [
+    ['API calls', b.calls, a.calls, full, null],
+    ['sessions', b.sessions, a.sessions, full, null],
+    ['average context per call', b.avg_ctx, a.avg_ctx, fmt, 'lower'],
+    ['median context per call', b.median_ctx, a.median_ctx, fmt, 'lower'],
+    ['90th percentile context', b.p90_ctx, a.p90_ctx, fmt, 'lower'],
+    ['calls carrying >150k context', b.over_150k, a.over_150k, x => pct(x), 'lower'],
+    ['tokens per API call (all types)', b.per_call, a.per_call, fmt, 'lower'],
+    ['compactions per 100 calls', b.compactions_per_100, a.compactions_per_100, x => x.toFixed(2), null],
+    ['output tokens per call', b.out / Math.max(b.calls,1), a.out / Math.max(a.calls,1), fmt, null],
+  ];
+  $('#ba').innerHTML = '<thead><tr><th>metric</th><th>before</th><th>after</th><th>change</th></tr></thead><tbody>' +
+    rows.map(([n, x, y, f, dir]) => { let ch = '—', cls = 'mute';
+      if (dir && x && a.calls) { const c = (y - x) / x; ch = (c > 0 ? '+' : '') + pct(c); cls = (c < 0) === (dir === 'lower') ? 'good' : 'bad'; }
+      return `<tr><td>${n}</td><td>${f(x)}</td><td>${a.calls ? f(y) : '—'}</td><td class="${cls}">${ch}</td></tr>`; }).join('') + '</tbody>';
+  $('#ba-note').textContent = a.calls < 500 ? `Only ${a.calls} calls since install so far. Treat “after” as early; it settles after about a week of normal use.` :
+    'Both columns are measured from your transcripts, not projected.';
+}
+
+// ---------- generic svg bar chart
+function barChart(el, labels, series, opts = {}){
+  const W = Math.max(el.clientWidth || 800, 320), H = opts.h || 260, P = {l: 52, r: 10, t: 10, b: 26};
+  const n = labels.length, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const stack = labels.map((_, i) => series.reduce((a, s) => a + (s.data[i] || 0), 0));
+  const max = Math.max(...stack, opts.line ? Math.max(...opts.line.data) : 0, 1);
+  const bw = iw / Math.max(n, 1);
+  let g = '';
+  for (let k = 0; k <= 4; k++){ const y = P.t + ih - ih * k / 4;
+    g += `<line x1="${P.l}" x2="${W - P.r}" y1="${y}" y2="${y}" stroke="${css('--line')}"/><text x="${P.l - 6}" y="${y + 4}" text-anchor="end">${(opts.yfmt || fmt)(max * k / 4)}</text>`; }
+  labels.forEach((lab, i) => { let y0 = P.t + ih; const x = P.l + i * bw + bw * 0.12, w = Math.max(bw * 0.76, 1);
+    let tt = `<b>${esc(lab)}</b>`;
+    series.forEach(s => { const v = s.data[i] || 0; if (!v) return; const h = ih * v / max; y0 -= h;
+      g += `<rect x="${x}" y="${y0}" width="${w}" height="${h}" fill="${s.color}"/>`; tt += `<br>${esc(s.name)}: ${(opts.yfmt || fmt)(v)}`; });
+    g += `<rect x="${P.l + i * bw}" y="${P.t}" width="${bw}" height="${ih}" fill="transparent" data-tip="${esc(tt)}"/>`;
+    const every = Math.ceil(n / Math.max(Math.floor(iw / 70), 1));
+    if (i % every === 0) g += `<text x="${x + w / 2}" y="${H - 8}" text-anchor="middle">${esc(lab.slice(5))}</text>`;
+    if (opts.marker && lab === opts.marker) g += `<line x1="${x}" x2="${x}" y1="${P.t}" y2="${P.t + ih}" stroke="${css('--bad')}" stroke-dasharray="4 3"/><text x="${x + 4}" y="${P.t + 12}" style="fill:${css('--bad')}">tokentrim</text>`;
+  });
+  el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;height:${H}px">${g}</svg>`;
+}
+const PAL = () => ['--c1','--c2','--c3','--c4','--c5','--c6'].map(css);
+
+function renderTimeline(){
+  const mode = $('#tl-mode').value, range = +$('#tl-range').value;
+  let days = Object.keys(D.daily).filter(d => d !== 'unknown').sort();
+  if (days.length){ // fill gaps
+    const out = []; let d = new Date(days[0] + 'T12:00:00'); const end = new Date(days[days.length - 1] + 'T12:00:00');
+    while (d <= end){ out.push(d.toISOString().slice(0, 10)); d.setDate(d.getDate() + 1); } days = out; }
+  if (range) days = days.slice(-range);
+  const get = (d) => D.daily[d] || {};
+  const marker = D.install_ts ? new Date(D.install_ts * 1000).toISOString().slice(0, 10) : null;
+  const P = PAL(); let series = [], o = {marker};
+  if (mode === 'type'){
+    const names = ['cache reads', 'cache writes', 'fresh input', 'output'];
+    series = names.map((n, k) => ({name: n, color: P[k], data: days.map(d => Object.values(get(d)).reduce((a, r) => a + r[k], 0))}));
+  } else if (mode === 'model'){
+    const models = {}; for (const d of days) for (const [m, r] of Object.entries(get(d))) models[m] = (models[m] || 0) + r[0] + r[1] + r[2] + r[3];
+    const top = Object.keys(models).sort((a, b) => models[b] - models[a]).slice(0, 6);
+    series = top.map((m, k) => ({name: m, color: P[k % 6], data: days.map(d => { const r = get(d)[m]; return r ? r[0] + r[1] + r[2] + r[3] : 0; })}));
+  } else if (mode === 'ctx'){
+    series = [{name: 'avg context / call', color: P[0], data: days.map(d => { let s = 0, c = 0; for (const r of Object.values(get(d))){ s += r[0] + r[1] + r[2]; c += r[4]; } return c ? s / c : 0; })}];
+  } else if (mode === 'calls'){
+    series = [{name: 'API calls', color: P[0], data: days.map(d => Object.values(get(d)).reduce((a, r) => a + r[4], 0))}];
+    o.yfmt = full;
+  } else {
+    series = [{name: 'API-equivalent cost', color: P[1], data: days.map(d => Object.entries(get(d)).reduce((a, [m, r]) => a + cost(m, r[0], r[1], r[2], r[3]), 0))}];
+    o.yfmt = money;
+  }
+  $('#tl-legend').innerHTML = series.map(s => `<span><span class="sw" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
+  barChart($('#tl'), days, series, o);
+}
+
+function renderWhere(){
+  const A = D.attribution, P = PAL();
+  const parts = [['tool results, inputs and messages', A.listed, P[0]], ['fixed floor × every call', A.fixed, P[1]], ['not attributable', A.other, P[3]]];
+  $('#attr').innerHTML = parts.map(([n, v, c]) => `<div style="width:${100 * v}%;background:${c}" data-tip="${esc(n)}: ${pct(v)}"></div>`).join('');
+  $('#attr-legend').innerHTML = parts.map(([n, v, c]) => `<span><span class="sw" style="background:${c}"></span>${esc(n)} ${pct(v)}</span>`).join('');
+  const max = Math.max(...D.sources.map(s => s.weighted), 1), tot = D.sources.reduce((a, s) => a + s.weighted, 0);
+  $('#src').innerHTML = '<thead><tr><th>source</th><th>results</th><th>raw</th><th>lifetime</th><th style="width:30%"></th></tr></thead><tbody>' +
+    D.sources.map(s => `<tr><td>${esc(s.name)}${s.images ? ` <span class="chip">${full(s.images)} img</span>` : ''}</td><td>${full(s.count)}</td><td>${fmt(s.raw)}</td><td>${fmt(s.weighted)} <span class="mute">${pct(s.weighted / tot)}</span></td><td><div class="hbar" style="width:${100 * s.weighted / max}%"></div></td></tr>`).join('') + '</tbody>';
+}
+
+const RULES = {screenshot_scale: 'Screenshot shrunk', screenshot_dedupe: 'Repeat screenshot blocked', read_image: 'Image downscaled before Read',
+  read_outline: 'Outline instead of huge file', read_outline_retry: 'Whole file read anyway (outline cost)', bash_trim: 'Long Bash output trimmed', mcp_shrink: 'MCP result shrunk'};
+function renderSavings(){
+  const R = D.savings.by_rule, rows = Object.entries(R).sort((a, b) => b[1].life - a[1].life);
+  const direct = rows.reduce((a, [, r]) => a + r.before - r.after, 0), life = rows.reduce((a, [, r]) => a + r.life, 0);
+  $('#sv-sub').textContent = D.savings.total_events ? `Measured from ${full(D.savings.total_events)} hook actions logged in ~/.cache/tokentrim/savings.jsonl.` :
+    'No hook actions logged yet. Savings appear here as new sessions run.';
+  const rp = D.replay, strong = D.profile ? rp[D.profile] : rp.strong;
+  $('#sv-kpis').innerHTML = [
+    kpi(fmt(direct), 'saved directly', 'tokens kept out of context', 'good'),
+    kpi(fmt(life), 'saved over their lifetime', 'incl. re-reads on later calls', 'good'),
+    kpi(full(D.savings.total_events), 'hook actions'),
+    kpi(pct(1 - rp.trimmed / Math.max(rp.orig, 1)), 'replay: output rules only', 'on your past sessions'),
+    kpi(pct(1 - strong / Math.max(rp.orig, 1)), `replay: + ${D.profile || 'strong'} profile`, 'context tokens re-sent', 'good'),
+  ].join('');
+  $('#sv-rules').innerHTML = '<thead><tr><th>rule</th><th>times</th><th>direct</th><th>lifetime</th></tr></thead><tbody>' +
+    (rows.length ? rows.map(([k, r]) => `<tr><td>${esc(RULES[k] || k)}${r.est ? ' <span class="chip">est.</span>' : ''}</td><td>${full(r.count)}</td><td class="${r.before - r.after < 0 ? 'bad' : ''}">${fmt(r.before - r.after)}</td><td class="${r.life < 0 ? 'bad' : 'good'}">${fmt(r.life)}</td></tr>`).join('')
+      : '<tr><td colspan="4" class="mute">nothing yet</td></tr>') + '</tbody>';
+  const prof = [['as it happened', rp.orig], ['output rules only', rp.trimmed], ...Object.keys(D.profiles).map(p => [`+ ${p} (${fmt(D.profiles[p])} window)`, rp[p]])];
+  const mx = Math.max(...prof.map(p => p[1]), 1);
+  $('#rp').innerHTML = '<table><tbody>' + prof.map(([n, v]) => `<tr><td>${esc(n)}${D.profile && n.includes(D.profile + ' (') ? ' <span class="chip">active</span>' : ''}</td><td>${fmt(v)}</td><td class="${v < rp.orig ? 'good' : 'mute'}">${v < rp.orig ? '−' + pct(1 - v / rp.orig) : ''}</td><td style="width:40%"><div class="hbar" style="width:${100 * v / mx}%"></div></td></tr>`).join('') + '</tbody></table>';
+  const sd = D.savings.daily, days = Object.keys(sd).sort();
+  if (days.length) barChart($('#sv-daily'), days, [{name: 'lifetime', color: css('--c3'), data: days.map(d => sd[d][1])}], {h: 180});
+  else $('#sv-daily').innerHTML = '<p class="mute">nothing yet</p>';
+  $('#sv-count').textContent = D.savings.recent.length + ' most recent';
+  $('#sv-recent').innerHTML = '<thead><tr><th>when</th><th>rule</th><th>tool</th><th>before</th><th>after</th><th>lifetime</th></tr></thead><tbody>' +
+    D.savings.recent.map(r => `<tr><td>${date(r.ts)}</td><td>${esc(RULES[r.rule] || r.rule)}</td><td>${esc((r.tool || '').replace(/^mcp__/, ''))}</td><td>${fmt(r.before)}</td><td>${fmt(r.after)}</td><td class="${(r.life ?? 0) < 0 ? 'bad' : 'good'}">${r.life != null ? fmt(r.life) : '—'}</td></tr>`).join('') + '</tbody>';
+}
+
+function renderPrices(){
+  $('#prices').innerHTML = Object.entries(PRICES).map(([f, [i, o]]) =>
+    `<label>${f} in $<input data-f="${f}" data-k="0" value="${i}" size="3"></label><label>out $<input data-f="${f}" data-k="1" value="${o}" size="3"></label>`).join(' · ') +
+    '<span class="mute">cache read 0.1× input, cache write 1.25× input</span>';
+  $('#prices').querySelectorAll('input').forEach(inp => inp.onchange = () => { PRICES[inp.dataset.f][+inp.dataset.k] = +inp.value || 0;
+    try { localStorage.setItem('tt-prices', JSON.stringify(PRICES)); } catch(e){} renderOverview(); renderModels(); renderTimeline(); });
+}
+
+function sortable(tbl, rows, cols, init){
+  let key = init, dir = -1;
+  const draw = () => { const r = rows.slice().sort((a, b) => { const x = cols[key].v(a), y = cols[key].v(b); return (x > y ? 1 : x < y ? -1 : 0) * dir; });
+    tbl.innerHTML = '<thead><tr>' + cols.map((c, i) => `<th data-i="${i}">${c.h}${i === key ? (dir < 0 ? ' ↓' : ' ↑') : ''}</th>`).join('') + '</tr></thead><tbody>' +
+      r.map(x => `<tr ${cols.rowAttr ? cols.rowAttr(x) : ''}>` + cols.map(c => `<td class="${c.cls || ''}">${c.f(x)}</td>`).join('') + '</tr>').join('') + '</tbody>';
+    tbl.querySelectorAll('th').forEach(th => th.onclick = () => { const i = +th.dataset.i; if (i === key) dir = -dir; else { key = i; dir = -1; } draw(); }); };
+  draw(); return draw;
+}
+
+function renderModels(){
+  const m = {};
+  for (const ms of Object.values(D.daily)) for (const [k, r] of Object.entries(ms)){ const x = m[k] = m[k] || [0, 0, 0, 0, 0]; r.forEach((v, i) => x[i] += v); }
+  const rows = Object.entries(m).map(([k, r]) => ({k, r, c: cost(k, ...r.slice(0, 4))}));
+  sortable($('#mdl'), rows, [{h: 'model', v: x => x.k, f: x => esc(x.k)}, {h: 'calls', v: x => x.r[4], f: x => full(x.r[4])},
+    {h: 'cache reads', v: x => x.r[0], f: x => fmt(x.r[0])}, {h: 'cache writes', v: x => x.r[1], f: x => fmt(x.r[1])},
+    {h: 'output', v: x => x.r[3], f: x => fmt(x.r[3])}, {h: 'cost', v: x => x.c, f: x => money(x.c)}], 5);
+  const p = {};
+  for (const s of S){ const x = p[s.project] = p[s.project] || {k: s.project, n: 0, calls: 0, tok: 0, c: 0, peak: 0};
+    x.n++; x.calls += s.calls + s.sub[0]; const t = s.cr + s.cw + s.inp + s.out + s.sub[1] + s.sub[2] + s.sub[3] + s.sub[4]; x.tok += t;
+    x.c += cost(s.model, s.cr + s.sub[1], s.cw + s.sub[2], s.inp + s.sub[3], s.out + s.sub[4]); x.peak = Math.max(x.peak, s.peak); }
+  sortable($('#prj'), Object.values(p), [{h: 'project', v: x => x.k, f: x => esc(x.k)}, {h: 'sessions', v: x => x.n, f: x => x.n},
+    {h: 'calls', v: x => x.calls, f: x => full(x.calls)}, {h: 'tokens', v: x => x.tok, f: x => fmt(x.tok)},
+    {h: 'peak ctx', v: x => x.peak, f: x => fmt(x.peak)}, {h: 'cost', v: x => x.c, f: x => money(x.c)}], 3);
+}
+
+let drawSessions;
+function renderSessions(){
+  const q = $('#q').value.toLowerCase(), f = $('#sf').value;
+  const rows = S.filter(s => (!q || (s.title + ' ' + s.project).toLowerCase().includes(q)) &&
+    (f === 'all' || (f === 'after' && s.after) || (f === 'before' && !s.after) || (f === 'long' && s.calls >= 300)));
+  const tot = s => s.cr + s.cw + s.inp + s.out + s.sub[1] + s.sub[2] + s.sub[3] + s.sub[4];
+  const cols = [
+    {h: 'session', v: s => s.title, f: s => `<div class="wrapcell">${esc(s.title || s.id.slice(0, 8))}<br><span class="mute">${esc(s.project)} · ${esc(s.model.replace('claude-', ''))}</span></div>`},
+    {h: 'started', v: s => s.start, f: s => date(s.start)},
+    {h: 'calls', v: s => s.calls, f: s => full(s.calls) + (s.sub[0] ? `<br><span class="mute">+${full(s.sub[0])} sub</span>` : '')},
+    {h: 'avg ctx', v: s => s.avg, f: s => fmt(s.avg)},
+    {h: 'peak ctx', v: s => s.peak, f: s => fmt(s.peak)},
+    {h: 'compactions', v: s => s.compactions, f: s => s.compactions},
+    {h: 'total tokens', v: tot, f: s => fmt(tot(s))},
+    {h: 'output', v: s => s.out, f: s => fmt(s.out)},
+    {h: 'saved', v: s => s.saved_life, f: s => s.saved_life ? `<span class="good">${fmt(s.saved_life)}</span>` : '<span class="mute">—</span>'},
+  ];
+  cols.rowAttr = s => `data-id="${s.id}" style="cursor:pointer"`;
+  drawSessions = sortable($('#ss'), rows, cols, 6);
+  $('#ss').onclick = e => { const tr = e.target.closest('tr[data-id]'); if (tr) showSession(S.find(s => s.id === tr.dataset.id)); };
+}
+
+function showSession(s){
+  $('#chart-session').style.display = 'block';
+  $('#cs-title').innerHTML = `${esc(s.title || s.id)} <span class="mute">· ${full(s.calls)} calls · peak ${fmt(s.peak)} · ${s.compactions} compactions</span>`;
+  const el = $('#cs'), W = Math.max(el.clientWidth || 800, 320), H = 200, P = {l: 52, r: 10, t: 10, b: 22};
+  const d = s.series, n = d.length, max = Math.max(...d, D.window ? D.window * 0.75 : 0, 1), iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const X = i => P.l + iw * i / Math.max(n - 1, 1), Y = v => P.t + ih - ih * v / max;
+  let g = '';
+  for (let k = 0; k <= 4; k++){ const y = P.t + ih - ih * k / 4; g += `<line x1="${P.l}" x2="${W - P.r}" y1="${y}" y2="${y}" stroke="${css('--line')}"/><text x="${P.l - 6}" y="${y + 4}" text-anchor="end">${fmt(max * k / 4)}</text>`; }
+  if (D.window) g += `<line x1="${P.l}" x2="${W - P.r}" y1="${Y(D.window * 0.75)}" y2="${Y(D.window * 0.75)}" stroke="${css('--bad')}" stroke-dasharray="4 3"/><text x="${W - P.r}" y="${Y(D.window * 0.75) - 4}" text-anchor="end" style="fill:${css('--bad')}">compacts here now</text>`;
+  g += `<polyline fill="none" stroke="${css('--accent')}" stroke-width="1.5" points="${d.map((v, i) => X(i) + ',' + Y(v)).join(' ')}"/>`;
+  s.comps.forEach(i => g += `<circle cx="${X(i)}" cy="${Y(d[Math.min(i, n - 1)] || 0)}" r="3" fill="${css('--c2')}"/>`);
+  g += `<text x="${P.l}" y="${H - 6}">call 1</text><text x="${W - P.r}" y="${H - 6}" text-anchor="end">call ${full(s.calls)}</text>`;
+  el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;height:${H}px">${g}</svg><div class="legend"><span><span class="sw" style="background:${css('--accent')}"></span>context per call</span><span><span class="sw" style="background:${css('--c2')}"></span>compaction</span></div>`;
+  el.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
+
+function renderFloor(){
+  $('#fl-sub').textContent = `A fresh session’s first call carries ${fmt(D.baseline_median)} tokens (median). Every later call re-sends it.`;
+  const own = D.fixed_rows.reduce((a, r) => a + r[1], 0);
+  $('#fl').innerHTML = '<thead><tr><th>part you control</th><th>tokens</th><th>share of floor</th></tr></thead><tbody>' +
+    D.fixed_rows.map(([n, v]) => `<tr><td>${esc(n)}</td><td>~${full(v)}</td><td>${pct(v / Math.max(D.baseline_median, 1))}</td></tr>`).join('') +
+    `<tr><td><b>set by Claude Code and connectors</b></td><td>~${full(Math.max(D.baseline_median - own, 0))}</td><td>${pct(Math.max(D.baseline_median - own, 0) / Math.max(D.baseline_median, 1))}</td></tr></tbody>`;
+}
+
+function renderAll(){ renderOverview(); renderBA(); renderTimeline(); renderWhere(); renderSavings(); renderPrices(); renderModels(); renderSessions(); renderFloor(); }
+$('#tl-mode').onchange = renderTimeline; $('#tl-range').onchange = renderTimeline;
+$('#q').oninput = renderSessions; $('#sf').onchange = renderSessions;
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(renderTimeline, 150); });
+renderAll();
+</script>
+</body>
+</html>
