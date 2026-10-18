@@ -2,6 +2,8 @@
 
 **Cut what Claude Code re-reads on every step, measured on your own sessions.**
 
+**Website:** [suncal.github.io/tokentrim](https://suncal.github.io/tokentrim/) · **Pro:** [$49 lifetime early-bird](https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva)
+
 ![74% less history re-read on 115 real conversations; usage limits last 3.9x longer](docs/savings.png)
 
 **What you're missing out on without it:** Claude Code re-reads your *whole* conversation on every step. On the author's real usage, 74% of that re-reading was avoidable. Run `bin/tokentrim replay` to get **your own** number in about a minute, before installing anything.
