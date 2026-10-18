@@ -51,43 +51,86 @@ svg text{fill:var(--mute);font-size:11px}
 .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .split{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:8px 0}
 .split div{height:100%}
-@media (max-width:640px){.kpi .v{font-size:18px}.right{margin-left:0}}
+.hero{padding:20px}
+.hero h1{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.hero .lead{font-size:15px;color:var(--mute);margin:0 0 16px;max-width:760px}
+.cmp{display:grid;grid-template-columns:120px 1fr auto;gap:8px 12px;align-items:center;margin:4px 0 6px}
+.cmp .lbl{font-size:13px;color:var(--mute)}
+.cmp .track{height:26px;background:var(--chip);border-radius:6px;overflow:hidden}
+.cmp .fill{height:100%;border-radius:6px}
+.cmp .val{font-weight:700;font-size:14px;white-space:nowrap}
+.big-good{font-size:34px;font-weight:800;color:var(--good);letter-spacing:-.02em}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.step{display:flex;gap:10px;align-items:flex-start}
+.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.step p{margin:2px 0 0;font-size:13px;color:var(--mute)}
+.tips li{margin:0 0 8px}
+.tips{margin:6px 0 0;padding-left:18px}
+.i{display:inline-flex;width:15px;height:15px;border-radius:50%;border:1px solid var(--mute);color:var(--mute);font-size:10px;font-style:normal;align-items:center;justify-content:center;cursor:help;margin-left:4px;vertical-align:1px}
+details.adv>summary{cursor:pointer;font-size:17px;font-weight:700;padding:10px 0;list-style:none}
+details.adv>summary::before{content:'▸ ';color:var(--mute)}
+details.adv[open]>summary::before{content:'▾ '}
+dl.gl{display:grid;grid-template-columns:minmax(120px,180px) 1fr;gap:8px 16px;margin:0}
+dl.gl dt{font-weight:600}dl.gl dd{margin:0;color:var(--mute)}
+@media (max-width:640px){.cmp{grid-template-columns:80px 1fr}.cmp .val{grid-column:2}dl.gl{grid-template-columns:1fr}dl.gl dd{margin-bottom:6px}.big-good{font-size:28px}
+.kpi .v{font-size:18px}.right{margin-left:0}}
 </style>
 </head>
 <body>
 <header><div class="bar">
   <div class="brand">tokentrim</div>
   <nav>
-    <a href="#overview">Overview</a><a href="#beforeafter">Before / after</a><a href="#timeline">Timeline</a>
-    <a href="#where">Where it goes</a><a href="#savings">Savings</a><a href="#models">Models &amp; projects</a>
-    <a href="#sessions">Sessions</a><a href="#floor">Fixed floor</a>
+    <a href="#summary">Summary</a><a href="#overview">Your usage</a><a href="#timeline">By day</a>
+    <a href="#savings">Savings</a><a href="#sessions">Conversations</a><a href="#advanced">Details</a><a href="#glossary">What the words mean</a>
   </nav>
   <div class="right"><span id="live" class="mute" style="display:none"></span><button id="refresh" title="Rebuild now" style="display:none">↻</button><span id="gen"></span><button id="theme" title="Toggle theme">◐</button></div>
 </div></header>
 <main>
 
+<section id="summary">
+  <div class="card hero">
+    <h1 id="hero-h">With tokentrim vs without it</h1>
+    <p class="lead" id="hero-lead"></p>
+    <div id="hero-cmp"></div>
+    <div class="note" id="hero-note"></div>
+  </div>
+  <div class="grid k6" id="hero-kpis" style="margin-top:12px"></div>
+  <div class="grid k2" style="margin-top:12px">
+    <div class="card" id="missing"></div>
+    <div class="card"><b>Tips for you</b><ul class="tips" id="tips"></ul></div>
+  </div>
+  <div style="margin-top:12px">
+    <div class="card"><b>How tokentrim helps</b>
+      <div class="steps" style="margin-top:10px">
+        <div class="step"><div class="n">1</div><div><b>Claude re-reads everything</b><p>Each time Claude takes a step, it re-reads the whole conversation so far. Long conversations get expensive fast.</p></div></div>
+        <div class="step"><div class="n">2</div><div><b>tokentrim keeps it short</b><p>It summarises older parts sooner and shrinks bulky things like screenshots, big files and long command output.</p></div></div>
+        <div class="step"><div class="n">3</div><div><b>Your limits last longer</b><p>Less to re-read on every step means fewer tokens used for the same work.</p></div></div>
+      </div></div>
+  </div>
+</section>
+
 <section id="overview">
-  <h2>Overview</h2>
+  <h2>Your usage</h2>
   <p class="sub" id="ov-sub"></p>
   <div class="grid k6" id="kpis"></div>
 </section>
 
 <section id="beforeafter">
-  <h2>Before vs after tokentrim</h2>
+  <h2>Before vs after, measured</h2>
   <p class="sub" id="ba-sub"></p>
   <div class="card"><div class="scroll" style="max-height:none"><table id="ba"></table></div>
   <div class="note" id="ba-note"></div></div>
 </section>
 
 <section id="timeline">
-  <h2>Daily usage</h2>
-  <p class="sub">Every API call, main sessions and sub-agents. The dashed line marks when tokentrim was installed.</p>
+  <h2>Usage by day</h2>
+  <p class="sub">How much Claude used each day, including helpers it started (sub-agents). The red dashed line is the day tokentrim was turned on. Hover a bar for numbers.</p>
   <div class="card">
     <div class="controls">
       <label>Show <select id="tl-mode">
-        <option value="type">tokens by type</option><option value="model">tokens by model</option>
-        <option value="ctx">average context per call</option><option value="calls">API calls</option>
-        <option value="cost">API-equivalent cost</option></select></label>
+        <option value="type">tokens, by kind</option><option value="model">tokens, by Claude model</option>
+        <option value="ctx">size of each step (avg)</option><option value="calls">number of steps</option>
+        <option value="cost">cost at API prices</option></select></label>
       <label>Range <select id="tl-range"><option value="0">all</option><option value="90">90 days</option><option value="30" selected>30 days</option><option value="14">14 days</option></select></label>
     </div>
     <div id="tl-legend" class="legend"></div>
@@ -95,6 +138,7 @@ svg text{fill:var(--mute);font-size:11px}
   </div>
 </section>
 
+<details class="adv" id="advanced"><summary>Details for the curious</summary>
 <section id="where">
   <h2>Where your tokens go</h2>
   <p class="sub">Each thing that enters the context is paid for again on every later call until compaction. These are the lifetime costs.</p>
@@ -109,17 +153,17 @@ svg text{fill:var(--mute);font-size:11px}
 </section>
 
 <section id="savings">
-  <h2>What tokentrim saved</h2>
+  <h2>What tokentrim saved you</h2>
   <p class="sub" id="sv-sub"></p>
   <div class="grid k6" id="sv-kpis"></div>
   <div class="grid k2" style="margin-top:12px">
-    <div class="card"><b>By rule</b><div class="scroll" style="max-height:none"><table id="sv-rules"></table></div>
-      <div class="note">“Direct” is what the result would have cost once. “Lifetime” multiplies that by the later calls that would have re-read it (measured per session from your transcripts). Screenshot sizes are estimates (~1,600 tokens for a full-size one).</div></div>
-    <div class="card"><b>Projected: your past sessions with tokentrim</b><div id="rp"></div>
-      <div class="note">Replay of every recorded session through the rules plus each compaction window. Assumes compaction fires at ~75% of the window (measured).</div></div>
+    <div class="card"><b>What it did</b><div class="scroll" style="max-height:none"><table id="sv-rules"></table></div>
+      <div class="note"><b>Once</b> = tokens kept out the first time. <b>Total</b> = that amount times every later step that would have re-read it. Screenshot sizes are estimates.</div></div>
+    <div class="card"><b>If tokentrim had been on from the start</b><div id="rp"></div>
+      <div class="note">We re-ran all your past conversations through tokentrim's rules. Bars show how much would have been re-read; shorter is better.</div></div>
   </div>
-  <div class="card" style="margin-top:12px"><b>Daily measured savings</b><div id="sv-daily"></div></div>
-  <div class="card" style="margin-top:12px"><b>Recent actions</b> <span class="chip" id="sv-count"></span>
+  <div class="card" style="margin-top:12px"><b>Saved per day</b><div id="sv-daily"></div></div>
+  <div class="card" style="margin-top:12px"><b>Latest things it trimmed</b> <span class="chip" id="sv-count"></span>
     <div class="scroll"><table id="sv-recent"></table></div></div>
 </section>
 
@@ -134,23 +178,42 @@ svg text{fill:var(--mute);font-size:11px}
 </section>
 
 <section id="sessions">
-  <h2>Sessions</h2>
-  <p class="sub">Click a session to see its context grow and compact. Sub-agent tokens are included in the totals column.</p>
+  <h2>Your conversations</h2>
+  <p class="sub">Each row is one Claude conversation. Click one to see how big it grew. Drops in the line are where Claude summarised older parts (orange dots).</p>
   <div class="card">
     <div class="controls">
-      <input id="q" placeholder="Search title or project" style="flex:1;min-width:180px">
-      <select id="sf"><option value="all">all sessions</option><option value="after">since tokentrim</option><option value="before">before tokentrim</option><option value="long">300+ calls</option></select>
+      <input id="q" placeholder="Search conversations" style="flex:1;min-width:180px">
+      <select id="sf"><option value="all">all conversations</option><option value="after">since tokentrim</option><option value="before">before tokentrim</option><option value="long">very long ones (300+ steps)</option></select>
     </div>
     <div id="chart-session" style="display:none"><div id="cs-title" style="font-weight:600;margin-bottom:4px"></div><div id="cs"></div></div>
     <div class="scroll"><table id="ss"></table></div>
   </div>
 </section>
 
+<section id="floor-anchor"></section>
 <section id="floor">
   <h2>Fixed floor</h2>
   <p class="sub" id="fl-sub"></p>
   <div class="card"><table id="fl"></table>
     <div class="note">The rest of the floor (system prompt, tool schemas, connector tool names, app instructions) is set by Claude Code and your connected MCP servers.</div></div>
+</section>
+</details>
+
+<section id="glossary">
+  <h2>What the words mean</h2>
+  <div class="card"><dl class="gl">
+    <dt>Token</dt><dd>The unit Claude counts text in. Roughly ¾ of a word; a printed page is about 400 tokens.</dd>
+    <dt>Step (API call)</dt><dd>Every time Claude thinks and acts once: reads a file, runs a command, replies. One message from you can trigger dozens of steps.</dd>
+    <dt>Conversation size (context)</dt><dd>Everything Claude has to keep in mind: your messages, its replies, files it read, command output. It is re-read on every step.</dd>
+    <dt>Re-read history (cache reads)</dt><dd>The cheap-but-huge part: the conversation so far, re-read at each step. Usually over 95% of all tokens.</dd>
+    <dt>Saved to cache (cache writes)</dt><dd>New material added to the conversation, stored so it can be re-read cheaply later.</dd>
+    <dt>New input</dt><dd>Text sent fresh, not from the cache. Usually tiny.</dd>
+    <dt>Claude's replies (output)</dt><dd>What Claude writes: answers, code, commands. Priced higher per token, but small in volume.</dd>
+    <dt>Summarising (compaction)</dt><dd>When a conversation gets big, Claude replaces older parts with a short summary. tokentrim makes this happen sooner, so steps stay small.</dd>
+    <dt>Sub-agents</dt><dd>Helper Claudes started for a side task. Their usage is counted too.</dd>
+    <dt>Hook</dt><dd>A small rule tokentrim runs before or after a tool, e.g. shrinking a screenshot.</dd>
+    <dt>Cost at API prices</dt><dd>What this would cost if paid per token. On a Pro/Max subscription you don't pay this directly; it shows how fast you use up your limits.</dd>
+  </dl></div>
 </section>
 
 </main>
@@ -203,15 +266,15 @@ function renderOverview(){
   const ctxAvg = (t.cr + t.cw + t.inp) / Math.max(t.calls + t.subcalls, 1);
   const sv = Object.values(D.savings.by_rule).reduce((a, r) => a + r.life, 0);
   $('#kpis').innerHTML = [
-    kpi(fmt(all), 'total tokens', 'all input + output'),
-    kpi(fmt(t.cr), 'cache reads', pct(t.cr / Math.max(all, 1)) + ' of everything'),
-    kpi(fmt(t.cw), 'cache writes', 'context written to cache'),
-    kpi(fmt(t.inp), 'fresh input'),
-    kpi(fmt(t.out), 'output', pct(t.out / Math.max(all, 1)) + ' of everything'),
-    kpi(full(t.calls + t.subcalls), 'API calls', fmt(t.subcalls) + ' by sub-agents'),
-    kpi(fmt(ctxAvg), 'avg context per call', 're-sent every step'),
-    kpi(money(dailyCost()), 'API-equivalent cost', 'at the prices below'),
-    kpi(fmt(sv), 'saved by tokentrim (measured)', D.savings.total_events + ' hook actions', 'good'),
+    kpi(fmt(all), 'total tokens used', 'everything, all conversations'),
+    kpi(fmt(t.cr), 're-read history', pct(t.cr / Math.max(all, 1)) + ' of everything'),
+    kpi(fmt(t.cw), 'added to history', 'new material saved for re-reading'),
+    kpi(fmt(t.inp), 'new input'),
+    kpi(fmt(t.out), 'Claude’s replies', pct(t.out / Math.max(all, 1)) + ' of everything'),
+    kpi(full(t.calls + t.subcalls), 'steps Claude took', fmt(t.subcalls) + ' by sub-agents'),
+    kpi(fmt(ctxAvg), 'average step size', 'history re-read per step'),
+    kpi(money(dailyCost()), 'cost at API prices', 'not a bill on Pro/Max'),
+    kpi(fmt(sv), 'saved by tokentrim so far', D.savings.total_events + ' hook actions', 'good'),
   ].join('');
 }
 
@@ -408,7 +471,49 @@ function renderFloor(){
     `<tr><td><b>set by Claude Code and connectors</b></td><td>~${full(Math.max(D.baseline_median - own, 0))}</td><td>${pct(Math.max(D.baseline_median - own, 0) / Math.max(D.baseline_median, 1))}</td></tr></tbody>`;
 }
 
-function renderAll(){ if (!D) return; renderOverview(); renderBA(); renderTimeline(); renderWhere(); renderSavings(); renderPrices(); renderModels(); renderSessions(); renderFloor(); }
+function renderHero(){
+  const rp = D.replay, prof = D.profile || 'strong', withT = rp[prof] || rp.strong, without = rp.orig;
+  const saved = Math.max(without - withT, 0), share = saved / Math.max(without, 1), x = without / Math.max(withT, 1);
+  // price the avoided re-reads at your own blended cache-read rate
+  let crTok = 0, crUsd = 0;
+  for (const ms of Object.values(D.daily)) for (const [m, r] of Object.entries(ms)) { crTok += r[0]; crUsd += cost(m, r[0], 0, 0, 0); }
+  const perTok = crUsd / Math.max(crTok, 1), usd = saved * perTok;
+  const first = Math.min(...S.map(s => s.start || Infinity)), last = Math.max(...S.map(s => s.end || 0));
+  const months = Math.max((last - first) / (30 * 86400), 0.25), perMonth = usd / months;
+  $('#hero-lead').innerHTML = `We re-ran your real Claude conversations (${full(S.length)} of them) both ways. ` +
+    `Without tokentrim, Claude re-read <b>${fmt(without)}</b> tokens of history. With it, the same work needs <b>${fmt(withT)}</b>. ` +
+    `That's <b class="good">${pct(share)} less</b>, so your plan's limits stretch about <b>${x.toFixed(1)}× further</b>.`;
+  const bar = (lbl, v, col) => `<div class="lbl">${lbl}</div><div class="track"><div class="fill" style="width:${100 * v / Math.max(without, 1)}%;background:${col}"></div></div><div class="val">${fmt(v)}</div>`;
+  $('#hero-cmp').innerHTML = `<div class="cmp">${bar('Without tokentrim', without, css('--bad'))}${bar('With tokentrim', withT, css('--good'))}</div>`;
+  $('#hero-note').textContent = `Tokens Claude re-reads as it works, across all your conversations. Dollar figures use API prices (${money(perTok * 1e6)} per million re-read tokens for your model mix); on a Pro/Max plan they show how much of your limit you get back, not a bill.`;
+  const b = D.phase.before, a = D.phase.after, live = a.calls >= 50 && b.avg_ctx;
+  $('#hero-kpis').innerHTML = [
+    kpi(pct(share), 'less for Claude to re-read', 'your conversations, replayed', 'good'),
+    kpi(fmt(saved), 'tokens saved', 'on your past conversations', 'good'),
+    kpi('~' + money(usd), 'saved at API prices', 'about ' + money(perMonth) + ' a month', 'good'),
+    kpi(x.toFixed(1) + '×', 'longer before limits', 'usage limits stretch this much'),
+    live ? kpi(pct(1 - a.avg_ctx / b.avg_ctx), 'smaller steps since install', `measured: ${fmt(b.avg_ctx)} → ${fmt(a.avg_ctx)} per step`, a.avg_ctx < b.avg_ctx ? 'good' : 'bad')
+         : kpi('—', 'measured since install', 'needs a few more days of use'),
+    kpi(fmt(Object.values(D.savings.by_rule).reduce((s, r) => s + r.life, 0)), 'trimmed live so far', full(D.savings.total_events) + ' screenshots / outputs shrunk', 'good'),
+  ].join('');
+  const long = S.filter(s => s.calls >= 300).length;
+  $('#missing').innerHTML = `<b>What people without tokentrim miss out on</b>
+    <ul class="tips">
+      <li><b>About ${pct(share)} of the history they make Claude re-read is avoidable.</b> Claude re-reads the whole conversation on every step, and without earlier summarising long chats balloon.</li>
+      <li><b>They hit usage limits ~${x.toFixed(1)}× sooner</b> for the same amount of work.</li>
+      <li><b>Paying per token?</b> For someone working like you, that's roughly ${money(perMonth)} a month left on the table.</li>
+      <li><b>Bulky screenshots and huge outputs stay in the chat</b> and get re-read on every later step.</li>
+    </ul>`;
+  const tips = [];
+  if (long) tips.push(`${long} of your conversations ran past 300 steps. Starting a fresh conversation for each new task is the biggest free saving.`);
+  if (!D.install_ts) tips.push('tokentrim is not switched on. Run <code>bin/tokentrim install</code>.');
+  else tips.push(`tokentrim is on (${esc(prof)} setting) since ${date(D.install_ts)}. New conversations use it automatically.`);
+  tips.push('Ask Claude to read pages as text instead of screenshots when you only need the words.');
+  tips.push('Unused connectors add their tool list to every step. Turn off the ones you rarely use.');
+  $('#tips').innerHTML = tips.map(t => `<li>${t}</li>`).join('');
+}
+
+function renderAll(){ if (!D) return; renderHero(); renderOverview(); renderBA(); renderTimeline(); renderWhere(); renderSavings(); renderPrices(); renderModels(); renderSessions(); renderFloor(); }
 $('#tl-mode').onchange = renderTimeline; $('#tl-range').onchange = renderTimeline;
 $('#q').oninput = renderSessions; $('#sf').onchange = renderSessions;
 let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(renderTimeline, 150); });
