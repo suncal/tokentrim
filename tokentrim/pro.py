@@ -106,7 +106,8 @@ def require():
 def status():
     lic = _load()
     if not lic:
-        print("tokentrim Free. Pro adds the weekly digest, budget alerts and Slack reports: %s" % BUY_URL)
+        print("tokentrim Free. Pro adds the weekly digest, budget alerts and Slack reports, "
+              "$49 lifetime for the first 500 buyers, then $9/month: %s" % BUY_URL)
     else:
         ok = is_pro()
         print("tokentrim Pro: %s (last checked %s)" % ("active" if ok else "NOT valid",
