@@ -1,10 +1,35 @@
+<div align="center">
+
+<img src="docs/logo.svg" width="80" alt="tokentrim logo">
+
 # tokentrim
 
-**Cut what Claude Code re-reads on every step, measured on your own sessions.**
+**Make Claude Code's usage limits last longer by cutting what it re-reads on every step,<br>measured on your own sessions.**
 
-**Website:** [suncal.github.io/tokentrim](https://suncal.github.io/tokentrim/) · **Pro:** [$49 lifetime early-bird](https://buy.polar.sh/polar_cl_f3ynkXOeRekKTm9C62vqBI2C3UGMRz1LgBNAp2GIvva)
+[![tests](https://github.com/suncal/tokentrim/actions/workflows/tests.yml/badge.svg)](https://github.com/suncal/tokentrim/actions/workflows/tests.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-3776AB.svg?logo=python&logoColor=white)](#install)
+[![Dependencies: 0](https://img.shields.io/badge/dependencies-0-4ade80.svg)](#install)
+[![Website](https://img.shields.io/badge/website-suncal.github.io%2Ftokentrim-0a0c0b.svg)](https://suncal.github.io/tokentrim/)
+[![GitHub stars](https://img.shields.io/github/stars/suncal/tokentrim?style=social)](https://github.com/suncal/tokentrim/stargazers)
+
+[Website](https://suncal.github.io/tokentrim/) · [Quick start](#quick-start) · [The honest numbers](#the-honest-numbers) · [What it changes](#what-it-changes) · [Pro](#pro) · [Discussions](https://github.com/suncal/tokentrim/discussions)
 
 ![74% less history re-read on 115 real conversations; usage limits last 3.9x longer](docs/savings.png)
+
+</div>
+
+## Quick start
+
+```bash
+git clone https://github.com/suncal/tokentrim && cd tokentrim
+bin/tokentrim replay     # your own number, in about a minute; installs nothing
+bin/tokentrim install    # if you like the number
+```
+
+Undo any time with `bin/tokentrim uninstall`. No dependencies, nothing leaves your machine.
+
+## Why it works
 
 **What you're missing out on without it:** Claude Code re-reads your *whole* conversation on every step. On the author's real usage, 74% of that re-reading was avoidable. Run `bin/tokentrim replay` to get **your own** number in about a minute, before installing anything.
 
@@ -100,6 +125,16 @@ python3 -m unittest discover -s tests
 
 The hooks were also verified live in headless Claude Code 2.1.299 (Bash trimming, outline-first reads, image downscaling, compaction trigger point).
 
+## Contributing
+
+Issues, new rules and real-world numbers are all welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and post your `replay` result in [Show and tell](https://github.com/suncal/tokentrim/discussions).
+
 ## License
 
-Apache-2.0
+[Apache-2.0](LICENSE). Not affiliated with Anthropic.
+
+<div align="center">
+
+**If tokentrim saved you tokens, a ⭐ helps other Claude Code users find it.**
+
+</div>

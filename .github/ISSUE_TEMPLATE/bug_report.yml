@@ -1,0 +1,31 @@
+name: Bug report
+description: Something tokentrim did that it shouldn't have (or didn't do)
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you ran, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: Output of `bin/tokentrim status`
+      render: text
+  - type: input
+    id: versions
+    attributes:
+      label: Claude Code version, OS and Python version
+      placeholder: "Claude Code 2.1.299, macOS 15.4, Python 3.12"
+    validations:
+      required: true
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Profile
+      options: [strong (default), balanced, max, not installed]
+  - type: markdown
+    attributes:
+      value: "Please don't paste transcripts, prompts or code you wouldn't want public. Totals are enough."
