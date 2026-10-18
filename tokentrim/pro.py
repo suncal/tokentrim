@@ -3,7 +3,7 @@
 The free tool (hooks, profiles, audit, replay, dashboard, share) stays free and open.
 Pro adds the parts that keep the savings going without you checking a dashboard.
 
-License keys are sold through Lemon Squeezy and checked against its public license API.
+License keys are sold through Polar (polar.sh) and checked against its public license-key API.
 Only the key and a machine label are sent; nothing about your usage ever leaves the machine.
 Slack posting is opt-in and sends totals only.
 """
@@ -14,13 +14,13 @@ import platform
 import subprocess
 import sys
 import time
-import urllib.parse
+import urllib.error
 import urllib.request
 
 LICENSE = os.path.expanduser("~/.config/tokentrim/license.json")
 BUY_URL = "https://github.com/suncal/tokentrim#pro"
-STORE_ID = None             # Lemon Squeezy store id; set at launch. None = checkout not open yet.
-API = "https://api.lemonsqueezy.com/v1/licenses/"
+ORG_ID = None               # Polar organization id; set at launch. None = checkout not open yet.
+API = "https://api.polar.sh/v1/customer-portal/license-keys/"
 RECHECK = 7 * 86400         # re-validate weekly
 GRACE = 30 * 86400          # keep working offline for this long after the last good check
 AGENT = os.path.expanduser("~/Library/LaunchAgents/com.tokentrim.digest.plist")
@@ -29,21 +29,18 @@ AGENT = os.path.expanduser("~/Library/LaunchAgents/com.tokentrim.digest.plist")
 # ---------- license
 
 def _post(action, fields):
-    req = urllib.request.Request(API + action, data=urllib.parse.urlencode(fields).encode(),
-                                 headers={"Accept": "application/json"})
+    req = urllib.request.Request(API + action, data=json.dumps(dict(fields, organization_id=ORG_ID)).encode(),
+                                 headers={"Accept": "application/json", "Content-Type": "application/json",
+                                          "User-Agent": "tokentrim (+https://github.com/suncal/tokentrim)"})
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
-            return json.load(r)
+            return json.loads(r.read() or b"{}")
     except urllib.error.HTTPError as e:  # the API answers 4xx with a JSON body
         try:
-            return json.load(e)
+            body = json.load(e)
         except ValueError:
-            return {"error": "HTTP %d" % e.code}
-
-
-def _ours(resp):
-    meta = resp.get("meta") or {}
-    return STORE_ID is None or meta.get("store_id") == STORE_ID
+            body = {}
+        return {"error": body.get("detail") or body.get("error") or "HTTP %d" % e.code}
 
 
 def _save(lic):
@@ -62,13 +59,12 @@ def _load():
 
 
 def activate(key):
-    if STORE_ID is None:
+    if ORG_ID is None:
         sys.exit("Pro checkout isn't open yet. Watch %s for launch." % BUY_URL)
-    resp = _post("activate", {"license_key": key, "instance_name": "tokentrim@" + platform.node()})
-    if not resp.get("activated") or not _ours(resp):
+    resp = _post("activate", {"key": key, "label": "tokentrim@" + platform.node()})
+    if not resp.get("id"):
         sys.exit("Activation failed: %s" % (resp.get("error") or "this key isn't for tokentrim"))
-    _save({"key": key, "instance": resp["instance"]["id"], "checked": time.time(),
-           "email": (resp.get("meta") or {}).get("customer_email", "")})
+    _save({"key": key, "instance": resp["id"], "checked": time.time()})
     print("tokentrim Pro activated. Thank you!")
 
 
@@ -76,7 +72,7 @@ def deactivate():
     lic = _load()
     if not lic:
         return print("No Pro license on this machine.")
-    _post("deactivate", {"license_key": lic["key"], "instance_id": lic["instance"]})
+    _post("deactivate", {"key": lic["key"], "activation_id": lic["instance"]})
     os.remove(LICENSE)
     print("Pro license removed from this machine (the seat is free to use elsewhere).")
 
@@ -88,10 +84,10 @@ def is_pro():
     if time.time() - lic.get("checked", 0) < RECHECK:
         return True
     try:
-        resp = _post("validate", {"license_key": lic["key"], "instance_id": lic["instance"]})
+        resp = _post("validate", {"key": lic["key"], "activation_id": lic["instance"]})
     except OSError:  # offline: trust the last good check for a while
         return time.time() - lic.get("checked", 0) < GRACE
-    if resp.get("valid") and _ours(resp):
+    if resp.get("status") == "granted" and resp.get("organization_id") == ORG_ID:
         lic["checked"] = time.time()
         _save(lic)
         return True

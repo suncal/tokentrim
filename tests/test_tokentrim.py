@@ -241,6 +241,21 @@ class Pro(unittest.TestCase):
             finally:
                 pro.LICENSE = old
 
+    def test_stale_license_revalidates_with_polar(self):
+        from tokentrim import pro
+        with tempfile.TemporaryDirectory() as d:
+            saved = pro.LICENSE, pro.ORG_ID, pro._post
+            pro.LICENSE, pro.ORG_ID = os.path.join(d, "license.json"), "org-1"
+            try:
+                pro._save({"key": "k", "instance": "a", "checked": 0})
+                pro._post = lambda action, f: {"status": "granted", "organization_id": "org-1"}
+                self.assertTrue(pro.is_pro())
+                pro._save({"key": "k", "instance": "a", "checked": 0})
+                pro._post = lambda action, f: {"status": "granted", "organization_id": "someone-else"}
+                self.assertFalse(pro.is_pro())
+            finally:
+                pro.LICENSE, pro.ORG_ID, pro._post = saved
+
     def test_recent_license_works_offline(self):
         import time
         from tokentrim import pro
