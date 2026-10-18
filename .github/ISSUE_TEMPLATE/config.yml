@@ -9,3 +9,6 @@ contact_links:
   - name: Security issue
     url: https://github.com/suncal/tokentrim/security/advisories/new
     about: Please report vulnerabilities privately.
+  - name: Pro license or billing help
+    url: mailto:support@boltak.com
+    about: Email support@boltak.com about your license key, refunds or invoices.

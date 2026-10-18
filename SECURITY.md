@@ -4,7 +4,7 @@ tokentrim runs as Claude Code hooks, so it sees every tool call. We take that se
 
 ## Reporting a vulnerability
 
-Please **don't open a public issue**. Report it privately through [GitHub security advisories](https://github.com/suncal/tokentrim/security/advisories/new). You'll get a reply within 3 days.
+Please **don't open a public issue**. Report it privately through [GitHub security advisories](https://github.com/suncal/tokentrim/security/advisories/new). Or email support@boltak.com. You'll get a reply within 3 days.
 
 ## What tokentrim does and doesn't do
 
