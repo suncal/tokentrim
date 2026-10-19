@@ -15,7 +15,7 @@
 
 [Website](https://suncal.github.io/tokentrim/) · [Quick start](#quick-start) · [The honest numbers](#the-honest-numbers) · [What it changes](#what-it-changes) · [Pro](#pro) · [Discussions](https://github.com/suncal/tokentrim/discussions)
 
-![74% less history re-read on 115 real conversations; usage limits last 3.9x longer](docs/savings.png)
+![75% less history re-read on 135 real conversations; usage limits last 4.0x longer](docs/savings.png)
 
 </div>
 
@@ -31,7 +31,7 @@ Undo any time with `bin/tokentrim uninstall`. No dependencies, nothing leaves yo
 
 ## Why it works
 
-**What you're missing out on without it:** Claude Code re-reads your *whole* conversation on every step. On the author's real usage, 74% of that re-reading was avoidable. Run `bin/tokentrim replay` to get **your own** number in about a minute, before installing anything.
+**What you're missing out on without it:** Claude Code re-reads your *whole* conversation on every step. On the author's real usage, 71–75% of that re-reading was avoidable, depending on the profile. Run `bin/tokentrim replay` to get **your own** number in about a minute, before installing anything.
 
 Most "save 90% tokens" tools shrink tool output. That's the wrong target. In an agent loop, about 98% of the input tokens you're billed for are **cache reads**: Claude Code re-sends the *entire* context on every API call. A session carrying 400k tokens of context pays for those 400k again on each step.
 
@@ -45,17 +45,17 @@ No dependencies (Python 3.9+ stdlib), nothing leaves your machine, and every hoo
 
 ## The honest numbers
 
-From the author's 103 real sessions (24,706 API calls, 10.9 billion context tokens):
+From the author's 135 real sessions (28,854 API calls, 11.3 billion context tokens), re-measured 20 Oct 2026:
 
 | | context tokens re-sent | cut |
 |---|---|---|
-| as it happened | 10,879,692,996 | — |
-| output trimming only (hooks) | 10,171,940,933 | **6.5%** |
-| + `balanced` profile (300k window) | | **66.5%** |
-| + `strong` profile (200k window, default) | | **74.5%** |
-| + `max` profile (150k window) | | **78.0%** |
+| as it happened | 11,349,251,410 | — |
+| output trimming only (hooks) | 10,568,885,015 | **6.9%** |
+| + `balanced` profile (300k window) | 4,297,754,626 | **62.1%** |
+| + `strong` profile (200k window, default) | 3,282,583,187 | **71.1%** |
+| + `max` profile (150k window) | 2,853,060,084 | **74.9%** |
 
-Why compaction dominates: the median API call carried **408k tokens** of context. 25 sessions that ran 300+ calls produced 93% of all cache reads. Context grows, and every later step re-pays for all of it.
+Why compaction dominates: the median API call carried **347k tokens** of context. 30 sessions that ran 300+ calls produced 93% of all cache reads. Context grows, and every later step re-pays for all of it.
 
 **Why it isn't 90%:** Claude Code's own system prompt, tool schemas and app instructions are about 40–60k tokens on every call, and no setting removes them. Once sessions are capped, that floor is most of what's left. Anyone promising 90% across *all* work is either measuring a single noisy `npm install` or not measuring.
 

@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>tokentrim: make Claude Code limits last longer</title>
-<meta name="description" content="Claude Code re-reads your whole conversation on every step. tokentrim keeps it small: 74% less history re-read on real sessions, so usage limits last 3.9× longer. Free, open source, local-only. See your own number before installing.">
+<meta name="description" content="Claude Code re-reads your whole conversation on every step. tokentrim keeps it small: 75% less history re-read on real sessions, so usage limits last 4.0× longer. Free, open source, local-only. See your own number before installing.">
 <link rel="canonical" href="https://suncal.github.io/tokentrim/">
 <meta property="og:title" content="tokentrim: stop paying Claude to re-read your whole conversation">
-<meta property="og:description" content="74% less history re-read on 115 real Claude Code conversations. Free, open source, local-only. Run the replay and get your own number.">
+<meta property="og:description" content="75% less history re-read on 135 real Claude Code conversations. Free, open source, local-only. Run the replay and get your own number.">
 <meta property="og:image" content="https://raw.githubusercontent.com/suncal/tokentrim/main/docs/savings.png">
 <meta property="og:url" content="https://suncal.github.io/tokentrim/">
 <meta property="og:type" content="website">
@@ -384,7 +384,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;color:var(--mute);fo
       <div>
         <a class="badge" href="#install"><b>NEW</b>Now a one-command Claude Code plugin</a>
         <h1>Stop paying Claude to re&#8209;read <em>your whole conversation.</em></h1>
-        <p class="sub">On every step, Claude Code sends everything said so far back to the model. tokentrim keeps that history small. On 115 real conversations that meant <b>74% less re-read</b> and usage limits that lasted <b>3.9× longer</b>.</p>
+        <p class="sub">On every step, Claude Code sends everything said so far back to the model. tokentrim keeps that history small. On 135 real conversations that meant <b>75% less re-read</b> and usage limits that lasted <b>4.0× longer</b>.</p>
 
         <div class="install" id="install">
           <div class="tabs" role="tablist" aria-label="Install method">
@@ -415,23 +415,23 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;color:var(--mute);fo
       </div>
 
       <div>
-        <div class="term" role="img" aria-label="Example replay output: 10.93 billion tokens re-read without tokentrim, 2.81 billion with it, 74 percent less">
+        <div class="term" role="img" aria-label="Example replay output: 11.35 billion tokens re-read without tokentrim, 2.85 billion with it, 75 percent less">
           <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>~/tokentrim — replay</span></div>
           <pre aria-hidden="true"><span class="p">$</span> bin/tokentrim replay
-<span class="d">reading 115 conversations from ~/.claude …</span>
-<span class="d">24,706 steps · median step re-read 408k tokens</span>
+<span class="d">reading 135 conversations from ~/.claude …</span>
+<span class="d">28,854 steps · median step re-read 347k tokens</span>
 
-<div class="meter"><span>without</span><div class="t"><div class="f" data-w="100" style="background:#f08a5d"></div></div><span class="n">10.93B</span></div><div class="meter"><span>with (strong)</span><div class="t"><div class="f" data-w="25.8" style="background:#4ade80"></div></div><span class="n">2.81B</span></div>
-<div class="big"><b>−74%</b> history re-read
-limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"></span></pre>
+<div class="meter"><span>without</span><div class="t"><div class="f" data-w="100" style="background:#f08a5d"></div></div><span class="n">11.35B</span></div><div class="meter"><span>with (max)</span><div class="t"><div class="f" data-w="25.1" style="background:#4ade80"></div></div><span class="n">2.85B</span></div>
+<div class="big"><b>−75%</b> history re-read
+limits last <b>4.0×</b> longer · ~$3.5K at API prices</div><span class="caret"></span></pre>
         </div>
         <p class="fine term-note">The author's own sessions. The replay shows you yours.</p>
       </div>
     </div>
 
     <div class="stats reveal">
-      <div><b class="g">−74%</b><span>history re-read, on 115 real conversations</span></div>
-      <div><b>3.9×</b><span>longer before you hit usage limits</span></div>
+      <div><b class="g">−75%</b><span>history re-read, on 135 real conversations</span></div>
+      <div><b>4.0×</b><span>longer before you hit usage limits</span></div>
       <div><b>6 CI targets</b><span>macOS and Linux, Python 3.9 to 3.13</span></div>
       <div><b>0 bytes</b><span>of your code or prompts sent anywhere</span></div>
     </div>
@@ -455,7 +455,7 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
         <div class="bars" data-mode="trim"></div>
         <div class="tot" style="color:var(--green)">2.81B<small>tokens re-read</small></div>
       </div>
-      <div class="note"><span>Each bar is one step of a long session. <b>Every bar gets paid for again.</b></span><span>Shrinking tool output alone saved <b>6.5%</b>. Keeping the conversation small saved <b>74%</b>.</span></div>
+      <div class="note"><span>Each bar is one step of a long session. <b>Every bar gets paid for again.</b></span><span>Shrinking tool output alone saved <b>6.9%</b>. Keeping the conversation small saved <b>75%</b>.</span></div>
     </div>
 
     <div class="compare reveal">
@@ -464,7 +464,7 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
           <thead><tr><th scope="col">&nbsp;</th><th scope="col">Shrinking tool output only</th><th scope="col">tokentrim</th></tr></thead>
           <tbody>
             <tr><th scope="row">What it targets</th><td>Tool output size</td><td class="us">The history re-read on every step</td></tr>
-            <tr><th scope="row">Saving on the same 115 conversations</th><td>6.5%</td><td class="us">74% less re-read</td></tr>
+            <tr><th scope="row">Saving on the same 135 conversations</th><td>6.9%</td><td class="us">75% less re-read</td></tr>
             <tr><th scope="row">Proof before you install</th><td><span class="n">Usually a vendor benchmark</span></td><td class="us"><span class="y">✓</span> A replay of your own transcripts</td></tr>
           </tbody>
         </table>
@@ -563,7 +563,7 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
     </div>
     <ul>
       <li class="reveal"><b>The trade-off is real</b>Summarising sooner means Claude forgets detail sooner. The default, strong, behaves close to Claude Code's old 200k window. Balanced is gentler; max is cheapest.</li>
-      <li class="reveal"><b>Cost drops less than tokens</b>Re-reads are cheap per token and output isn't touched, so billed cost and limit burn fall about 55–70%, not 74%.</li>
+      <li class="reveal"><b>Cost drops less than tokens</b>Re-reads are cheap per token and output isn't touched, so billed cost and limit burn fall about 55–70%, not 75%.</li>
       <li class="reveal"><b>Your number will differ</b>Short sessions re-read little, so they save little. That's why the replay comes first, before you install anything.</li>
       <li class="reveal"><b>Not affiliated with Anthropic</b>tokentrim uses Claude Code's public hooks and settings. It doesn't patch Claude Code or touch your account.</li>
     </ul>
@@ -658,7 +658,7 @@ limits last <b>3.9×</b> longer · ~$3.3K at API prices</div><span class="caret"
       <details><summary>Does anything leave my machine?</summary><p>No. The free tool reads transcripts Claude Code already stores locally and never sends them anywhere. Pro's license check sends only your key and a machine label. The hosted Pro dashboard receives totals and project folder names only, never prompts or code. Slack posting is opt-in and sends weekly totals only.</p></details>
       <details><summary>Plugin or full install: which should I use?</summary><p>The plugin is one command and adds the hooks plus <code>/tokentrim:replay</code>, <code>/tokentrim:dashboard</code> and <code>/tokentrim:share</code>. A plugin can't set the compaction window, which is where most of the saving comes from, so also run <code>tokentrim install</code> from a clone if you want it. Having both is safe: the plugin's hooks stand down while the full install's hooks are active, so nothing runs twice.</p></details>
       <details><summary>Can it pick the best model for each message?</summary><p>Not per message: Claude Code has no switch for that. Smart model uses Claude Code's own opusplan (Opus plans, Sonnet does the work), and pairs well with cheaper sub-agents, lower effort and the model advisor. Model changes apply to new sessions; <code>/model</code> in a session still wins.</p></details>
-      <details><summary>I'm on a Pro or Max plan, not paying per token. Does this help?</summary><p>Yes, and it's the main reason most people use it. Plan limits are spent on the same tokens, so re-reading less means hitting the 5-hour and weekly limits later. On the author's usage, limits lasted 3.9× longer.</p></details>
+      <details><summary>I'm on a Pro or Max plan, not paying per token. Does this help?</summary><p>Yes, and it's the main reason most people use it. Plan limits are spent on the same tokens, so re-reading less means hitting the 5-hour and weekly limits later. On the author's usage, limits lasted 4.0× longer.</p></details>
       <details><summary>Will Claude forget things?</summary><p>It summarises earlier, so very old detail in a long conversation gets condensed sooner. The default profile behaves close to how Claude Code worked with a 200k window. If you notice it, switch to <code>balanced</code> with one command.</p></details>
       <details><summary>How do I undo it?</summary><p><code>tokentrim uninstall</code> removes exactly what install added. Your settings were backed up before install, your own hooks are left alone, and one config flag turns every hook off instantly. Remove the plugin with <code>claude plugin uninstall tokentrim@tokentrim</code>.</p></details>
       <details><summary>What do I need?</summary><p>Claude Code and Python 3.9 or newer. No packages to install. It's tested on macOS and Linux. The Pro Monday digest schedules itself on macOS; elsewhere you can run <code>tokentrim digest</code> from your own scheduler.</p></details>
