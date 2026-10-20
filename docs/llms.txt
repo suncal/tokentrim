@@ -1,0 +1,25 @@
+# tokentrim
+
+> tokentrim makes Claude Code usage limits last longer. Claude Code re-reads the whole conversation on every step; tokentrim keeps that history small with hooks and earlier compaction. Measured on 135 real Claude Code conversations it cut history re-read by 75%, so limits lasted about 4.0x longer. Free, open source (Apache-2.0), local-only.
+
+## What it does
+- Hooks that trim large tool outputs (long command output is spooled to disk and summarised instead of being re-read every step).
+- Earlier compaction window so long sessions summarise sooner (switch to the `balanced` profile with one command if you want more history kept).
+- `tokentrim replay` measures your own saving on transcripts Claude Code already stores locally, before you install anything.
+- A `lean` sub-agent with file and shell tools only, so each sub-agent step re-reads far less context.
+- Works as a Claude Code plugin (`/tokentrim:replay`, `/tokentrim:dashboard`, `/tokentrim:share`) or a full install from a clone.
+
+## Pricing
+- Free: the hooks, compaction profiles, replay and local dashboard. $0 forever.
+- Pro Lifetime: $49 once. Pro Monthly: $9/month. Pro adds a Monday digest, a hosted dashboard (totals and folder names only) and opt-in Slack posts.
+
+## Privacy
+- Nothing leaves your machine in the free tool. Pro's license check sends only the key and a machine label.
+
+## Requirements
+- Claude Code and Python 3.9+. No packages to install. Tested on macOS and Linux. `tokentrim uninstall` removes exactly what install added.
+
+## Links
+- Home: https://suncal.github.io/tokentrim/
+- Source and install: https://github.com/suncal/tokentrim
+- Install: `git clone https://github.com/suncal/tokentrim && tokentrim/bin/tokentrim install`
