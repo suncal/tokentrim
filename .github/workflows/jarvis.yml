@@ -1,0 +1,27 @@
+name: JARVIS pages
+# Renders content/jarvis/*.json (committed by the sales-ops publisher) into pages, then Pages deploys the commit.
+on:
+  push:
+    branches: [main]
+    paths: ['content/jarvis/**', 'jarvis_pages.py']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jarvis-pages
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 jarvis_pages.py
+      - name: Commit rendered pages
+        run: |
+          git config user.name "jarvis-pages-bot"
+          git config user.email "jarvis@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Render JARVIS pages"
+          git pull --rebase origin main
+          git push
