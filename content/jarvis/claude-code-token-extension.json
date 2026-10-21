@@ -1,0 +1,39 @@
+{
+ "path": "/claude-code-token-extension/",
+ "title": "TokenTrim",
+ "h1": "Claude Code Token Extension",
+ "description": "TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output. It trims unnecessary output, reads files in",
+ "html": "<h1>Claude Code Token Extension</h1>\n<p>TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output. It trims unnecessary output, reads files in ranges, and spools long command output to disk, making limits last roughly 4x longer.</p>\n<h2>What you get</h2>\n<p>Free version available, Pro lifetime license for $49, Pro monthly subscription for $9</p>\n<h2>Why tokentrim</h2>\n<p>TokenTrim is designed for developers and CTOs at 10-200 person US software companies who hit Claude Code limits. By using TokenTrim, users can better manage their Claude Code token spend and get more out of their usage limits.</p>\n<h2>FAQ</h2>\n<p><b>Is TokenTrim affiliated with Anthropic?</b> No, TokenTrim is not affiliated with Anthropic.</p>\n<p><b>What is the benefit of using TokenTrim?</b> TokenTrim helps extend Claude Code usage limits by optimizing tool output.</p>\n<p><b>Next step:</b> Download TokenTrim for free and start extending your Claude Code token limits today.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is TokenTrim affiliated with Anthropic?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, TokenTrim is not affiliated with Anthropic."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the benefit of using TokenTrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "TokenTrim helps extend Claude Code usage limits by optimizing tool output."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code token extension",
+  "claude code token control",
+  "claude code token limit extension"
+ ],
+ "updated": "2026-10-21",
+ "draft_id": "de531d8e87",
+ "source": "seo"
+}
