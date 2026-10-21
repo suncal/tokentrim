@@ -1,0 +1,39 @@
+{
+ "path": "/claude-code-token-optimizer/",
+ "title": "TokenTrim",
+ "h1": "Claude Code Token Optimizer",
+ "description": "TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output. It trims unnecessary output, reads files in",
+ "html": "<h1>Claude Code Token Optimizer</h1>\n<p>TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output. It trims unnecessary output, reads files in ranges, and spools long command output to disk, making limits last roughly 4x longer.</p>\n<h2>What you get</h2>\n<p>Free version available, Pro lifetime license for $49, Pro monthly subscription for $9</p>\n<h2>Why tokentrim</h2>\n<p>For developers and CTOs at 10-200 person US software companies who hit Claude Code limits, TokenTrim provides a cost-effective solution to optimize token usage. By using TokenTrim, users can make the most of their Claude Code subscription and reduce costs.</p>\n<h2>FAQ</h2>\n<p><b>Is TokenTrim affiliated with Anthropic?</b> No, TokenTrim is not affiliated with Anthropic.</p>\n<p><b>What is the benefit of using TokenTrim?</b> TokenTrim helps extend Claude Code usage limits by optimizing tool output, making limits last roughly 4x longer.</p>\n<p><b>Next step:</b> Download TokenTrim for free and start optimizing your Claude Code token usage today</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is TokenTrim affiliated with Anthropic?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, TokenTrim is not affiliated with Anthropic."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the benefit of using TokenTrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "TokenTrim helps extend Claude Code usage limits by optimizing tool output, making limits last roughly 4x longer."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code token optimizer",
+  "claude code token saving tool",
+  "claude code usage extension"
+ ],
+ "updated": "2026-10-21",
+ "draft_id": "d1eb5357c0",
+ "source": "seo"
+}
