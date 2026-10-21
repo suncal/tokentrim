@@ -1,0 +1,39 @@
+{
+ "path": "/claude-code-token-dashboard/",
+ "title": "TokenTrim",
+ "h1": "Claude Code Token Dashboard",
+ "description": "TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output and file reading. It provides a dashboard to track",
+ "html": "<h1>Claude Code Token Dashboard</h1>\n<p>TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output and file reading. It provides a dashboard to track token spend per session, making it easier to manage Claude Code usage.</p>\n<h2>What you get</h2>\n<p>Free local toolkit, $49 lifetime Pro upgrade, $9/month Pro subscription</p>\n<h2>Why tokentrim</h2>\n<p>TokenTrim is designed for developers and CTOs at 10-200 person US software companies who frequently hit Claude Code limits. By using TokenTrim, users can make their Claude Code usage limits last longer and reduce token waste.</p>\n<h2>FAQ</h2>\n<p><b>Is TokenTrim affiliated with Anthropic?</b> No, TokenTrim is not affiliated with Anthropic.</p>\n<p><b>What is the cost of TokenTrim Pro?</b> $49 lifetime or $9/month</p>\n<p><b>Next step:</b> Download TokenTrim for free and start optimizing your Claude Code usage today</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is TokenTrim affiliated with Anthropic?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, TokenTrim is not affiliated with Anthropic."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the cost of TokenTrim Pro?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "$49 lifetime or $9/month"
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code token dashboard",
+  "claude code hooks to save tokens",
+  "claude code pro limit reached"
+ ],
+ "updated": "2026-10-21",
+ "draft_id": "d20b798eca",
+ "source": "seo"
+}
