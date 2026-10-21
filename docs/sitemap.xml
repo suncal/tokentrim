@@ -2,4 +2,5 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://suncal.github.io/tokentrim/</loc><lastmod>2026-10-21</lastmod></url>
   <url><loc>https://suncal.github.io/tokentrim/llms.txt</loc><lastmod>2026-10-21</lastmod></url>
+  <!-- jarvis --><url><loc>https://suncal.github.io/tokentrim/claude-code-token-dashboard/</loc><lastmod>2026-10-21</lastmod></url><url><loc>https://suncal.github.io/tokentrim/claude-code-token-optimizer/</loc><lastmod>2026-10-21</lastmod></url><url><loc>https://suncal.github.io/tokentrim/extend-claude-code-limits/</loc><lastmod>2026-10-21</lastmod></url><url><loc>https://suncal.github.io/tokentrim/tokentrim-for-claude-code/</loc><lastmod>2026-10-21</lastmod></url><!-- /jarvis -->
 </urlset>
