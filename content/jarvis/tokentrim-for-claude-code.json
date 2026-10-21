@@ -1,0 +1,37 @@
+{
+ "path": "/tokentrim-for-claude-code/",
+ "title": "TokenTrim",
+ "h1": "Tokentrim for Claude Code",
+ "description": "Tokentrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output. It trims unnecessary output, reads files in",
+ "html": "<h1>Tokentrim for Claude Code</h1>\n<p>Tokentrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output. It trims unnecessary output, reads files in ranges, and spools long command output to disk, making limits last longer.</p>\n<h2>What you get</h2>\n<p>Free version available, Pro lifetime license for $49, Pro monthly subscription for $9</p>\n<h2>Why tokentrim</h2>\n<p>Tokentrim is designed for developers and CTOs at US software companies who hit Claude Code limits, helping them work more efficiently. By using Tokentrim, users can make the most of their Claude Code usage and reduce waste.</p>\n<h2>FAQ</h2>\n<p><b>Is Tokentrim affiliated with Anthropic?</b> No, Tokentrim is not affiliated with Anthropic.</p>\n<p><b>What is the target audience for Tokentrim?</b> Developers and CTOs at 10-200 person US software companies who hit Claude Code limits.</p>\n<p><b>Next step:</b> Download Tokentrim for free and start optimizing your Claude Code usage today.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is Tokentrim affiliated with Anthropic?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, Tokentrim is not affiliated with Anthropic."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the target audience for Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Developers and CTOs at 10-200 person US software companies who hit Claude Code limits."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim for claude code"
+ ],
+ "updated": "2026-10-21",
+ "draft_id": "d2bdc6f9a0",
+ "source": "seo"
+}
