@@ -1,0 +1,39 @@
+{
+ "path": "/claude-code-token-budgeting/",
+ "title": "TokenTrim",
+ "h1": "Claude Code Token Budgeting",
+ "description": "TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output and file reading. By using TokenTrim, developers",
+ "html": "<h1>Claude Code Token Budgeting</h1>\n<p>TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output and file reading. By using TokenTrim, developers can make their Claude Code token budget last roughly 4x longer.</p>\n<h2>What you get</h2>\n<p>Free local toolkit, $49 lifetime Pro upgrade, $9/month Pro subscription</p>\n<h2>Why tokentrim</h2>\n<p>TokenTrim is designed for developers and CTOs at 10-200 person US software companies who hit Claude Code limits. It provides a dashboard to track token spend per session, helping teams optimize their Claude Code usage.</p>\n<h2>FAQ</h2>\n<p><b>Is TokenTrim affiliated with Anthropic?</b> No, TokenTrim is not affiliated with Anthropic.</p>\n<p><b>What is the benefit of upgrading to Pro?</b> Upgrading to Pro provides additional features and support.</p>\n<p><b>Next step:</b> Download TokenTrim for free and start optimizing your Claude Code token budget today.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is TokenTrim affiliated with Anthropic?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, TokenTrim is not affiliated with Anthropic."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the benefit of upgrading to Pro?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Upgrading to Pro provides additional features and support."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code token budgeting",
+  "claude code efficiency booster",
+  "claude code token extender"
+ ],
+ "updated": "2026-10-21",
+ "draft_id": "db1f755184",
+ "source": "seo"
+}
