@@ -1,0 +1,39 @@
+{
+ "path": "/claude-code-token-usage-reducer/",
+ "title": "TokenTrim",
+ "h1": "Claude Code Token Usage Reducer",
+ "description": "TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output and file reading. It can make your Claude Code",
+ "html": "<h1>Claude Code Token Usage Reducer</h1>\n<p>TokenTrim is a free, local toolkit that helps extend Claude Code usage limits by optimizing tool output and file reading. It can make your Claude Code limits last roughly 4x longer, with a dashboard to track token spend per session.</p>\n<h2>What you get</h2>\n<p>Free version available, Pro for $49 lifetime, Pro for $9/month</p>\n<h2>Why tokentrim</h2>\n<p>TokenTrim is designed for developers and CTOs at 10-200 person US software companies who hit Claude Code limits, helping them get the most out of their resources. By using TokenTrim, you can reduce the likelihood of hitting these limits and make your Claude Code usage more efficient.</p>\n<h2>FAQ</h2>\n<p><b>Is TokenTrim affiliated with Anthropic?</b> No, TokenTrim is not affiliated with Anthropic.</p>\n<p><b>What are the benefits of using TokenTrim Pro?</b> TokenTrim Pro offers additional features and support for a one-time fee of $49 or a monthly subscription of $9.</p>\n<p><b>Next step:</b> Try TokenTrim for free today and start reducing your Claude Code token usage.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is TokenTrim affiliated with Anthropic?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, TokenTrim is not affiliated with Anthropic."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What are the benefits of using TokenTrim Pro?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "TokenTrim Pro offers additional features and support for a one-time fee of $49 or a monthly subscription of $9."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code token usage reducer",
+  "claude code resource saver",
+  "claude code token stretch tool"
+ ],
+ "updated": "2026-10-21",
+ "draft_id": "dab3dbcff3",
+ "source": "seo"
+}
