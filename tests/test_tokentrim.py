@@ -116,6 +116,22 @@ class Hooks(unittest.TestCase):
         self.assertEqual(acts[1]["input"]["scale"], 0.4)
         self.assertEqual(acts[0], inp["actions"][0])
 
+    def test_scale_cap_off_by_default_then_lowers_explicit_scale(self):
+        shot = {"tool_name": "mcp__Claude_Browser__computer", "tool_input": {"action": "screenshot", "scale": 0.6}}
+        self.assertIsNone(run_hook("pre", shot, self.home))
+        path = os.path.join(self.home, ".config/tokentrim/config.json")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as fh:
+            json.dump({"screenshot_scale_cap": 0.4}, fh)
+        out = run_hook("pre", shot, self.home)
+        self.assertEqual(out["hookSpecificOutput"]["updatedInput"]["scale"], 0.4)
+        zoom = {"tool_name": "mcp__Claude_Browser__computer",
+                "tool_input": {"action": "zoom", "region": [0, 0, 9, 9], "scale": 0.9}}
+        self.assertIsNone(run_hook("pre", zoom, self.home))
+        inp = {"actions": [{"name": "computer", "input": {"action": "screenshot", "scale": 0.5}}]}
+        out = run_hook("pre", {"tool_name": "mcp__Claude_Browser__browser_batch", "tool_input": inp}, self.home)
+        self.assertEqual(out["hookSpecificOutput"]["updatedInput"]["actions"][0]["input"]["scale"], 0.4)
+
     def test_batch_earlier_screenshots_smaller(self):
         inp = {"actions": [{"name": "computer", "input": {"action": "screenshot"}},
                            {"name": "computer", "input": {"action": "left_click", "coordinate": [1, 1]}},

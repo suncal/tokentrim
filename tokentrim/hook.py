@@ -75,12 +75,17 @@ READ_ONLY = {"find", "read_page", "get_page_text", "read_console_messages", "rea
 
 
 def _scale_screenshot(inp, cfg, scale=None):
+    if inp.get("save_to_disk"):
+        return None  # an image meant for the user keeps full size
     if inp.get("action") in ("screenshot", "zoom") and "scale" not in inp:
-        if inp.get("save_to_disk"):
-            return None  # an image meant for the user keeps full size
         new = dict(inp)
         new["scale"] = scale or (cfg["zoom_scale"] if inp.get("action") == "zoom" else cfg["screenshot_scale"])
         return new
+    cap = cfg.get("screenshot_scale_cap")
+    if cap and inp.get("action") == "screenshot" and isinstance(inp.get("scale"), (int, float)) \
+            and inp["scale"] > cap:
+        # Claude often asks for 0.5-0.6 out of habit; zoom stays the way to see detail
+        return dict(inp, scale=cap)
     return None
 
 
@@ -123,7 +128,8 @@ def rule_screenshot(tool, inp, cfg, session=""):
             _page_state(session, "shot")
         new = _scale_screenshot(inp, cfg) if cfg["screenshot_scale"] < 1 else None
         if new:
-            _saving("screenshot_scale", tool, SHOT_TOKENS, SHOT_TOKENS * new["scale"] ** 2, est=True)
+            was = inp.get("scale") or 1
+            _saving("screenshot_scale", tool, SHOT_TOKENS * was ** 2, SHOT_TOKENS * new["scale"] ** 2, est=True)
             _rewrite(new, "%s %s scale=%s" % (tool.split("__")[1], inp.get("action"), new["scale"]))
     elif name == "browser_batch":
         items = [i for i in (inp.get("actions") or []) if isinstance(i, dict)]
@@ -133,11 +139,13 @@ def rule_screenshot(tool, inp, cfg, session=""):
             if k in shots and cfg["screenshot_scale"] < 1:
                 # only the batch's last screenshot is what Claude acts on; earlier ones are progress checks
                 scale = cfg["screenshot_scale"] if k == shots[-1] else cfg["batch_extra_scale"]
-                new = _scale_screenshot(item["input"], cfg, scale)
+                item_in = item["input"]
+                new = _scale_screenshot(item_in, cfg, scale)
                 if new:
                     item = dict(item, input=new)
                     changed = True
-                    _saving("screenshot_scale", tool, SHOT_TOKENS, SHOT_TOKENS * scale ** 2, est=True)
+                    was = item_in.get("scale") or 1
+                    _saving("screenshot_scale", tool, SHOT_TOKENS * was ** 2, SHOT_TOKENS * new["scale"] ** 2, est=True)
             actions.append(item)
         last = items[-1] if items else {}
         if session:
