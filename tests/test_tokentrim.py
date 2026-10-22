@@ -140,6 +140,21 @@ class Hooks(unittest.TestCase):
         acts = out["hookSpecificOutput"]["updatedInput"]["actions"]
         self.assertEqual((acts[0]["input"]["scale"], acts[2]["input"]["scale"]), (0.25, 0.4))
 
+    def test_batch_last_shot_only_off_by_default_then_drops_earlier(self):
+        inp = {"actions": [{"name": "computer", "input": {"action": "screenshot"}},
+                           {"name": "computer", "input": {"action": "left_click", "coordinate": [1, 1]}},
+                           {"name": "computer", "input": {"action": "screenshot"}},
+                           {"name": "computer", "input": {"action": "zoom", "region": [0, 0, 9, 9]}}]}
+        ev = {"tool_name": "mcp__Claude_Browser__browser_batch", "tool_input": inp}
+        self.assertEqual(len(run_hook("pre", ev, self.home)["hookSpecificOutput"]["updatedInput"]["actions"]), 4)
+        path = os.path.join(self.home, ".config/tokentrim/config.json")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as fh:
+            json.dump({"batch_last_shot_only": True}, fh)
+        acts = run_hook("pre", ev, self.home)["hookSpecificOutput"]["updatedInput"]["actions"]
+        self.assertEqual([a["input"]["action"] for a in acts], ["left_click", "screenshot", "zoom"])
+        self.assertEqual(acts[1]["input"]["scale"], 0.4)
+
     def test_big_read_outline_then_allowed(self):
         path = os.path.join(self.home, "big.py")
         with open(path, "w") as fh:
@@ -241,6 +256,30 @@ class Install(unittest.TestCase):
             self.assertEqual(json.load(fh), original)
         with open(cli.CLAUDE_MD) as fh:
             self.assertEqual(fh.read(), "# my notes\n")
+
+    def test_install_adds_sub_agents_and_keeps_users_own(self):
+        from tokentrim import cli
+        d = tempfile.mkdtemp()
+        old = cli.SETTINGS, cli.CLAUDE_MD
+        cli.SETTINGS, cli.CLAUDE_MD = os.path.join(d, "settings.json"), os.path.join(d, "CLAUDE.md")
+        agents = os.path.join(d, "agents")
+        os.makedirs(agents)
+        with open(os.path.join(agents, "lean.md"), "w") as fh:
+            fh.write("my own lean agent")
+        sys.stdout, real = io.StringIO(), sys.stdout
+        try:
+            cli.install("strong")
+            cli.install("strong")
+            with open(os.path.join(agents, "lean.md")) as fh:
+                self.assertEqual(fh.read(), "my own lean agent")   # not overwritten
+            self.assertTrue(os.path.exists(os.path.join(agents, "lean-browser.md")))
+            with open(cli.CLAUDE_MD) as fh:
+                self.assertIn('subagent_type "lean-browser"', fh.read())
+            cli.uninstall()
+            self.assertEqual(os.listdir(agents), ["lean.md"])          # ours removed, theirs kept
+        finally:
+            sys.stdout = real
+            cli.SETTINGS, cli.CLAUDE_MD = old
 
 
 def _fake_data():

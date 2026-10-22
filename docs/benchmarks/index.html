@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>tokentrim benchmarks</title>
+<meta name="description" content="Every tokentrim number with its sample size and method: 135 real Claude Code sessions, 28,854 API calls, 11.3B context tokens replayed.">
+<link rel="canonical" href="https://suncal.github.io/tokentrim/benchmarks/">
+<meta property="og:title" content="tokentrim benchmarks: measured, not promised">
+<meta property="og:description" content="What tokentrim cuts on 135 real Claude Code sessions, with sample sizes, methods and the limits we can't get past.">
+<meta property="og:url" content="https://suncal.github.io/tokentrim/benchmarks/">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#0a0c0b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8f6" media="(prefers-color-scheme: light)">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<script>try{var t=localStorage.getItem('tt-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{
+  --bg:#0a0c0b; --card:#121715; --line:#1f2723; --line2:#2b3530;
+  --ink:#eef2ef; --soft:#b3beb7; --mute:#7f8c84;
+  --green:#4ade80; --orange:#f08a5d;
+  --sans:"Geist",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px; color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f7f8f6; --card:#ffffff; --line:#e1e6e1; --line2:#cfd7d0;
+  --ink:#0d1410; --soft:#3e4a43; --mute:#66736b; --green:#15803d; --orange:#c2410c; color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f7f8f6; --card:#ffffff; --line:#e1e6e1; --line2:#cfd7d0;
+  --ink:#0d1410; --soft:#3e4a43; --mute:#66736b; --green:#15803d; --orange:#c2410c; color-scheme:light;
+}
+:root[data-theme="dark"]{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--green)}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--line);padding:18px 0}
+header .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo{font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
+header nav a{color:var(--soft);text-decoration:none;font-size:14.5px;margin-left:16px}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.03em;margin:56px 0 0}
+h2{font-size:24px;letter-spacing:-.02em;margin:56px 0 8px}
+.eyebrow{font:500 12.5px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--green);margin:0}
+.lede{color:var(--soft);font-size:18px;max-width:680px}
+p{color:var(--soft)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:32px 0 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stat b{display:block;font:600 26px var(--mono);color:var(--ink)}
+.stat span{color:var(--mute);font-size:13.5px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card);margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+td.n{font-family:var(--mono);white-space:nowrap;color:var(--ink)}
+.tag{display:inline-block;font:500 11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--line2);color:var(--mute);white-space:nowrap}
+.tag.m{color:var(--green);border-color:currentColor}
+.tag.e{color:var(--orange);border-color:currentColor}
+code{font:14px var(--mono);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;overflow-x:auto;font:14px/1.5 var(--mono)}
+footer{border-top:1px solid var(--line);margin-top:72px;padding:28px 0 48px;color:var(--mute);font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="logo" href="../">tokentrim</a>
+    <nav aria-label="Main"><a href="../#how">How it works</a><a href="https://github.com/suncal/tokentrim#readme">Docs</a></nav>
+  </div>
+</header>
+<main class="wrap">
+  <p class="eyebrow" style="margin-top:56px">Benchmarks</p>
+  <h1 style="margin-top:12px">Measured, not promised.</h1>
+  <p class="lede">Every number tokentrim quotes, with how it was measured and on how much data. Measurements are tagged <span class="tag m">measured</span>; anything projected is tagged <span class="tag e">estimate</span>.</p>
+
+  <div class="stats">
+    <div class="stat"><b>135</b><span>real Claude Code sessions</span></div>
+    <div class="stat"><b>28,854</b><span>API calls replayed</span></div>
+    <div class="stat"><b>11.3B</b><span>context tokens re-read</span></div>
+    <div class="stat"><b>75%</b><span>less re-read at max</span></div>
+  </div>
+
+  <h2>History re-read per setting</h2>
+  <p>A replay of real transcripts: each session is re-run through tokentrim's rules and compaction point, and the context tokens sent on every call are summed before and after. Re-measured 20 Oct 2026.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Setup</th><th>Compacts at</th><th>Cut</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>Output trimming only</td><td class="n">—</td><td class="n">6.9%</td><td><span class="tag m">measured</span></td></tr>
+      <tr><td>balanced</td><td class="n">300k</td><td class="n">62.1%</td><td><span class="tag m">measured</span></td></tr>
+      <tr><td>strong (default)</td><td class="n">200k</td><td class="n">71.1%</td><td><span class="tag m">measured</span></td></tr>
+      <tr><td>max</td><td class="n">150k</td><td class="n">74.9%</td><td><span class="tag m">measured</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>Most of the cut comes from compacting sooner, not from trimming. Trimming tool output alone is under 7%, because Claude Code already keeps big outputs out of the context.</p>
+
+  <h2>Browser and sub-agent rules</h2>
+  <p>Newer rules, measured on smaller samples. Treat these as directional.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Rule</th><th>Effect</th><th>Sample</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>Screenshot cap 0.4 (<code>screenshot_scale_cap</code>, opt-in)</td><td class="n">−20% of screenshot tokens</td><td>replay of one week's sessions, 331k screenshot tokens</td><td><span class="tag m">measured</span></td></tr>
+      <tr><td><code>lean</code> sub-agent vs general-purpose</td><td class="n">−86% tokens</td><td>same task run once each</td><td><span class="tag m">measured</span></td></tr>
+      <tr><td><code>lean-browser</code> sub-agent for 3+ step browser jobs</td><td class="n">≈ −6% of main-chat input</td><td>simulation on recent sessions</td><td><span class="tag e">estimate</span></td></tr>
+      <tr><td>Drop earlier screenshots in a batch (<code>batch_last_shot_only</code>, off by default)</td><td class="n">≈ −3.5% of tool-result weight</td><td>simulation on recent sessions</td><td><span class="tag e">estimate</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What no tool can cut</h2>
+  <p>Claude Code's own system prompt and tool list cost <b>40–60k tokens</b> on every call, and a fresh desktop chat starts near <b>77k</b>. Those are fixed by Claude Code, so a short session saves little and nobody can honestly promise 90% across all your work.</p>
+  <p>Billed cost and limit burn fall less than tokens, about <b>55–70%</b>, because cached re-reads are cheap per token and output isn't touched.</p>
+
+  <h2>Get your own number</h2>
+  <p>The replay runs locally on your own transcripts before you install anything. Nothing leaves your machine.</p>
+<pre>git clone https://github.com/suncal/tokentrim &amp;&amp; cd tokentrim
+bin/tokentrim replay</pre>
+  <p>Method and code: <a href="https://github.com/suncal/tokentrim#the-honest-numbers">README · The honest numbers</a> and <a href="https://github.com/suncal/tokentrim/blob/main/tokentrim/replay.py">replay.py</a>.</p>
+</main>
+<footer><div class="wrap">tokentrim is not affiliated with Anthropic. <a href="../">Home</a> · <a href="https://github.com/suncal/tokentrim">GitHub</a></div></footer>
+</body>
+</html>

@@ -68,13 +68,14 @@ Why compaction dominates: the median API call carried **347k tokens** of context
 | Rule | Hook | What it does | Lossy? |
 |---|---|---|---|
 | Compaction window | `env` | `CLAUDE_CODE_AUTO_COMPACT_WINDOW`; compaction fires at ~75% of it (measured) | summarises old turns |
-| Screenshots | PreToolUse | Browser `screenshot`/`zoom` (Claude in Chrome, built-in browser, `browser_batch`) get `scale: 0.5`, so **¼ the tokens**. Coordinates stay in full-res space. Explicit `scale` and `save_to_disk` are respected | lower-res image |
+| Screenshots | PreToolUse | Browser `screenshot`/`zoom` (Claude in Chrome, built-in browser, `browser_batch`) get `scale: 0.4`, so **about ⅙ the tokens** (earlier shots in a `browser_batch` get 0.25). Coordinates stay in full-res space. Explicit `scale` and `save_to_disk` are respected | lower-res image |
 | Images via Read | PreToolUse | Images over 1024px are downscaled with `sips` to a cached JPEG first | lower-res image |
 | Huge files | PreToolUse | Whole-file Read of a file over 40 KB returns an **outline** (defs/headings + line numbers) first. Asking again lets the full read through | no: retry gets everything |
 | Long Bash output | PostToolUse | Over 6k chars → head + tail; identical-line runs collapsed; ANSI/progress bars stripped. **Full output spooled to disk**, path included | no: full copy on disk |
 | MCP results | PostToolUse | JSON minified, null/empty fields dropped, base64 blobs removed, list items never dropped; over 12k chars clipped with full copy on disk | no: full copy on disk |
 | Context meter | UserPromptSubmit | Past 120k tokens, tells **you** (not Claude, 0 tokens) to `/compact` or start fresh | — |
-| Guidance | `~/.claude/CLAUDE.md` | ~110 tokens: prefer page text over screenshots, Edit over Write, ranged reads | — |
+| Guidance | `~/.claude/CLAUDE.md` | ~223 tokens: prefer page text over screenshots, Edit over Write, ranged reads, `lean` / `lean-browser` sub-agents | — |
+| Sub-agents | `~/.claude/agents/` | `lean` (file/shell work, 86% fewer tokens than general-purpose in one test) and `lean-browser` (browser jobs: screenshots stay in the sub-agent). Your own files with the same name are never overwritten | — |
 
 ## Install
 
@@ -110,7 +111,7 @@ bin/tokentrim uninstall              # removes exactly what install added
 
 `install` backs up `~/.claude/settings.json` first, keeps all your existing hooks and env, and is idempotent. New sessions pick it up.
 
-Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Set `"enabled": false` to switch every hook off instantly.
+Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Two opt-in switches, off by default: `"screenshot_scale_cap": 0.4` caps even an explicit screenshot `scale`, and `"batch_last_shot_only": true` keeps only the last screenshot of a `browser_batch`. Measured numbers: [benchmarks](https://suncal.github.io/tokentrim/benchmarks/). Set `"enabled": false` to switch every hook off instantly.
 
 ## Live view
 

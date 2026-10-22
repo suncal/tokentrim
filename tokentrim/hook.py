@@ -135,7 +135,13 @@ def rule_screenshot(tool, inp, cfg, session=""):
         items = [i for i in (inp.get("actions") or []) if isinstance(i, dict)]
         shots = [k for k, i in enumerate(items) if i.get("name") == "computer" and _is_shot(i.get("input"))]
         changed, actions = False, []
+        drop = shots[:-1] if cfg.get("batch_last_shot_only") else []
         for k, item in enumerate(inp.get("actions") or []):
+            if k in drop:
+                # a screenshot changes nothing on the page, so later steps never depend on it
+                _saving("batch_shot_drop", tool, SHOT_TOKENS * cfg["batch_extra_scale"] ** 2, 0, est=True)
+                changed = True
+                continue
             if k in shots and cfg["screenshot_scale"] < 1:
                 # only the batch's last screenshot is what Claude acts on; earlier ones are progress checks
                 scale = cfg["screenshot_scale"] if k == shots[-1] else cfg["batch_extra_scale"]
@@ -151,7 +157,10 @@ def rule_screenshot(tool, inp, cfg, session=""):
         if session:
             _page_state(session, "shot" if last.get("name") == "computer" and _is_shot(last.get("input")) else "act")
         if changed:
-            _rewrite(dict(inp, actions=actions), "browser_batch %d screenshots scaled" % len(shots))
+            note = "browser_batch %d screenshots scaled" % len(shots)
+            if drop:
+                note = "browser_batch: kept only the last of %d screenshots" % len(shots)
+            _rewrite(dict(inp, actions=actions), note)
     elif session:
         _page_state(session, "act")
 

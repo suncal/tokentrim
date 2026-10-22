@@ -49,6 +49,8 @@ GUIDANCE = """%s
 - Read large files in ranges (offset/limit) after looking at their outline; don't cat whole files.
 - Pipe long command output through head/tail/grep; long output is trimmed and spooled to disk anyway.
 - One task per session: suggest a fresh session when the topic changes.
+- Sub-agents: use subagent_type "lean" for file/shell work (search, read, edit, run tests); general-purpose only when the task needs the browser, web, MCP connectors or other agents.
+- Browser jobs of 3+ steps where you only need the result: use subagent_type "lean-browser"; drive the browser yourself only when you must see the page to decide.
 %s""" % (GUIDANCE_START, GUIDANCE_END)
 
 
@@ -122,7 +124,11 @@ def install(profile="strong", guidance=True):
     print("  compaction -> CLAUDE_CODE_AUTO_COMPACT_WINDOW=%d (%s)" % (PROFILES[profile], profile))
     if guidance:
         _write_guidance(True)
-        print("  guidance   ->", CLAUDE_MD, "(~110 tokens)")
+        print("  guidance   ->", CLAUDE_MD, "(~%d tokens)" % (len(GUIDANCE) // 4))
+        added = _write_agents(marker)
+        _save_settings(s)
+        if added:
+            print("  sub-agents ->", ", ".join(added), "in", _agents_dir())
     if _plugin_enabled(s):
         print("  plugin     -> tokentrim plugin is also enabled; its hooks stand down while these are installed")
     print("\nNew sessions pick this up. Already-open sessions keep their old settings.")
@@ -141,6 +147,47 @@ def _write_guidance(on):
         text = (text.rstrip("\n") + "\n\n" + GUIDANCE + "\n").lstrip("\n")
     with open(CLAUDE_MD, "w") as fh:
         fh.write(text + ("\n" if text and not text.endswith("\n") else ""))
+
+
+def _agents_dir():
+    return os.path.join(os.path.dirname(CLAUDE_MD), "agents")
+
+
+def _write_agents(marker):
+    """Copy agents/*.md (lean, lean-browser) next to CLAUDE.md. Never overwrite a
+    user's own agent of the same name: only files we put there, recorded in marker."""
+    src, dst = os.path.join(ROOT, "agents"), _agents_dir()
+    ours = marker.setdefault("agents", [])
+    if not os.path.isdir(src):
+        return []
+    added = []
+    for name in sorted(os.listdir(src)):
+        if not name.endswith(".md"):
+            continue
+        target = os.path.join(dst, name)
+        if os.path.exists(target) and name not in ours:
+            with open(target) as a, open(os.path.join(src, name)) as b:
+                if a.read() != b.read():
+                    continue   # someone else's agent with this name: leave it
+        os.makedirs(dst, exist_ok=True)
+        shutil.copyfile(os.path.join(src, name), target)
+        if name not in ours:
+            ours.append(name)
+        added.append(name[:-3])
+    return added
+
+
+def _remove_agents(marker):
+    src, dst = os.path.join(ROOT, "agents"), _agents_dir()
+    for name in marker.get("agents") or []:
+        target, mine = os.path.join(dst, name), os.path.join(src, name)
+        if not os.path.exists(target):
+            continue
+        if os.path.exists(mine):
+            with open(target) as a, open(mine) as b:
+                if a.read() != b.read():
+                    continue   # edited since install: keep the user's version
+        os.remove(target)
 
 
 def uninstall():
@@ -169,6 +216,7 @@ def uninstall():
         s.pop("env", None)
     _save_settings(s)
     _write_guidance(False)
+    _remove_agents(marker)
     print("tokentrim removed. (Spooled outputs remain in ~/.cache/tokentrim; delete them if you like.)")
 
 
