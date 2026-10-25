@@ -81,6 +81,8 @@ def page(d, head, header, footer):
 <meta property="og:title" content="{e(d.get("title") or d.get("h1"))}">
 <meta property="og:description" content="{e(d.get("description"))}">
 <meta property="og:url" content="{url}">
+<meta property="og:image" content="https://raw.githubusercontent.com/suncal/tokentrim/main/docs/savings.png">
+<meta name="twitter:card" content="summary_large_image">
 {head}
 {ld}<style>.jarvis-page{{max-width:760px;margin:0 auto;padding:40px 20px 64px;line-height:1.65}}.jarvis-page h1{{line-height:1.2;margin:0 0 18px}}.jarvis-page h2{{margin:32px 0 10px}}.jarvis-page li{{margin:6px 0}}.jarvis-page .upd{{opacity:.65;font-size:.9em;margin-top:36px}}</style>
 </head>
