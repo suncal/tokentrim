@@ -15,13 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 jarvis_pages.py
-      - name: Commit rendered pages
+      - name: Render and commit pages
+        # Rendered files (sitemap.xml, index.html) conflict when two posts land seconds apart, and a
+        # rebase then dropped the newer page. So: always render on top of the latest main, retry the push.
         run: |
           git config user.name "jarvis-pages-bot"
           git config user.email "jarvis@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet && exit 0
-          git commit -m "Render JARVIS pages"
-          git pull --rebase origin main
-          git push
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            python3 jarvis_pages.py
+            git add -A
+            git diff --cached --quiet && exit 0
+            git commit -qm "Render JARVIS pages"
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
