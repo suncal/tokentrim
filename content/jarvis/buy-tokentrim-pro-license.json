@@ -1,0 +1,45 @@
+{
+ "path": "/buy-tokentrim-pro-license/",
+ "title": "Buy TokenTrim Pro License",
+ "h1": "Buy TokenTrim Pro License",
+ "description": "TokenTrim Pro gives you a hosted dashboard, weekly budget alerts, and Slack totals. Install the free toolkit or upgrade to Pro for a full‑featured,",
+ "html": "<h1>Buy TokenTrim Pro License</h1>\n<p>TokenTrim Pro gives you a hosted dashboard, weekly budget alerts, and Slack totals. Install the free toolkit or upgrade to Pro for a full‑featured, cost‑saving experience.</p>\n<h2>How it works for a single developer</h2>\n<ol><li>Clone the repo or install the plugin.</li><li>Run <code>tokentrim</code> to trim Claude Code output and read files in ranges.</li><li>Use the replay command to see your savings.</li><li>Upgrade to Pro: the hosted dashboard appears on any device, and you get a Monday digest and a weekly budget alert at 80%.</li></ol>\n<h2>What you get / what it costs</h2>\n<ul><li><b>Free</b>: all hooks, 3 strength profiles, replay, dashboard, daily budget guard, cold‑cache alert.</li><li><b>Pro</b>: $49 lifetime (first 500 buyers) or $9/month.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget alert at 80%, Slack totals, and support for up to 3 machines.</li></ul>\n<h2>FAQ</h2>\n<p><b>Question?</b> How much can I save with TokenTrim? <b>Answer:</b> On 135 real conversations, history re‑read was cut by 75%, limits last 4.0x longer, and billed cost fell roughly 55‑70%. Shrinking tool output alone saved 6.9%.</p>\n<p><b>Question?</b> Do I need a special environment? <b>Answer:</b> TokenTrim requires Python 3.9 or newer and works on macOS and Linux. Nothing leaves your machine by default.</p>\n<p><b>Question?</b> Can I use it on multiple devices? <b>Answer:</b> Yes, Pro supports up to 3 machines and offers a hosted dashboard viewable on any device.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/buy-tokentrim-pro-license/\">Buy TokenTrim Pro license</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "How much can I save with TokenTrim? **Answer:** On 135 real conversations, history re‑read was cut by 75%, limits last 4.0x longer, and billed cost fell roughly 55‑70%. Shrinking tool output alone saved 6.9%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Do I need a special environment? **Answer:** TokenTrim requires Python 3.9 or newer and works on macOS and Linux. Nothing leaves your machine by default."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Can I use it on multiple devices? **Answer:** Yes, Pro supports up to 3 machines and offers a hosted dashboard viewable on any device."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "buy tokentrim pro license"
+ ],
+ "updated": "2026-10-26",
+ "draft_id": "dbaf9868b3",
+ "source": "seo"
+}
