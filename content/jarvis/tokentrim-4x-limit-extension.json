@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-4x-limit-extension/",
+ "title": "tokentrim 4x limit extension",
+ "h1": "tokentrim 4x limit extension",
+ "description": "Yes, tokentrim can extend Claude Code limits about 4 times by compacting your conversation history. Install the full version, enable the compaction",
+ "html": "<h1>tokentrim 4x limit extension</h1>\n<p>Yes, tokentrim can extend Claude Code limits about 4 times by compacting your conversation history. Install the full version, enable the compaction window, and the toolkit will trim and summarize earlier turns automatically.</p>\n<h2>How it works for a single Claude Code session</h2>\n<ol><li>Clone the repository or add the plugin to your environment.</li><li>Run Claude Code as usual; tokentrim records each response.</li><li>When the conversation grows, the <b>compaction window</b> rewrites earlier turns into a short summary.</li><li>The trimmed output is stored locally; long outputs are spooled to disk.</li><li>The <b>replay</b> command lets you see the exact reduction numbers for your session.</li></ol>\n<h2>What you get and the cost</h2>\n<ul><li><b>Free tier</b> – all hooks, three strength profiles, replay command, local dashboard, daily budget guard, cold‑cache alert. Nothing leaves your machine.</li><li><b>Pro lifetime</b> – $49 one‑time (first 500 buyers). Adds a hosted dashboard usable on any device, Monday digest, weekly budget alert at 80 %, Slack totals, and support for up to 3 machines.</li><li><b>Pro monthly</b> – $9 per month, same Pro features on a subscription basis.</li></ul>\n<p>All features run on Python 3.9+ and are tested on macOS and Linux.</p>\n<h2>FAQ</h2>\n<p><b>How much history can tokentrim cut?</b> On the author’s 135 real conversations, history re‑read dropped by 75 % and limits lasted 4.0 × longer.</p>\n<p><b>Do I need an internet connection for the free version?</b> No. By default nothing leaves your machine; all processing is local.</p>\n<p><b>Can I see the savings for my own runs?</b> Yes. Use the <code>replay</code> command; it prints your own reduction percentages (typically 6.9 % from output trimming alone).</p>\n<p>Ready to extend your Claude Code limits? <a href=\"/tokentrim/\">Install tokentrim now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much history can tokentrim cut?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "On the author’s 135 real conversations, history re‑read dropped by 75 % and limits lasted 4.0 × longer."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need an internet connection for the free version?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. By default nothing leaves your machine; all processing is local."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I see the savings for my own runs?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Use the `replay` command; it prints your own reduction percentages (typically 6.9 % from output trimming alone)."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 4x limit extension"
+ ],
+ "updated": "2026-10-26",
+ "draft_id": "d5a08ebf05",
+ "source": "seo"
+}
