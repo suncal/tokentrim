@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-cost-savings-estimate/",
+ "title": "tokentrim cost savings estimate",
+ "h1": "tokentrim cost savings estimate",
+ "description": "tokentrim is a free, open‑source toolkit that trims Claude Code output and manages token usage. On the site you can see how much you can save by",
+ "html": "<h1>tokentrim cost savings estimate</h1>\n<p>tokentrim is a free, open‑source toolkit that trims Claude Code output and manages token usage. On the site you can see how much you can save by installing it and running the cost‑savings estimate.</p>\n<h2>How to get a savings estimate for your own conversations</h2>\n<ol><li>Install tokentrim as a plugin or clone the repo.</li><li>Run the <b>replay</b> command on a conversation you’ve had with Claude.</li><li>The dashboard shows the number of tokens that would have been read, the compaction window used, and the resulting cost reduction.</li><li>Compare the “before” and “after” numbers to see the exact savings.</li></ol>\n<h2>What you get and the costs</h2>\n<ul><li>All hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold‑cache alert are free.</li><li>Pro lifetime: $49 (first 500 buyers).</li><li>Pro monthly: $9/month.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget alert at 80%, Slack totals, and support for up to 3 machines.</li><li>Nothing leaves your machine by default.</li></ul>\n<h2>FAQ</h2>\n<p><b>Question?</b> How much can I save with the free version? <b>Answer:</b> In 135 real conversations, the free version cut history re‑read by 75%, made limits last 4.0x longer, and reduced billed cost by roughly 55‑70%.</p>\n<p><b>Question?</b> Do I need a paid plan to see savings? <b>Answer:</b> No. The free toolkit includes all hooks and the replay command that shows your own numbers.</p>\n<p><b>Question?</b> What if I want a team dashboard? <b>Answer:</b> A shared team dashboard is in the works; a paid team audit is available on request.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/\">Get started with the free toolkit → /tokentrim/</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "How much can I save with the free version? **Answer:** In 135 real conversations, the free version cut history re‑read by 75%, made limits last 4.0x longer, and reduced billed cost by roughly 55‑70%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Do I need a paid plan to see savings? **Answer:** No. The free toolkit includes all hooks and the replay command that shows your own numbers."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "What if I want a team dashboard? **Answer:** A shared team dashboard is in the works; a paid team audit is available on request."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim cost savings estimate"
+ ],
+ "updated": "2026-10-26",
+ "draft_id": "d4972e4011",
+ "source": "seo"
+}
