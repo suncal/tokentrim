@@ -1,0 +1,45 @@
+{
+ "path": "/install-tokentrim-plugin/",
+ "title": "Install Tokentrim Plugin",
+ "h1": "Install Tokentrim Plugin",
+ "description": "Install the Tokentrim plugin to trim Claude Code output, read files in ranges, and spool long output to disk—all locally on your machine. The plugin saves",
+ "html": "<h1>Install Tokentrim Plugin</h1>\n<p>Install the Tokentrim plugin to trim Claude Code output, read files in ranges, and spool long output to disk—all locally on your machine. The plugin saves you time and money by compressing conversation history and reducing token usage.</p>\n<h2>How it works for a single Claude Code session</h2>\n<ol><li><b>Add the plugin</b> – Download the repository or install via the plugin manager.</li><li><b>Run a Claude Code task</b> – The plugin automatically trims the tool output and limits the conversation window.</li><li><b>Check the replay</b> – Use the replay command to see how many tokens were saved and how long the limit lasts.</li><li><b>Review the dashboard</b> – View your token usage and budget guard in the local dashboard.</li></ol>\n<h2>What you get / what it costs / limits</h2>\n<ul><li>Free: all hooks, 3 strength profiles, replay, dashboard, daily budget guard, cold‑cache alert.</li><li>Pro: $49 lifetime for the first 500 buyers or $9/month.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget alert at 80%, Slack totals, and up to 3 machines.</li><li>Nothing leaves your machine by default.</li><li>Requires Python 3.9 or newer; works on macOS and Linux.</li></ul>\n<h2>FAQ</h2>\n<p><b>Question?</b> *Does the plugin affect my privacy?* Answer: Nothing leaves your machine unless you enable the hosted dashboard in Pro.</p>\n<p><b>Question?</b> *Can I use it with multiple machines?* Answer: Yes, the Pro plan allows up to 3 machines.</p>\n<p><b>Question?</b> *What is the biggest saving?* Answer: Summarising earlier conversation cuts history re‑read by 75% and extends limits 4.0x, reducing billed cost by roughly 55‑70%.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/install-tokentrim-plugin/\">Install the Tokentrim plugin now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "*Does the plugin affect my privacy?* Answer: Nothing leaves your machine unless you enable the hosted dashboard in Pro."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "*Can I use it with multiple machines?* Answer: Yes, the Pro plan allows up to 3 machines."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "*What is the biggest saving?* Answer: Summarising earlier conversation cuts history re‑read by 75% and extends limits 4.0x, reducing billed cost by roughly 55‑70%."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "install tokentrim plugin"
+ ],
+ "updated": "2026-10-26",
+ "draft_id": "d96d4738fc",
+ "source": "seo"
+}
