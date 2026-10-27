@@ -1,0 +1,29 @@
+{
+ "path": "/tokentrim-75-history-cut/",
+ "title": "Tokentrim 75% History Cut",
+ "h1": "Tokentrim 75% History Cut",
+ "description": "You can significantly reduce the history re-read in your conversations with Tokentrim, a free, open-source local toolkit that trims tool output and",
+ "html": "<h1>Tokentrim 75% History Cut</h1>\n<p>You can significantly reduce the history re-read in your conversations with Tokentrim, a free, open-source local toolkit that trims tool output and summarizes earlier conversations. On the author's 135 real conversations, Tokentrim cut history re-read by 75% and made limits last 4.0x longer, resulting in a billed cost fall of roughly 55-70%.</p>\n<h2>How it Works for Claude Code</h2>\n<p>Tokentrim works by trimming tool output, reading files in ranges, and spooling long output to disk. The biggest saving comes from summarizing earlier conversation, which is set by the full install. You can install Tokentrim as a plugin or in full via git clone, and it's compatible with Python 3.9 or newer. The replay command shows your own numbers, so you can see the impact of Tokentrim on your conversations.</p>\n<h2>What You Get</h2>\n<p>With Tokentrim, you get all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert for free. The Pro lifetime option is available for $49 once for the first 500 buyers, and the Pro monthly option is $9/month. Pro adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>What is the benefit of using Tokentrim?</b> Tokentrim can cut history re-read by 75% and make limits last 4.0x longer, resulting in a billed cost fall of roughly 55-70%. <b>Is Tokentrim free?</b> Yes, Tokentrim is free, open-source, and all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert are available for free. <b>What is the Pro option?</b> The Pro option adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and up to 3 machines, available for $49 once for the first 500 buyers or $9/month.</p>\n<p><a href=\"/tokentrim/\">Learn more about Tokentrim and how to get started</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is the benefit of using Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Tokentrim can cut history re-read by 75% and make limits last 4.0x longer, resulting in a billed cost fall of roughly 55-70%. **Is Tokentrim free?** Yes, Tokentrim is free, open-source, and all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert are available for free. **What is the Pro option?** The Pro option adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and up to 3 machines, available for $49 once for the first 500 buyers or $9/month."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 75% history cut"
+ ],
+ "updated": "2026-10-27",
+ "draft_id": "dc7b939fcf",
+ "source": "seo"
+}
