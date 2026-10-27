@@ -1,0 +1,29 @@
+{
+ "path": "/tokentrim-3-machines-pro/",
+ "title": "Tokentrim 3 Machines Pro",
+ "h1": "Tokentrim 3 Machines Pro",
+ "description": "You can install Tokentrim to trim tool output, read files in ranges, and spool long output to disk. The Pro version of Tokentrim offers additional",
+ "html": "<h1>Tokentrim 3 Machines Pro</h1>\n<p>You can install Tokentrim to trim tool output, read files in ranges, and spool long output to disk. The Pro version of Tokentrim offers additional features, including a hosted dashboard on any device.</p>\n<h2>How it Works</h2>\n<p>Tokentrim is a free, open-source local toolkit that works with Python 3.9 or newer on macOS and Linux. It trims tool output, reads files in ranges, and spools long output to disk. The full install of Tokentrim sets a compaction window, which can cut history re-read by 75% and make limits last 4.0x longer, based on the author's 135 real conversations.</p>\n<h2>What You Get and What it Costs</h2>\n<p>The Pro lifetime version costs $49 once for the first 500 buyers, and the Pro monthly version costs $9/month. With the Pro version, you get a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and the ability to use Tokentrim on multiple machines.</p>\n<h2>FAQ</h2>\n<p><b>What are the benefits of the full install of Tokentrim?</b> The full install of Tokentrim can cut history re-read by 75% and make limits last 4.0x longer, based on the author's 135 real conversations. <b>Is my data secure?</b> Nothing leaves your machine by default, so your data is secure. <b>How do I get started with Tokentrim?</b> You can start by installing Tokentrim as a plugin or in full via git clone. <a href=\"/tokentrim/\">Get started with Tokentrim</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What are the benefits of the full install of Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The full install of Tokentrim can cut history re-read by 75% and make limits last 4.0x longer, based on the author's 135 real conversations. **Is my data secure?** Nothing leaves your machine by default, so your data is secure. **How do I get started with Tokentrim?** You can start by installing Tokentrim as a plugin or in full via git clone. [Get started with Tokentrim](/tokentrim/)"
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 3 machines pro"
+ ],
+ "updated": "2026-10-27",
+ "draft_id": "ddea0bc8c5",
+ "source": "seo"
+}
