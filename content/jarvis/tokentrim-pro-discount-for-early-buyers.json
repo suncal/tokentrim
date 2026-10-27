@@ -1,0 +1,31 @@
+{
+ "path": "/tokentrim-pro-discount-for-early-buyers/",
+ "title": "Tokentrim Pro Discount for Early Buyers",
+ "h1": "Tokentrim Pro Discount for Early Buyers",
+ "description": "You can get Tokentrim Pro for a one-time payment of $49, but only if you are one of the first 500 buyers. Tokentrim Pro offers a hosted dashboard on any",
+ "html": "<h1>Tokentrim Pro Discount for Early Buyers</h1>\n<p>You can get Tokentrim Pro for a one-time payment of $49, but only if you are one of the first 500 buyers. Tokentrim Pro offers a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, and Slack totals.</p>\n<h2>What is Tokentrim Pro</h2>\n<p>Tokentrim Pro is an upgrade to the free version of Tokentrim. It adds features like a hosted dashboard, Monday digest, and weekly budget with alert.</p>\n<h2>Features of Tokentrim Pro</h2>\n<p>Tokentrim Pro includes a hosted dashboard, Monday digest, weekly budget with alert at 80%, and Slack totals. You can use it on up to 3 machines.</p>\n<h2>Benefits of Tokentrim Pro</h2>\n<p>The full install of Tokentrim cut history re-read by 75% and made limits last 4.0x longer for the author's 135 conversations. Shrinking tool output alone saved 6.9%. The billed cost fell roughly 55-70%.</p>\n<h2>FAQ</h2>\n<p><b>What is the cost of Tokentrim Pro?</b> The cost is $49 once for the first 500 buyers, or $9/month. <b>How does Tokentrim Pro help with budgeting?</b> Tokentrim Pro offers a weekly budget with alert at 80%, helping you stay on top of your token usage. <b>Is my data secure with Tokentrim Pro?</b> Yes, nothing leaves your machine by default.</p>\n<p>Next, you can <a href=\"https://suncal.github.io/tokentrim/\">install Tokentrim</a> to start using it and consider upgrading to Tokentrim Pro.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is the cost of Tokentrim Pro?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The cost is $49 once for the first 500 buyers, or $9/month. **How does Tokentrim Pro help with budgeting?** Tokentrim Pro offers a weekly budget with alert at 80%, helping you stay on top of your token usage. **Is my data secure with Tokentrim Pro?** Yes, nothing leaves your machine by default."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim pro discount for early buyers",
+  "tokentrim pro hosted dashboard",
+  "tokentrim pro budget alert feature"
+ ],
+ "updated": "2026-10-27",
+ "draft_id": "dfff5ecae9",
+ "source": "seo"
+}
