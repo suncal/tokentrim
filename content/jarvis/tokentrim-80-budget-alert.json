@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-80-budget-alert/",
+ "title": "tokentrim 80% budget alert",
+ "h1": "tokentrim 80% budget alert",
+ "description": "tokentrim lets you see when your Claude Code token usage reaches 80 % of your daily limit. The free dashboard shows a clear alert so you can stop or",
+ "html": "<h1>tokentrim 80% budget alert</h1>\n<p>tokentrim lets you see when your Claude Code token usage reaches 80 % of your daily limit. The free dashboard shows a clear alert so you can stop or adjust your session before you hit the cap.</p>\n<h2>How the 80 % budget alert works</h2>\n<ol><li>Install tokentrim as a plugin or clone the full repo.</li><li>Run your Claude Code sessions normally.</li><li>The dashboard tracks token usage in real time.</li><li>When usage hits 80 % of the set daily budget, an alert appears.</li><li>You can pause or modify the session to stay within limits.</li></ol>\n<h2>What you get</h2>\n<ul><li>All hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold‑cache alert are free.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget alert at 80 %, Slack totals, and support for up to 3 machines.</li><li>Nothing leaves your machine unless you choose to share data.</li></ul>\n<h2>FAQ</h2>\n<p><b>What does the 80 % alert do?</b> It notifies you when your daily token usage reaches 80 % of the set budget, helping you avoid unexpected charges.</p>\n<p><b>Do I need a paid plan to see the alert?</b> No. The alert is part of the free dashboard. Paid plans add extra alerts and reporting.</p>\n<p><b>Can I change the alert threshold?</b> Yes. The dashboard lets you set any percentage you prefer.</p>\n<h2>Next step</h2>\n<p><a href=\"https://suncal.github.io/tokentrim/\">Install tokentrim and enable the 80 % budget alert</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What does the 80 % alert do?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It notifies you when your daily token usage reaches 80 % of the set budget, helping you avoid unexpected charges."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need a paid plan to see the alert?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The alert is part of the free dashboard. Paid plans add extra alerts and reporting."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I change the alert threshold?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. The dashboard lets you set any percentage you prefer."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 80% budget alert"
+ ],
+ "updated": "2026-10-27",
+ "draft_id": "dc9c6cd84a",
+ "source": "seo"
+}
