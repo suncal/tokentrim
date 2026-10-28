@@ -1,0 +1,47 @@
+{
+ "path": "/tokentrim-pro-monday-digest/",
+ "title": "tokentrim pro monday digest",
+ "h1": "tokentrim pro monday digest",
+ "description": "Tokentrim Pro includes a Monday Digest that emails you a brief summary of Claude Code usage each week. It shows token totals, cost reduction and any",
+ "html": "<h1>tokentrim pro monday digest</h1>\n<p>Tokentrim Pro includes a Monday Digest that emails you a brief summary of Claude Code usage each week. It shows token totals, cost reduction and any budget alerts so you can stay aware of limits.</p>\n<h2>How the Monday Digest works</h2>\n<ol><li>Install Tokentrim Pro (lifetime or monthly).</li><li>Activate the Pro features, including the hosted dashboard.</li><li>Set a weekly budget and the 80 % alert threshold.</li><li>Every Monday you receive an email with usage numbers, cost‑reduction range (55‑70 %) and any budget warnings.</li></ol>\n<h2>What you get</h2>\n<ul><li>Hosted dashboard that you can open on any device.</li><li>Weekly Monday Digest email with token usage and budget alerts.</li><li>Free features such as daily budget guard and cold‑cache alert.</li><li>Pro pricing: $49 one‑time lifetime (first 500 buyers) or $9 per month.</li><li>Support for up to 3 machines.</li></ul>\n<h2>FAQ</h2>\n<p><b>Does the digest cost extra beyond the Pro price?</b> No. The Monday Digest is included in the Pro subscription, whether you choose the $49 lifetime fee or the $9 monthly plan.</p>\n<p><b>Do I need the hosted dashboard to receive the digest?</b> The digest is part of the Pro package; enabling Pro features provides the data needed for the email, but no additional steps are required beyond the Pro activation.</p>\n<p><b>Will my data leave my machine?</b> By default nothing leaves your machine. The hosted dashboard stores only the information needed for the digest; all other hooks run locally.</p>\n<h2>Next step</h2>\n<p><a href=\"/tokentrim/claude-code-token-dashboard/\">Set up the Monday Digest now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does the digest cost extra beyond the Pro price?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The Monday Digest is included in the Pro subscription, whether you choose the $49 lifetime fee or the $9 monthly plan."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need the hosted dashboard to receive the digest?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The digest is part of the Pro package; enabling Pro features provides the data needed for the email, but no additional steps are required beyond the Pro activation."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will my data leave my machine?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "By default nothing leaves your machine. The hosted dashboard stores only the information needed for the digest; all other hooks run locally."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim pro monday digest",
+  "tokentrim pro 55-70% cost reduction",
+  "tokentrim pro lifetime deal"
+ ],
+ "updated": "2026-10-28",
+ "draft_id": "d59fd543ae",
+ "source": "seo"
+}
