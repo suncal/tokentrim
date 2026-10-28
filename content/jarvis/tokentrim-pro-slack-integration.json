@@ -1,0 +1,47 @@
+{
+ "path": "/tokentrim-pro-slack-integration/",
+ "title": "tokentrim pro slack integration",
+ "h1": "tokentrim pro slack integration",
+ "description": "The tokentrim pro slack integration shows your Claude Code usage and budget alerts in Slack. Add the bot to a channel and get real‑time token spend and",
+ "html": "<h1>tokentrim pro slack integration</h1>\n<p>The tokentrim pro slack integration shows your Claude Code usage and budget alerts in Slack. Add the bot to a channel and get real‑time token spend and daily budget status.</p>\n<h2>How it works</h2>\n<ol><li>Install the pro package on up to three machines.</li><li>Add the Slack bot to the channel you want to monitor.</li><li>The bot posts a daily budget guard message and a weekly digest.</li><li>When your budget reaches 80 % it sends an alert.</li><li>View detailed usage numbers in the hosted dashboard from any device.</li></ol>\n<h2>What you get</h2>\n<ul><li>Hosted dashboard on any device.</li><li>Monday digest and weekly budget alert at 80 %.</li><li>Slack totals and alerts.</li><li>Up to 3 machines.</li><li>Pro lifetime $49 (first 500 buyers) or Pro monthly $9/month.</li><li>Nothing leaves your machine by default.</li><li>Requires Python 3.9 or newer; tested on macOS and Linux.</li></ul>\n<h2>FAQ</h2>\n<p><b>How many machines can I use with the pro plan?</b> Up to 3 machines.</p>\n<p><b>What happens when my budget hits 80 %?</b> The Slack bot posts an alert in the channel you configured.</p>\n<p><b>Do I need to pay for each machine separately?</b> No. The pro plan covers all machines in your account.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/tokentrim-pro-slack-integration/\">Get started with the tokentrim pro slack integration</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How many machines can I use with the pro plan?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Up to 3 machines."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What happens when my budget hits 80 %?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The Slack bot posts an alert in the channel you configured."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need to pay for each machine separately?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The pro plan covers all machines in your account."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim pro slack integration",
+  "tokentrim pro machine limit 3",
+  "tokentrim pro daily budget guard"
+ ],
+ "updated": "2026-10-28",
+ "draft_id": "d54ba0d0ea",
+ "source": "seo"
+}
