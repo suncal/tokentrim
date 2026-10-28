@@ -1,0 +1,29 @@
+{
+ "path": "/tokentrim-free-vs-paid/",
+ "title": "Tokentrim Free vs Paid",
+ "h1": "Tokentrim Free vs Paid",
+ "description": "You can use Tokentrim for free or pay for the Pro version. The free version includes all hooks, 3 strength profiles, replay, dashboard, daily budget",
+ "html": "<h1>Tokentrim Free vs Paid</h1>\n<p>You can use Tokentrim for free or pay for the Pro version. The free version includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert.</p>\n<h2>How Tokentrim Works</h2>\n<p>Tokentrim trims tool output, reads files in ranges, and spools long output to disk. The full install sets a compaction window, which summarizes earlier conversations. This saved 75% on history re-read and made limits last 4.0x longer in the author's tests on 135 conversations.</p>\n<h2>What You Get</h2>\n<p>The free version of Tokentrim is free and open-source. The Pro version costs $49 once for a lifetime or $9/month. Pro adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and use on up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>What are the benefits of using Tokentrim?</b> Tokentrim can save you money by reducing your Claude Code usage, with the author's tests showing a 55-70% reduction in billed cost. <b>Is my data secure?</b> Nothing leaves your machine by default, so your data is secure. <b>How do I get started with Tokentrim?</b> You can install Tokentrim as a plugin or via git clone.</p>\n<p>Next, you can <a href=\"/tokentrim/\">install Tokentrim</a> to start using it.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What are the benefits of using Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Tokentrim can save you money by reducing your Claude Code usage, with the author's tests showing a 55-70% reduction in billed cost. **Is my data secure?** Nothing leaves your machine by default, so your data is secure. **How do I get started with Tokentrim?** You can install Tokentrim as a plugin or via git clone."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim free vs paid"
+ ],
+ "updated": "2026-10-28",
+ "draft_id": "d54e8d1c19",
+ "source": "seo"
+}
