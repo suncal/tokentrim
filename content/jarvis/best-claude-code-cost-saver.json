@@ -1,0 +1,29 @@
+{
+ "path": "/best-claude-code-cost-saver/",
+ "title": "Best Claude Code Cost Saver",
+ "h1": "Best Claude Code Cost Saver",
+ "description": "You're looking for a way to reduce your Claude Code costs, and tokentrim is a free, open-source toolkit that can help you do just that. tokentrim can save",
+ "html": "<h1>Best Claude Code Cost Saver</h1>\n<p>You're looking for a way to reduce your Claude Code costs, and tokentrim is a free, open-source toolkit that can help you do just that. tokentrim can save you money by trimming tool output, summarizing earlier conversations, and setting a daily budget guard.</p>\n<h2>How tokentrim Works for Claude Code Cost Savings</h2>\n<p>tokentrim trims tool output, reads files in ranges, and spools long output to disk, which can save you 6.9% on costs. The full install also sets a compaction window, which can save you even more by summarizing earlier conversations. On 135 real conversations, tokentrim cut history re-read by 75% and made limits last 4.0x longer.</p>\n<h2>What You Get with tokentrim</h2>\n<p>With tokentrim, you get a range of features, including all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert, all for free. If you upgrade to Pro, you'll get additional features like a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, and Slack totals, all for $49 once for the first 500 buyers or $9/month.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with tokentrim?</b> tokentrim cut history re-read by 75% and made limits last 4.0x longer on 135 real conversations, resulting in a billed cost fall of roughly 55-70%. <b>Do I need to pay for tokentrim?</b> No, tokentrim is free and open-source, but you can upgrade to Pro for additional features. <b>Is my data secure with tokentrim?</b> Yes, nothing leaves your machine by default, so your data is secure.</p>\n<p>To get started with tokentrim and start saving on your Claude Code costs, <a href=\"/tokentrim/\">install tokentrim now</a> and explore its features.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "tokentrim cut history re-read by 75% and made limits last 4.0x longer on 135 real conversations, resulting in a billed cost fall of roughly 55-70%. **Do I need to pay for tokentrim?** No, tokentrim is free and open-source, but you can upgrade to Pro for additional features. **Is my data secure with tokentrim?** Yes, nothing leaves your machine by default, so your data is secure."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "best claude code cost saver"
+ ],
+ "updated": "2026-10-28",
+ "draft_id": "d6820e7dd0",
+ "source": "seo"
+}
