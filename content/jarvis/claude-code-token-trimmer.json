@@ -1,0 +1,47 @@
+{
+ "path": "/claude-code-token-trimmer/",
+ "title": "Claude Code Token Trimmer",
+ "h1": "Claude Code Token Trimmer",
+ "description": "Yes, this is the free, open‑source toolkit that trims Claude Code output and compacts conversation history. Install it as a plugin or clone the repo, then",
+ "html": "<h1>Claude Code Token Trimmer</h1>\n<p>Yes, this is the free, open‑source toolkit that trims Claude Code output and compacts conversation history. Install it as a plugin or clone the repo, then use the dashboard to manage tokens locally.</p>\n<h2>How it works for a single Claude Code session</h2>\n<ol><li>Run Claude Code with the tokentrim hook enabled.</li><li>The hook trims each tool’s output and writes long results to disk.</li><li>When the conversation reaches the compaction window, tokentrim summarizes earlier messages (full install only).</li><li>The replay command shows your own token‑saving numbers.</li></ol>\n<h2>What you get and the cost</h2>\n<ul><li>Free version: all hooks, three strength profiles, replay command, local dashboard, daily budget guard, cold‑cache alert.</li><li>Pro lifetime: $49 (first 500 buyers) – adds a hosted dashboard usable on any device, Monday digest, weekly budget alert at 80%, Slack totals, and support for up to three machines.</li><li>Pro monthly: $9 per month – same Pro features on a subscription basis.</li></ul>\n<h2>FAQ</h2>\n<p><b>Does anything leave my machine?</b> No. All processing stays on your computer unless you choose the hosted Pro dashboard.</p>\n<p><b>What Python version do I need?</b> Python 3.9 or newer. The toolkit is tested on macOS and Linux.</p>\n<p><b>How much can I expect to save?</b> In the author’s 135 real conversations, summarising the conversation cut history re‑read by 75%, extended limits by about 4.0×, and reduced billed cost by roughly 55‑70%. Trimming tool output alone saved 6.9%.</p>\n<p><a href=\"/tokentrim/claude-code-token-optimizer/\">Get started with Claude Code Token Trimmer</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does anything leave my machine?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. All processing stays on your computer unless you choose the hosted Pro dashboard."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What Python version do I need?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Python 3.9 or newer. The toolkit is tested on macOS and Linux."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How much can I expect to save?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "In the author’s 135 real conversations, summarising the conversation cut history re‑read by 75%, extended limits by about 4.0×, and reduced billed cost by roughly 55‑70%. Trimming tool output alone saved 6.9%."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code token trimmer",
+  "claude code usage optimizer",
+  "claude code efficiency tool"
+ ],
+ "updated": "2026-10-28",
+ "draft_id": "d7944a38c2",
+ "source": "seo"
+}
