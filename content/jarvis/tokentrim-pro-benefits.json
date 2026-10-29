@@ -1,0 +1,30 @@
+{
+ "path": "/tokentrim-pro-benefits/",
+ "title": "tokentrim pro benefits",
+ "h1": "tokentrim pro benefits",
+ "description": "You can upgrade to tokentrim Pro to get a hosted dashboard, Monday digest, and weekly budget alerts. The Pro subscription costs $49 once for the first 500",
+ "html": "<h1>tokentrim pro benefits</h1>\n<p>You can upgrade to tokentrim Pro to get a hosted dashboard, Monday digest, and weekly budget alerts. The Pro subscription costs $49 once for the first 500 buyers or $9/month.</p>\n<h2>How it works</h2>\n<p>tokentrim Pro adds a hosted dashboard that you can access on any device, showing your token usage and budget. You also get a Monday digest and a weekly budget alert when you hit 80% of your limit. The Pro features work with the local hooks and replay command that you get with the free toolkit.</p>\n<h2>What you get and what it costs</h2>\n<p>The free features include all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. The Pro subscription adds a hosted dashboard, Monday digest, and weekly budget alert at 80%. You can buy the Pro subscription for $49 once or $9/month.</p>\n<h2>FAQ</h2>\n<p><b>What is the difference between the free and Pro plans?</b> The free plan gives you all local hooks and a basic dashboard. Pro adds a hosted dashboard and weekly alerts. <b>Can I try Pro before buying?</b> You can install the free toolkit and then upgrade to Pro with a one-time $49 payment or a $9/month subscription. <b>Do I need a paid plan to see my token usage?</b> No. The free dashboard shows daily usage and budget guard. Pro only expands the dashboard and adds alerts.</p>\n<p>To get started with tokentrim Pro, <a href=\"https://suncal.github.io/tokentrim/\">install the free toolkit</a> and then upgrade to Pro.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is the difference between the free and Pro plans?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The free plan gives you all local hooks and a basic dashboard. Pro adds a hosted dashboard and weekly alerts. **Can I try Pro before buying?** You can install the free toolkit and then upgrade to Pro with a one-time $49 payment or a $9/month subscription. **Do I need a paid plan to see my token usage?** No. The free dashboard shows daily usage and budget guard. Pro only expands the dashboard and adds alerts."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim pro benefits",
+  "tokentrim pro subscription cost"
+ ],
+ "updated": "2026-10-29",
+ "draft_id": "d3f4977811",
+ "source": "seo"
+}
