@@ -1,0 +1,45 @@
+{
+ "path": "/cut-claude-code-token-usage/",
+ "title": "Cut Claude Code Token Usage",
+ "h1": "Cut Claude Code Token Usage",
+ "description": "You can cut Claude Code token usage with tokentrim, a free and open-source local toolkit. Tokentrim trims tool output and summarizes earlier conversations",
+ "html": "<h1>Cut Claude Code Token Usage</h1>\n<p>You can cut Claude Code token usage with tokentrim, a free and open-source local toolkit. Tokentrim trims tool output and summarizes earlier conversations to reduce token usage.</p>\n<h2>How it Works for Claude Code</h2>\n<p>The full install of tokentrim sets a compaction window, which summarizes earlier conversations and can significantly reduce token usage. You can see your own numbers with the replay command. On 135 real conversations, tokentrim cut history re-read by 75%, making limits last 4.0x longer. Shrinking tool output alone saved 6.9%.</p>\n<h2>What You Get</h2>\n<p>With tokentrim, you get all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert for free. The Pro version adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, up to 3 machines. You can purchase Pro lifetime for $49 once for the first 500 buyers or Pro monthly for $9/month.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with tokentrim?</b> You can save roughly 55-70% on billed cost by reducing token usage with tokentrim. <b>Is my data secure?</b> Nothing leaves your machine by default, so your data is secure. <b>What are the system requirements for tokentrim?</b> Tokentrim needs Python 3.9 or newer and has been tested on macOS and Linux.</p>\n<p>To get started with reducing your Claude Code token usage, <a href=\"/tokentrim/\">install tokentrim now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can save roughly 55-70% on billed cost by reducing token usage with tokentrim."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing leaves your machine by default, so your data is secure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What are the system requirements for tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Tokentrim needs Python 3.9 or newer and has been tested on macOS and Linux."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "cut claude code token usage"
+ ],
+ "updated": "2026-10-29",
+ "draft_id": "d658b91172",
+ "source": "seo"
+}
