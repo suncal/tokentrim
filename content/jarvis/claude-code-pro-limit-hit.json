@@ -1,0 +1,47 @@
+{
+ "path": "/claude-code-pro-limit-hit/",
+ "title": "Claude Code Pro Limit Hit – How to Keep Working",
+ "h1": "Claude Code Pro Limit Hit – How to Keep Working",
+ "description": "You can keep Claude Code running when the Pro limit is hit by using tokentrim. It trims tool output and summarizes earlier conversation, allowing you to",
+ "html": "<h1>Claude Code Pro Limit Hit – How to Keep Working</h1>\n<p>You can keep Claude Code running when the Pro limit is hit by using tokentrim. It trims tool output and summarizes earlier conversation, allowing you to continue without waiting for a new quota. tokentrim has been tested on 135 real conversations and cut history re-read by 75% and made limits last 4.0x longer.</p>\n<h2>What happens when your Claude Code Pro limit is reached</h2>\n<ol><li>Install tokentrim (plugin or full git clone).</li><li>Run the <b>replay</b> command – it shows your current usage numbers.</li><li>tokentrim’s “compaction window” summarizes past dialogue, cutting re‑read history by about 75% and extending limits up to 4.0× longer.</li><li>The trimmed output is spooled to disk, so the next request stays under the Pro limit.</li></ol>\n<h2>What you get and the cost</h2>\n<ul><li><b>Free tier</b>: all hooks, three strength profiles, replay command, local dashboard, daily‑budget guard, cold‑cache alert. Nothing leaves your machine.</li><li><b>Pro lifetime</b>: $49 one‑time (first 500 buyers). Adds a hosted dashboard you can open on any device, a Monday digest, weekly budget alerts at 80%, Slack totals, and support for up to three machines.</li><li><b>Pro monthly</b>: $9 per month, same Pro features as the lifetime license.</li></ul>\n<p>All features run on Python 3.9 or newer (macOS or Linux).</p>\n<h2>FAQ</h2>\n<p><b>Why does my Pro plan still hit the limit?</b> Even with a Pro plan Claude Code can exceed the per‑request token ceiling. tokentrim reduces the amount sent by summarizing earlier conversation and trimming tool output, which historically cut history re‑read by 75% and saved 55-70% of billed cost.</p>\n<p><b>Do I need to send any data to the cloud?</b> No. By default nothing leaves your machine. The hosted dashboard in the Pro tier is optional.</p>\n<p><b>Can I see how much I’m saving?</b> Run the <b>replay</b> command; it prints your own usage numbers and shows the reduction achieved by tokentrim.</p>\n<p>Next, <a href=\"https://suncal.github.io/tokentrim/\">get started with tokentrim</a> to keep your Claude Code Pro running smoothly.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Why does my Pro plan still hit the limit?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Even with a Pro plan Claude Code can exceed the per‑request token ceiling. tokentrim reduces the amount sent by summarizing earlier conversation and trimming tool output, which historically cut history re‑read by 75% and saved 55-70% of billed cost."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need to send any data to the cloud?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. By default nothing leaves your machine. The hosted dashboard in the Pro tier is optional."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I see how much I’m saving?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Run the **replay** command; it prints your own usage numbers and shows the reduction achieved by tokentrim."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code pro limit hit",
+  "claude code pro api error rate limit reached",
+  "claude code usage limit pro plan"
+ ],
+ "updated": "2026-10-29",
+ "draft_id": "da076f32a3",
+ "source": "seo"
+}
