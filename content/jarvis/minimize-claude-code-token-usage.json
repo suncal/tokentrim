@@ -1,0 +1,45 @@
+{
+ "path": "/minimize-claude-code-token-usage/",
+ "title": "Minimize Claude Code Token Usage",
+ "h1": "Minimize Claude Code Token Usage",
+ "description": "You can minimize Claude Code token usage with tokentrim, a free, open-source local toolkit that trims tool output and summarizes earlier conversations. On",
+ "html": "<h1>Minimize Claude Code Token Usage</h1>\n<p>You can minimize Claude Code token usage with tokentrim, a free, open-source local toolkit that trims tool output and summarizes earlier conversations. On this site, you can install tokentrim as a plugin or in full via git clone and start reducing your token usage.</p>\n<h2>How Tokentrim Works for Claude Code</h2>\n<p>Tokentrim works by trimming tool output, reading files in ranges, and spooling long output to disk. The biggest saving comes from summarizing earlier conversations, which can cut history re-read by 75% and make limits last 4.0x longer. You can also use the replay command to see your own numbers and adjust your usage accordingly. Tokentrim is compatible with Python 3.9 or newer and has been tested on macOS and Linux.</p>\n<h2>What You Get with Tokentrim</h2>\n<p>With tokentrim, you get a range of features, including all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert, all for free. If you upgrade to Pro, you get additional features like a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, and Slack totals, all for $49 once for the first 500 buyers or $9/month.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with tokentrim?</b> You can save roughly 55-70% on billed cost by minimizing Claude Code token usage with tokentrim. <b>Is my data secure?</b> Nothing leaves your machine by default, so your data is secure. <b>How do I get started?</b> You can install tokentrim as a plugin or in full via git clone and start minimizing your Claude Code token usage.</p>\n<p><a href=\"/tokentrim/tokentrim-for-claude-code/\">Get started with minimizing Claude Code token usage now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can save roughly 55-70% on billed cost by minimizing Claude Code token usage with tokentrim."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing leaves your machine by default, so your data is secure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do I get started?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can install tokentrim as a plugin or in full via git clone and start minimizing your Claude Code token usage."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "minimize claude code token usage"
+ ],
+ "updated": "2026-10-29",
+ "draft_id": "d2b43ffdab",
+ "source": "seo"
+}
