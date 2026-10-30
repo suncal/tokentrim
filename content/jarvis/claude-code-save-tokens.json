@@ -1,0 +1,47 @@
+{
+ "path": "/claude-code-save-tokens/",
+ "title": "Claude Code Save Tokens",
+ "h1": "Claude Code Save Tokens",
+ "description": "Tokentrim is a free, open-source local toolkit that can help you save tokens on your Claude Code usage. It does this by trimming tool output, reading",
+ "html": "<h1>Claude Code Save Tokens</h1>\n<p>Tokentrim is a free, open-source local toolkit that can help you save tokens on your Claude Code usage. It does this by trimming tool output, reading files in ranges, and spooling long output to disk, with the biggest saving coming from summarizing earlier conversations.</p>\n<h2>How Tokentrim Saves Tokens</h2>\n<p>Tokentrim saves tokens by trimming tool output, reading files in ranges, and spooling long output to disk. The biggest saving comes from summarizing earlier conversations, which can cut history re-read by 75% and make limits last 4.0x longer. On the author's 135 real conversations, this resulted in a significant reduction in token usage. You can see your own numbers with the replay command.</p>\n<h2>What You Get and Costs</h2>\n<p>With the free version, you get all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. The Pro lifetime version costs $49 once for the first 500 buyers, and the Pro monthly version costs $9/month, adding a hosted dashboard, Monday digest, weekly budget with alert at 80%, Slack totals, and up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with tokentrim?</b> You can save roughly 55-70% on billed cost, with the biggest saving coming from summarizing earlier conversations. <b>Do I need to pay for support?</b> No, you can contact support at support@boltak.com. <b>Can I use tokentrim on multiple machines?</b> Yes, with the Pro version, you can use tokentrim on up to 3 machines.</p>\n<p>To get started with tokentrim and potentially save tokens on your Claude Code usage, click <a href=\"/tokentrim/\">here</a> to install it as a plugin or in full via git clone.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can save roughly 55-70% on billed cost, with the biggest saving coming from summarizing earlier conversations."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need to pay for support?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, you can contact support at support@boltak.com."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I use tokentrim on multiple machines?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, with the Pro version, you can use tokentrim on up to 3 machines."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code save tokens",
+  "claude code hooks",
+  "claude code usage limits reset"
+ ],
+ "updated": "2026-10-30",
+ "draft_id": "d2fc1227b7",
+ "source": "seo"
+}
