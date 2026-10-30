@@ -1,0 +1,45 @@
+{
+ "path": "/best-claude-code-cost-optimizer/",
+ "title": "Best Claude Code Cost Optimizer",
+ "h1": "Best Claude Code Cost Optimizer",
+ "description": "Tokentrim is a free, open‑source toolkit that trims Claude Code output, reads files in ranges, and spools long output to disk. On this site you install",
+ "html": "<h1>Best Claude Code Cost Optimizer</h1>\n<p>Tokentrim is a free, open‑source toolkit that trims Claude Code output, reads files in ranges, and spools long output to disk. On this site you install the plugin or full clone, then use the dashboard to keep your token usage low and your costs down.</p>\n<h2>How it works for a single conversation</h2>\n<ol><li>Install the plugin or clone the repo.</li><li>Run a conversation with Claude Code.</li><li>Tokentrim automatically trims the tool output and summarizes earlier chat (the compaction window).</li><li>The replay command shows you the token savings for that session.</li><li>Adjust the compaction window or switch to a different strength profile from the dashboard.</li></ol>\n<h2>What you get / what it costs / limits</h2>\n<ul><li>All hooks, 3 strength profiles, replay, dashboard, daily budget guard, cold‑cache alert – <b>free</b>.</li><li>Pro lifetime $49 (first 500 buyers) or Pro monthly $9/month.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget with 80% alert, Slack totals, and support for up to 3 machines.</li><li>Nothing leaves your machine by default.</li><li>Requires Python 3.9 or newer; tested on macOS and Linux.</li></ul>\n<h2>FAQ</h2>\n<p><b>Question?</b> How much can I save? <b>Answer:</b> On 135 real conversations, history re‑read was cut by 75%, limits lasted 4.0x longer, and billed cost fell roughly 55‑70%. Shrinking tool output alone saved 6.9%.</p>\n<p><b>Question?</b> Do I need a paid plan? <b>Answer:</b> No. The free plan includes all hooks, replay, and a dashboard. Pro adds extra dashboards and alerts.</p>\n<p><b>Question?</b> Will my data leave my machine? <b>Answer:</b> Nothing leaves your machine by default. The hosted dashboard is only available with the Pro plan.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/\">Get started with Tokentrim</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "How much can I save?"
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Answer:** On 135 real conversations, history re‑read was cut by 75%, limits lasted 4.0x longer, and billed cost fell roughly 55‑70%. Shrinking tool output alone saved 6.9%.\n\n**Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Do I need a paid plan?"
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Answer:** No. The free plan includes all hooks, replay, and a dashboard. Pro adds extra dashboards and alerts.\n\n**Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Will my data leave my machine?"
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "best claude code cost optimizer"
+ ],
+ "updated": "2026-10-30",
+ "draft_id": "dd9ae1a941",
+ "source": "seo"
+}
