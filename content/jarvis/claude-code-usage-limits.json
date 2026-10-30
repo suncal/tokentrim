@@ -1,0 +1,47 @@
+{
+ "path": "/claude-code-usage-limits/",
+ "title": "Claude Code Usage Limits",
+ "h1": "Claude Code Usage Limits",
+ "description": "Use tokentrim to keep your Claude Code conversations within budget. It trims output, reads only needed file ranges, and saves history so you pay less.",
+ "html": "<h1>Claude Code Usage Limits</h1>\n<p>Use tokentrim to keep your Claude Code conversations within budget. It trims output, reads only needed file ranges, and saves history so you pay less.</p>\n<h2>How it works for a single Claude Code session</h2>\n<ol><li>Install the plugin or clone the repo.</li><li>Run your Claude Code script.</li><li>tokentrim trims the tool output and spools long replies to disk.</li><li>The replay command shows your token usage and savings.</li></ol>\n<h2>What you get / what it costs</h2>\n<ul><li>All hooks, 3 strength profiles, replay, dashboard, daily budget guard, cold‑cache alert – <b>free</b>.</li><li>Pro lifetime $49 (first 500 buyers) or Pro monthly $9/month.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget alert at 80%, Slack totals, up to 3 machines.</li></ul>\n<h2>FAQ</h2>\n<p><b>Question?</b> How much can I save? <b>Answer:</b> In 135 real conversations, history re‑read dropped 75%, limits lasted 4.0x longer, and billed cost fell 55‑70%. Shrinking output alone saved 6.9%.</p>\n<p><b>Question?</b> Does anything leave my machine? <b>Answer:</b> Nothing leaves by default. Only the hosted dashboard in Pro uses external servers.</p>\n<p><b>Question?</b> Which OS works? <b>Answer:</b> Tested on macOS and Linux with Python 3.9 or newer.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/claude-code-usage-limits/\">Start trimming your Claude Code usage</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "How much can I save?"
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Answer:** In 135 real conversations, history re‑read dropped 75%, limits lasted 4.0x longer, and billed cost fell 55‑70%. Shrinking output alone saved 6.9%.\n\n**Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Does anything leave my machine?"
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Answer:** Nothing leaves by default. Only the hosted dashboard in Pro uses external servers.\n\n**Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Which OS works?"
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code usage limits",
+  "claude code token usage",
+  "claude code usage tracker"
+ ],
+ "updated": "2026-10-30",
+ "draft_id": "d15de09a6b",
+ "source": "seo"
+}
