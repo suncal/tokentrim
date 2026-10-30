@@ -1,0 +1,47 @@
+{
+ "path": "/claude-code-limit-extender-tool/",
+ "title": "Claude Code Limit Extender Tool",
+ "h1": "Claude Code Limit Extender Tool",
+ "description": "You're looking for a way to extend the limits of Claude Code, and this site provides a free, open-source toolkit to help you do just that. Here, you can",
+ "html": "<h1>Claude Code Limit Extender Tool</h1>\n<p>You're looking for a way to extend the limits of Claude Code, and this site provides a free, open-source toolkit to help you do just that. Here, you can install the tokentrim plugin or full toolkit to trim tool output, read files in ranges, and spool long output to disk, ultimately saving you time and money.</p>\n<h2>How it Works for Claude Code</h2>\n<p>The tokentrim toolkit is designed to work with Claude Code, summarizing earlier conversations and reducing the amount of history that needs to be re-read. This can lead to significant savings, with the author's own tests showing a 75% reduction in history re-read and a 4.0x increase in limit longevity. You can install the toolkit as a plugin or via git clone, and it's compatible with Python 3.9 or newer on macOS and Linux.</p>\n<h2>What You Get and What it Costs</h2>\n<p>The free version of tokentrim includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. For $49, you can upgrade to the Pro lifetime version, which adds a hosted dashboard, Monday digest, weekly budget with alert at 80%, and Slack totals, all accessible from up to 3 machines. Alternatively, you can opt for the Pro monthly subscription for $9/month.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with tokentrim?</b> With tokentrim, you can save roughly 55-70% on billed costs, depending on your usage. <b>Is my data secure?</b> Yes, nothing leaves your machine by default, ensuring your data remains secure. <b>What if I need help or have questions?</b> You can contact support at support@boltak.com for assistance.</p>\n<p><a href=\"/tokentrim/\">Get started with the Claude Code Limit Extender Tool</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "With tokentrim, you can save roughly 55-70% on billed costs, depending on your usage."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, nothing leaves your machine by default, ensuring your data remains secure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What if I need help or have questions?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can contact support at support@boltak.com for assistance."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code limit extender tool",
+  "claude code budget optimizer tool",
+  "claude code budgeting solution"
+ ],
+ "updated": "2026-10-30",
+ "draft_id": "d03a371804",
+ "source": "seo"
+}
