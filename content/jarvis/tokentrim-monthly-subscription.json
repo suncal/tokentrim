@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-monthly-subscription/",
+ "title": "tokentrim monthly subscription",
+ "h1": "tokentrim monthly subscription",
+ "description": "A tokentrim monthly subscription gives you the Pro dashboard, Monday digest emails, and weekly budget alerts for $9 each month. It also lets you run Pro",
+ "html": "<h1>tokentrim monthly subscription</h1>\n<p>A tokentrim monthly subscription gives you the Pro dashboard, Monday digest emails, and weekly budget alerts for $9 each month. It also lets you run Pro features on up to three machines.</p>\n<h2>How the subscription works</h2>\n<ol><li>Open the subscription page on this site.</li><li>Click <b>Subscribe</b>; payment is handled by Polar.</li><li>After payment, the Pro dashboard becomes available on any device you log in with.</li><li>You receive a Monday digest and weekly alerts when token usage reaches 80 % of your budget.</li></ol>\n<h2>What you receive</h2>\n<ul><li>Hosted Pro dashboard that updates live token usage.</li><li>Monday digest summarising recent activity.</li><li>Weekly alerts at 80 % of your set budget.</li><li>Slack totals (if you connect Slack).</li><li>Ability to run Pro on up to <b>3 machines</b>.</li><li>All free features remain: Claude Code hooks, three strength profiles, replay command, local dashboard, daily budget guard, cold‑cache alert.</li></ul>\n<h2>Why you might want Pro</h2>\n<p>The free toolkit already trims tool output and spools long output to disk. The biggest saving comes from summarising earlier conversation, a feature only the full install provides. In the author’s 135 real conversations, history re‑read dropped by 75 % and limits lasted 4.0 x longer, cutting billed cost by roughly 55‑70 %. Pro adds a hosted dashboard that lets you watch those savings on any device, plus email digests and alerts that keep you within budget. If you work on several machines, the three‑machine limit lets you keep the same Pro experience everywhere.</p>\n<h2>FAQ</h2>\n<p><b>What does the monthly subscription add to the free version?</b> It adds a hosted dashboard, Monday digest, weekly budget alerts at 80 % usage, Slack totals, and support for up to three machines.</p>\n<p><b>Will any data leave my computer because of the subscription?</b> No. By default nothing leaves your machine. The hosted dashboard is an optional view; all token processing stays local.</p>\n<p><b>How can I see the impact of the Pro features?</b> Run the <code>replay</code> command. It shows your own token usage numbers so you can compare before and after the upgrade.</p>\n<h2>Next step</h2>\n<p>Ready to add Pro features? Visit the <b><a href=\"/tokentrim/tokentrim-monthly-subscription/\">tokentrim subscription page</a></b> and click <b>Subscribe</b> to start your monthly plan.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What does the monthly subscription add to the free version?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It adds a hosted dashboard, Monday digest, weekly budget alerts at 80 % usage, Slack totals, and support for up to three machines."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will any data leave my computer because of the subscription?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. By default nothing leaves your machine. The hosted dashboard is an optional view; all token processing stays local."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How can I see the impact of the Pro features?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Run the `replay` command. It shows your own token usage numbers so you can compare before and after the upgrade."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim monthly subscription"
+ ],
+ "updated": "2026-10-30",
+ "draft_id": "d10dfbdce5",
+ "source": "seo"
+}
