@@ -1,0 +1,47 @@
+{
+ "path": "/claude-code-cost-management-solution/",
+ "title": "Claude Code Cost Management Solution",
+ "h1": "Claude Code Cost Management Solution",
+ "description": "You're looking for a way to manage your Claude Code costs, and this site offers a free, open-source toolkit to help you do just that. Here, you can find a",
+ "html": "<h1>Claude Code Cost Management Solution</h1>\n<p>You're looking for a way to manage your Claude Code costs, and this site offers a free, open-source toolkit to help you do just that. Here, you can find a solution to trim tool output, read files in ranges, and spool long output to disk, all of which can help reduce your costs.</p>\n<h2>How it Works for Claude Code Cost Management</h2>\n<p>The tokentrim toolkit is designed to work with Claude Code, and it can help you save money by summarizing earlier conversations and reducing the amount of data that needs to be processed. The full install sets a compaction window, which can cut history re-read by 75% and make limits last 4.0x longer. You can also use the replay command to see your own numbers and understand where you can save.</p>\n<h2>What You Get and What it Costs</h2>\n<p>The free version of tokentrim includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. If you need more features, you can upgrade to Pro for a one-time payment of $49 or $9/month. The Pro version adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and support for up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with tokentrim?</b> You can save roughly 55-70% on your billed cost, depending on your usage. <b>Is my data secure?</b> Nothing leaves your machine by default, so your data is secure. <b>What are the system requirements?</b> You need Python 3.9 or newer to run tokentrim, and it's been tested on macOS and Linux.</p>\n<p><a href=\"/tokentrim/\">Get started with tokentrim today</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can save roughly 55-70% on your billed cost, depending on your usage."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing leaves your machine by default, so your data is secure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What are the system requirements?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You need Python 3.9 or newer to run tokentrim, and it's been tested on macOS and Linux."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code cost management solution",
+  "claude code compaction",
+  "claude code token limiter"
+ ],
+ "updated": "2026-10-31",
+ "draft_id": "d2403e5a20",
+ "source": "seo"
+}
