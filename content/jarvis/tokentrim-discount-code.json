@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-discount-code/",
+ "title": "Tokentrim Discount Code",
+ "h1": "Tokentrim Discount Code",
+ "description": "You're looking for a tokentrim discount code to optimize your Claude Code usage and reduce costs. On this site, you can learn about tokentrim, a free,",
+ "html": "<h1>Tokentrim Discount Code</h1>\n<p>You're looking for a tokentrim discount code to optimize your Claude Code usage and reduce costs. On this site, you can learn about tokentrim, a free, open-source local toolkit that trims tool output, reads files in ranges, and spools long output to disk, and find out how to get the most out of it.</p>\n<h2>How Tokentrim Works for Claude Code</h2>\n<p>Tokentrim is designed to work with Claude Code, and it can help you save on costs by summarizing earlier conversations and reducing the amount of data that needs to be re-read. With tokentrim, you can install it as a plugin or in full via git clone, and it's compatible with Python 3.9 or newer. The full install sets the compaction window, which can cut history re-read by 75% and make limits last 4.0x longer.</p>\n<h2>What You Get and What It Costs</h2>\n<p>Tokentrim is free, with all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert included. The Pro lifetime option is available for $49 once for the first 500 buyers, and the Pro monthly option is $9/month. The Pro option adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>Do I need to pay for tokentrim?</b> No, tokentrim is free, with optional Pro lifetime and Pro monthly upgrades. <b>Will my data be shared?</b> Nothing leaves your machine by default. <b>How much can I save with tokentrim?</b> The author's tests on 135 real conversations showed a 55-70% reduction in billed cost.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/\">Get started with tokentrim</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do I need to pay for tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, tokentrim is free, with optional Pro lifetime and Pro monthly upgrades."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will my data be shared?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing leaves your machine by default."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How much can I save with tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The author's tests on 135 real conversations showed a 55-70% reduction in billed cost."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim discount code"
+ ],
+ "updated": "2026-10-31",
+ "draft_id": "db4be75a70",
+ "source": "seo"
+}
