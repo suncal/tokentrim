@@ -1,0 +1,46 @@
+{
+ "path": "/tokentrim-cost-savings-calculator/",
+ "title": "Tokentrim Cost Savings Calculator",
+ "h1": "Tokentrim Cost Savings Calculator",
+ "description": "You can use the Tokentrim cost savings calculator to see how much you can save on your Claude Code bills by using Tokentrim. On the author's 135 real",
+ "html": "<h1>Tokentrim Cost Savings Calculator</h1>\n<p>You can use the Tokentrim cost savings calculator to see how much you can save on your Claude Code bills by using Tokentrim. On the author's 135 real conversations, Tokentrim cut history re-read by 75% and made limits last 4.0x longer, resulting in a billed cost fall of roughly 55-70%.</p>\n<h2>How Tokentrim Works for Cost Savings</h2>\n<p>Tokentrim trims tool output, reads files in ranges, and spools long output to disk, which helps reduce costs. The biggest saving comes from summarising earlier conversation, which is only available in the full install. You can also use the replay command to see your own numbers and estimate your potential cost savings.</p>\n<h2>What You Get and What It Costs</h2>\n<p>The free version of Tokentrim includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. The Pro lifetime version costs $49 once for the first 500 buyers, and the Pro monthly version costs $9/month, adding features like a hosted dashboard on any device, Monday digest, and weekly budget with alert at 80%.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with Tokentrim?</b> You can save roughly 55-70% on your billed cost, and shrinking tool output alone can save 6.9%. <b>Do I need to pay for the Pro version to get the cost savings calculator?</b> No, the cost savings calculator is available in the free version, but the Pro version offers additional features. <b>Is my data secure with Tokentrim?</b> Yes, nothing leaves your machine by default, so your data is secure. <a href=\"/tokentrim/\">Get started with Tokentrim</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can save roughly 55-70% on your billed cost, and shrinking tool output alone can save 6.9%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need to pay for the Pro version to get the cost savings calculator?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, the cost savings calculator is available in the free version, but the Pro version offers additional features."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, nothing leaves your machine by default, so your data is secure. [Get started with Tokentrim](/tokentrim/)"
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim cost savings calculator",
+  "tokentrim cost reduction software"
+ ],
+ "updated": "2026-10-31",
+ "draft_id": "d772f8df6a",
+ "source": "seo"
+}
