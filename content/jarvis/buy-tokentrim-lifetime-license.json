@@ -1,0 +1,45 @@
+{
+ "path": "/buy-tokentrim-lifetime-license/",
+ "title": "Buy Tokentrim Lifetime License",
+ "h1": "Buy Tokentrim Lifetime License",
+ "description": "You can buy a Tokentrim lifetime license on this site, which gives you access to Pro features like a hosted dashboard and weekly budget alerts. To get",
+ "html": "<h1>Buy Tokentrim Lifetime License</h1>\n<p>You can buy a Tokentrim lifetime license on this site, which gives you access to Pro features like a hosted dashboard and weekly budget alerts. To get started, you simply need to pay a one-time fee of $49, available for the first 500 buyers, and you'll get lifetime access to Tokentrim Pro.</p>\n<h2>How it Works for Claude Code Users</h2>\n<p>Tokentrim is a local toolkit that trims tool output, reads files in ranges, and spools long output to disk, helping you optimize your Claude Code usage. With Tokentrim, you can summarize earlier conversations, which can cut your history re-read by 75% and make your limits last 4.0x longer. The replay command also shows you your own numbers, so you can see the savings for yourself.</p>\n<h2>What You Get and What it Costs</h2>\n<p>The lifetime license costs $49, a one-time payment, and gives you access to Pro features like a hosted dashboard on any device, Monday digest, and weekly budget with alert at 80%. You can also use Tokentrim on up to 3 machines. The free version is also available, with features like all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert.</p>\n<h2>FAQ</h2>\n<p><b>What is the benefit of buying a lifetime license?</b> Buying a lifetime license gives you access to Pro features and lifetime updates, without having to pay a monthly fee. <b>How many machines can I use Tokentrim on with a lifetime license?</b> You can use Tokentrim on up to 3 machines with a lifetime license. <b>Is my data secure with Tokentrim?</b> Yes, nothing leaves your machine by default, so your data is secure.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/buy-tokentrim-lifetime-license/\">Buy your Tokentrim lifetime license now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is the benefit of buying a lifetime license?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Buying a lifetime license gives you access to Pro features and lifetime updates, without having to pay a monthly fee."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How many machines can I use Tokentrim on with a lifetime license?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can use Tokentrim on up to 3 machines with a lifetime license."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, nothing leaves your machine by default, so your data is secure."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "buy tokentrim lifetime license"
+ ],
+ "updated": "2026-10-31",
+ "draft_id": "dd26266123",
+ "source": "seo"
+}
