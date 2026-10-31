@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-token-saving-plugin/",
+ "title": "Tokentrim Token Saving Plugin",
+ "h1": "Tokentrim Token Saving Plugin",
+ "description": "You can use the Tokentrim token saving plugin to reduce your Claude Code costs by trimming tool output and summarizing earlier conversations. The plugin",
+ "html": "<h1>Tokentrim Token Saving Plugin</h1>\n<p>You can use the Tokentrim token saving plugin to reduce your Claude Code costs by trimming tool output and summarizing earlier conversations. The plugin is free, open-source, and can be installed as a plugin or in full via git clone to start saving on your Claude Code bills.</p>\n<h2>How it Works</h2>\n<p>The Tokentrim plugin trims tool output, reads files in ranges, and spools long output to disk. It also summarizes earlier conversations, which can significantly reduce your costs. On the author's 135 real conversations, it cut history re-read by 75% and made limits last 4.0x longer.</p>\n<h2>Features and Costs</h2>\n<p>The free version includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. The Pro lifetime version costs $49 once for the first 500 buyers, and the Pro monthly version costs $9/month. The Pro version adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>How much can I save with Tokentrim?</b> You can save roughly 55-70% on your billed cost, and the plugin can make your limits last 4.0x longer. <b>Is my data secure?</b> Nothing leaves your machine by default, so your data is secure. <b>What are the system requirements?</b> You need Python 3.9 or newer to use Tokentrim, and it has been tested on macOS and Linux.</p>\n<p>To start saving on your Claude Code bills with the Tokentrim token saving plugin, <a href=\"/tokentrim/\">install it now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can save roughly 55-70% on your billed cost, and the plugin can make your limits last 4.0x longer."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing leaves your machine by default, so your data is secure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What are the system requirements?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You need Python 3.9 or newer to use Tokentrim, and it has been tested on macOS and Linux."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim token saving plugin"
+ ],
+ "updated": "2026-10-31",
+ "draft_id": "d2054c80b9",
+ "source": "seo"
+}
