@@ -1,0 +1,46 @@
+{
+ "path": "/tokentrim-pro-lifetime-price/",
+ "title": "Tokentrim Pro Lifetime Price",
+ "h1": "Tokentrim Pro Lifetime Price",
+ "description": "Tokentrim Pro gives you a hosted dashboard, Monday digests, weekly budget alerts, Slack totals, and support for up to three machines for a one‑time fee of",
+ "html": "<h1>Tokentrim Pro Lifetime Price</h1>\n<p>Tokentrim Pro gives you a hosted dashboard, Monday digests, weekly budget alerts, Slack totals, and support for up to three machines for a one‑time fee of <b>$49</b>. The free toolkit already trims output, reads file ranges, and spools long responses to disk.</p>\n<h2>How it works for a single developer on macOS</h2>\n<ol><li>Install the free plugin with <code>pip install tokentrim</code> or clone the repo using <code>git clone</code>.</li><li>Enable the <b>Pro</b> add‑on by visiting the Pro pricing page and paying $49.</li><li>Open the hosted dashboard on any device; it shows your token usage, daily budget guard, and cold‑cache alerts.</li><li>When you hit the 80 % weekly budget threshold, you receive a Slack alert.</li><li>Run the <code>replay</code> command to see your own savings numbers.</li></ol>\n<h2>What you get</h2>\n<ul><li><b>Cost</b>: $49 lifetime for the first 500 buyers.</li><li><b>Monthly</b>: $9/month for ongoing use.</li><li><b>Machines</b>: up to 3 devices.</li><li><b>Dashboard</b>: hosted on a remote server, accessible from any device.</li><li><b>Alerts</b>: weekly budget alert at 80 %, daily budget guard.</li><li><b>Slack</b>: totals sent to your channel.</li><li><b>Data privacy</b>: nothing leaves your machine by default.</li></ul>\n<h2>FAQ</h2>\n<p><b>What does Pro add compared to the free version?</b> Pro adds a hosted dashboard, Monday digests, weekly budget alerts, Slack totals, and support for up to three machines. The free version keeps all hooks, replay, and the dashboard locally.</p>\n<p><b>Is a separate server required for the dashboard?</b> No. The hosted dashboard runs on a remote server and is accessible from any device.</p>\n<p><b>What happens when I reach my budget limit?</b> The dashboard alerts you at 80 % of your weekly limit; you can adjust your settings or pause usage.</p>\n<h2>Next step</h2>\n<p>Visit the <a href=\"https://suncal.github.io/tokentrim/tokentrim-pro-lifetime-price/\">Tokentrim Pro pricing page</a> to enable Pro and start saving.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What does Pro add compared to the free version?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Pro adds a hosted dashboard, Monday digests, weekly budget alerts, Slack totals, and support for up to three machines. The free version keeps all hooks, replay, and the dashboard locally."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is a separate server required for the dashboard?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The hosted dashboard runs on a remote server and is accessible from any device."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What happens when I reach my budget limit?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The dashboard alerts you at 80 % of your weekly limit; you can adjust your settings or pause usage."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim pro lifetime price",
+  "tokentrim pro monthly cost"
+ ],
+ "updated": "2026-11-01",
+ "draft_id": "df16db0957",
+ "source": "seo"
+}
