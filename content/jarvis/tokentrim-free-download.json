@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-free-download/",
+ "title": "tokentrim free download",
+ "h1": "tokentrim free download",
+ "description": "Download tokentrim for free and start trimming Claude Code output, reading files in ranges, and spooling long output to disk—all locally on your machine.",
+ "html": "<h1>tokentrim free download</h1>\n<p>Download tokentrim for free and start trimming Claude Code output, reading files in ranges, and spooling long output to disk—all locally on your machine.</p>\n<h2>How to install and use the free toolkit</h2>\n<ol><li>Clone the repo or install the plugin.</li><li>Run the dashboard with <code>python -m tokentrim.dashboard</code>.</li><li>Use the hooks to trim tool output or read file ranges.</li><li>View your token usage with the replay command.</li></ol>\n<h2>What you get for free</h2>\n<ul><li>All hooks and the dashboard.</li><li>Three strength profiles.</li><li>Replay command and daily budget guard.</li><li>Cold‑cache alert.</li><li>Nothing leaves your machine by default.</li><li>Requires Python 3.9 or newer; tested on macOS and Linux.</li></ul>\n<h2>FAQ</h2>\n<p><b>Question?</b> *Is tokentrim truly free?* Yes. All core features are open‑source under Apache‑2.0.</p>\n<p><b>Question?</b> *What about limits on token usage?* The free install trims history re‑read by 75%, extending limits 4.0x and reducing billed cost by 55‑70%.</p>\n<p><b>Question?</b> *Can I upgrade to Pro?* Yes. Pro is $49 lifetime for the first 500 buyers or $9/month. It adds a hosted dashboard, Monday digest, weekly budget alerts, Slack totals, and support for up to 3 machines.</p>\n<p><a href=\"https://suncal.github.io/tokentrim/tokentrim-free-download/\">Download tokentrim free</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "*Is tokentrim truly free?* Yes. All core features are open‑source under Apache‑2.0."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "*What about limits on token usage?* The free install trims history re‑read by 75%, extending limits 4.0x and reducing billed cost by 55‑70%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Question?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "*Can I upgrade to Pro?* Yes. Pro is $49 lifetime for the first 500 buyers or $9/month. It adds a hosted dashboard, Monday digest, weekly budget alerts, Slack totals, and support for up to 3 machines."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim free download"
+ ],
+ "updated": "2026-11-01",
+ "draft_id": "dd5d950b13",
+ "source": "seo"
+}
