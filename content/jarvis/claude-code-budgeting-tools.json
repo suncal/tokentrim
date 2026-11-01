@@ -1,0 +1,45 @@
+{
+ "path": "/claude-code-budgeting-tools/",
+ "title": "Claude Code Budgeting Tools",
+ "h1": "Claude Code Budgeting Tools",
+ "description": "Use tokentrim to trim Claude Code output, read file ranges, and spool long output to disk. Install as a plugin or clone the repo.",
+ "html": "<h1>Claude Code Budgeting Tools</h1>\n<p>Use tokentrim to trim Claude Code output, read file ranges, and spool long output to disk. Install as a plugin or clone the repo.</p>\n<h2>How it works for a single Claude Code session</h2>\n<ol><li><b>Install</b> the plugin or clone the repo.</li><li>Run your Claude Code script.</li><li>The toolkit trims the tool output and reads only the needed file ranges.</li><li>If the output is long, it is spooled to disk instead of staying in memory.</li><li>After the run, the replay command shows your savings and token usage.</li></ol>\n<h2>What you get / what it costs</h2>\n<ul><li>All hooks, 3 strength profiles, replay, dashboard, daily budget guard, cold‑cache alert – <b>free</b>.</li><li>Pro lifetime: $49 (first 500 buyers).</li><li>Pro monthly: $9/month.</li><li>Pro adds a hosted dashboard, Monday digest, weekly budget alert at 80%, Slack totals, and support for up to 3 machines.</li><li>Nothing leaves your machine by default.</li></ul>\n<h2>FAQ</h2>\n<p><b>How much can I save?</b> On 135 real conversations, history re‑read was cut by 75%, limits lasted 4.0x longer, and billed cost fell roughly 55‑70%. Shrinking tool output alone saved 6.9%.</p>\n<p><b>Do I need a special OS?</b> Python 3.9 or newer is required. Tested on macOS and Linux.</p>\n<p><b>Can I use it on multiple machines?</b> Yes, Pro lets you use it on up to 3 machines.</p>\n<h2>Next Step</h2>\n<p>Visit the <a href=\"https://suncal.github.io/tokentrim/claude-code-budgeting-tools/\">Get started page</a> to install or clone tokentrim and begin trimming.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much can I save?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "On 135 real conversations, history re‑read was cut by 75%, limits lasted 4.0x longer, and billed cost fell roughly 55‑70%. Shrinking tool output alone saved 6.9%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need a special OS?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Python 3.9 or newer is required. Tested on macOS and Linux."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I use it on multiple machines?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, Pro lets you use it on up to 3 machines."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "claude code budgeting tools"
+ ],
+ "updated": "2026-11-01",
+ "draft_id": "d427c42bbc",
+ "source": "seo"
+}
