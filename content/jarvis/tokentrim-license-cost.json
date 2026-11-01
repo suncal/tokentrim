@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-license-cost/",
+ "title": "Tokentrim License Cost",
+ "h1": "Tokentrim License Cost",
+ "description": "You're looking for the cost of a Tokentrim license, and you want to know what you get for your money. On this site, you can find the details of the free",
+ "html": "<h1>Tokentrim License Cost</h1>\n<p>You're looking for the cost of a Tokentrim license, and you want to know what you get for your money. On this site, you can find the details of the free and paid options, and choose the one that suits your needs. The author tested Tokentrim on 135 real conversations and found it cut history re-read by 75% and made limits last 4.0x longer, with billed cost falling roughly 55-70%.</p>\n<h2>How Tokentrim Works for Claude Code Users</h2>\n<p>Tokentrim is a local toolkit that helps you optimize your Claude Code usage by trimming tool output, reading files in ranges, and spooling long output to disk. It also summarizes earlier conversations, which can significantly reduce your costs.</p>\n<h2>What You Get and What it Costs</h2>\n<p>The free version of Tokentrim includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. The Pro lifetime license costs $49 once for the first 500 buyers, and the Pro monthly license costs $9/month. The Pro version adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, Slack totals, and support for up to 3 machines.</p>\n<h2>FAQ</h2>\n<p><b>What savings can I expect with Tokentrim?</b> The author's test on 135 conversations showed a 75% cut in history re-read and limits lasting 4.0x longer, with billed cost falling roughly 55-70%. Shrinking tool output alone saved 6.9%. <b>Is Tokentrim free to use?</b> Yes, the basic version of Tokentrim is free to use, and it includes many useful features such as all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. <b>How do I get started with Tokentrim?</b> You can install Tokentrim as a plugin or in full via git clone, and you need to have Python 3.9 or newer installed on your machine. To get started with Tokentrim, go to the <a href=\"/tokentrim/\">Tokentrim homepage</a> and follow the installation instructions.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What savings can I expect with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The author's test on 135 conversations showed a 75% cut in history re-read and limits lasting 4.0x longer, with billed cost falling roughly 55-70%. Shrinking tool output alone saved 6.9%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is Tokentrim free to use?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, the basic version of Tokentrim is free to use, and it includes many useful features such as all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do I get started with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can install Tokentrim as a plugin or in full via git clone, and you need to have Python 3.9 or newer installed on your machine. To get started with Tokentrim, go to the [Tokentrim homepage](/tokentrim/) and follow the installation instructions."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim license cost"
+ ],
+ "updated": "2026-11-01",
+ "draft_id": "d5735493f5",
+ "source": "seo"
+}
