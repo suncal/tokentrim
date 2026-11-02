@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-install-via-git/",
+ "title": "tokentrim install via git",
+ "h1": "tokentrim install via git",
+ "description": "You can install the full tokentrim toolkit by cloning its repository with Git. After cloning, you’ll have all Claude Code hooks, the local dashboard, and",
+ "html": "<h1>tokentrim install via git</h1>\n<p>You can install the full tokentrim toolkit by cloning its repository with Git. After cloning, you’ll have all Claude Code hooks, the local dashboard, and the compaction window that saves the most tokens.</p>\n<h2>How to install tokentrim with git</h2>\n<ol><li>Open a terminal on macOS or Linux.</li><li>Run</li></ol>\n<p>``<code>bash git clone https://suncal.github.io/tokentrim/ </code>``</p>\n<ol><li>Change into the directory:</li></ol>\n<p>``<code>bash cd tokentrim </code>``</p>\n<ol><li>Follow the README to install the Python 3.9+ requirements.</li><li>Activate the plugin or run the toolkit locally.</li></ol>\n<p>All steps are on this page, so you stay in one place from download to first run.</p>\n<h2>What you get and what it costs</h2>\n<ul><li><b>Free features</b> – all hooks, three strength profiles, replay command, local dashboard, daily‑budget guard, and cold‑cache alert.</li><li><b>Pro upgrade (optional)</b> – $49 lifetime for the first 500 buyers or $9 /month. Adds a hosted dashboard usable on any device, a Monday digest, weekly budget alerts at 80 % usage, Slack totals, and support for up to three machines.</li><li><b>No data leaves your machine</b> unless you enable the hosted dashboard.</li></ul>\n<h2>FAQ</h2>\n<p><b>Does the git install include the compaction window?</b> Yes. Only the full install (via git) provides the summarising compaction window, which on the author’s 135 real conversations cut history re‑read by 75 % and extended limits by about 4.0 ×.</p>\n<p><b>What Python version do I need?</b> Python 3.9 or newer. The toolkit is tested on macOS and Linux.</p>\n<p><b>Can I see my own token savings?</b> Run the <code>replay</code> command after a session; it reports the exact reduction you achieved.</p>\n<h2>Next step</h2>\n<p>Clone the repository now and start trimming your token usage. <a href=\"https://suncal.github.io/tokentrim/\">Clone tokentrim</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does the git install include the compaction window?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Only the full install (via git) provides the summarising compaction window, which on the author’s 135 real conversations cut history re‑read by 75 % and extended limits by about 4.0 ×."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What Python version do I need?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Python 3.9 or newer. The toolkit is tested on macOS and Linux."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I see my own token savings?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Run the `replay` command after a session; it reports the exact reduction you achieved."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim install via git"
+ ],
+ "updated": "2026-11-02",
+ "draft_id": "de45818e87",
+ "source": "seo"
+}
