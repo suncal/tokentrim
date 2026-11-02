@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-4-0x-limit-extension/",
+ "title": "tokentrim 4.0x limit extension",
+ "h1": "tokentrim 4.0x limit extension",
+ "description": "Yes. tokentrim can extend Claude Code limits about 4 times longer by compacting conversation history. Install the full version, enable the compaction",
+ "html": "<h1>tokentrim 4.0x limit extension</h1>\n<p>Yes. tokentrim can extend Claude Code limits about 4 times longer by compacting conversation history. Install the full version, enable the compaction window, and the toolkit does the rest on your machine.</p>\n<h2>How it works for a single Claude Code session</h2>\n<ol><li>Clone the repo or add the plugin.</li><li>Run Claude Code as usual; tokentrim trims each tool output and reads files in ranges.</li><li>The full install activates the “compaction window” that summarizes earlier turns.</li><li>When the token budget is near its limit, tokentrim spools excess output to disk and re‑plays only the compacted history.</li></ol>\n<p>Result: the same conversation runs up to 4.0x longer before hitting the limit.</p>\n<h2>What you get and the cost</h2>\n<ul><li>Free local toolkit: all hooks, three strength profiles, replay command, dashboard, daily‑budget guard, cold‑cache alert.</li><li>Pro upgrade (optional): hosted dashboard on any device, Monday digest, weekly budget alert at 80 %, Slack totals, up to 3 machines.</li><li>Lifetime: $49 (one‑time, first 500 buyers)</li><li>Monthly: $9 per month</li></ul>\n<p>Everything stays on your computer unless you choose the hosted dashboard. Requires Python 3.9+; works on macOS and Linux.</p>\n<h2>FAQ</h2>\n<p><b>Does the free version include the compaction window?</b> No. The compaction window that yields the 4.0x extension is only in the full install, which is still free.</p>\n<p><b>Will using tokentrim increase my Claude Code costs?</b> On the author’s 135 real conversations, history re‑read dropped 75 % and billed cost fell roughly 55‑70 %. Trimming tool output alone saved 6.9 %.</p>\n<p><b>Can I use tokentrim on multiple machines?</b> The free version runs on any number of machines you install it on. Pro adds support for up to 3 machines with a hosted dashboard.</p>\n<p>You can start extending your Claude Code limits now: <a href=\"/tokentrim/claude-code-limit-maximizer/\">tokentrim 4.0x limit extension</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does the free version include the compaction window?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The compaction window that yields the 4.0x extension is only in the full install, which is still free."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will using tokentrim increase my Claude Code costs?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "On the author’s 135 real conversations, history re‑read dropped 75 % and billed cost fell roughly 55‑70 %. Trimming tool output alone saved 6.9 %."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I use tokentrim on multiple machines?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The free version runs on any number of machines you install it on. Pro adds support for up to 3 machines with a hosted dashboard."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 4.0x limit extension"
+ ],
+ "updated": "2026-11-02",
+ "draft_id": "d4712f5c89",
+ "source": "seo"
+}
