@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-python-3-9-plugin/",
+ "title": "tokentrim Python 3.9 plugin",
+ "h1": "tokentrim Python 3.9 plugin",
+ "description": "tokentrim is a free, open‑source local toolkit that trims Claude Code output and saves tokens. Install it with git clone or as a plugin in Claude Code on",
+ "html": "<h1>tokentrim Python 3.9 plugin</h1>\n<p>tokentrim is a free, open‑source local toolkit that trims Claude Code output and saves tokens. Install it with <code>git clone</code> or as a plugin in Claude Code on macOS or Linux with Python 3.9+.</p>\n<h2>How to use it in a single session</h2>\n<ol><li>Clone the repo or add the plugin to your Claude Code setup.</li><li>Run your prompt normally.</li><li>tokentrim trims tool output and writes long results to disk.</li><li>When earlier context is needed, it summarizes the conversation (the compaction window) and feeds the short version back, cutting the history re‑read by about 75 %.</li><li>Use the <code>replay</code> command to view your own token‑saving numbers.</li></ol>\n<h2>What you get</h2>\n<ul><li><b>Free tier</b> – all hooks, three strength profiles, replay, local dashboard, daily budget guard, cold‑cache alert. Nothing leaves your machine.</li><li><b>Pro lifetime</b> – $49 (first 500 buyers). Adds a hosted dashboard on any device, weekly budget alert at 80 %, and support for up to three machines.</li><li><b>Pro monthly</b> – $9/month, same Pro features.</li></ul>\n<p>All features run locally unless you enable the hosted dashboard.</p>\n<h2>FAQ</h2>\n<p><b>Does the plugin need an internet connection?</b> No. All processing stays on your machine. Only the optional hosted dashboard sends data out.</p>\n<p><b>Can I see my savings?</b> Yes. The <code>replay</code> command shows your token‑reduction numbers, and the dashboard visualizes daily usage.</p>\n<p><b>What if I need more than three machines?</b> Pro supports up to three machines. For larger setups, request a paid team audit at support@boltak.com.</p>\n<h2>Next step</h2>\n<p><a href=\"/tokentrim/tokentrim-python-3-9-plugin/\">Install the tokentrim Python 3.9 plugin now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does the plugin need an internet connection?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. All processing stays on your machine. Only the optional hosted dashboard sends data out."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I see my savings?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. The `replay` command shows your token‑reduction numbers, and the dashboard visualizes daily usage."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What if I need more than three machines?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Pro supports up to three machines. For larger setups, request a paid team audit at support@boltak.com."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim python 3.9 plugin"
+ ],
+ "updated": "2026-11-03",
+ "draft_id": "d266505417",
+ "source": "seo"
+}
