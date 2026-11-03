@@ -1,0 +1,46 @@
+{
+ "path": "/tokentrim-pro-49-lifetime/",
+ "title": "tokentrim pro $49 lifetime",
+ "h1": "tokentrim pro $49 lifetime",
+ "description": "Yes, you can buy the Tokentrim Pro lifetime license for a one‑time $49 payment. After purchase you get the hosted dashboard, weekly budget alerts, Slack",
+ "html": "<h1>tokentrim pro $49 lifetime</h1>\n<p>Yes, you can buy the Tokentrim Pro lifetime license for a one‑time $49 payment. After purchase you get the hosted dashboard, weekly budget alerts, Slack totals and the ability to run Pro on up to three machines.</p>\n<h2>How it works for a single developer who wants a persistent dashboard</h2>\n<ol><li>Install the full Tokentrim toolkit via <code>git clone</code> (requires Python 3.9+).</li><li>Activate the Pro license (enter the code you receive after purchase).</li><li>Open the hosted dashboard on any device – it shows your Claude Code token usage, daily budget guard and cold‑cache alerts.</li><li>The dashboard updates automatically; you can also run the <code>replay</code> command to see your own savings numbers.</li></ol>\n<h2>What you get and what it costs</h2>\n<ul><li><b>Free features</b> – all Claude Code hooks, three strength profiles, replay command, local dashboard, daily budget guard, cold‑cache alert.</li><li><b>Pro lifetime upgrade</b> – $49 one‑time payment (first 500 buyers). Adds:</li><li>Hosted dashboard accessible from any device.</li><li>Monday digest email.</li><li>Weekly budget with alert at 80 % of your limit.</li><li>Slack totals reporting.</li><li>Support for up to three machines.</li><li>Nothing leaves your machine unless you enable the hosted dashboard.</li><li>No monthly fee; the $9/month option is also available if you prefer a subscription.</li></ul>\n<h2>FAQ</h2>\n<p><b>What does the Pro license enable that the free version doesn’t?</b> It provides a hosted, always‑available dashboard, weekly budget alerts at 80 % usage, Slack totals and the ability to use Pro on three separate machines.</p>\n<p><b>Do I need to pay anything else after the $49 purchase?</b> No. The $49 lifetime payment covers all current Pro features for the lifetime of the product.</p>\n<p><b>Can I try Pro before buying?</b> You can install the full toolkit for free and test the local hooks and replay command. The hosted dashboard and multi‑machine support are only available after purchase.</p>\n<p><a href=\"/tokentrim/\">Buy the Tokentrim Pro lifetime license now</a></p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What does the Pro license enable that the free version doesn’t?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It provides a hosted, always‑available dashboard, weekly budget alerts at 80 % usage, Slack totals and the ability to use Pro on three separate machines."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do I need to pay anything else after the $49 purchase?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The $49 lifetime payment covers all current Pro features for the lifetime of the product."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I try Pro before buying?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can install the full toolkit for free and test the local hooks and replay command. The hosted dashboard and multi‑machine support are only available after purchase."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim pro $49 lifetime",
+  "tokentrim pro $9/month"
+ ],
+ "updated": "2026-11-03",
+ "draft_id": "db51bc943a",
+ "source": "seo"
+}
