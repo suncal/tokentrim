@@ -13,6 +13,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE / "docs"  # the folder Pages serves
 BASE = "https://suncal.github.io/tokentrim"  # public URL of ROOT, no trailing slash
+OLD_BASE = "https://suncal.github.io/tokentrim"  # the publisher's JSON may still link here
 HOME = ROOT / "index.html"
 SITEMAP = ROOT / "sitemap.xml"
 SRC = HERE / "content" / "jarvis"
@@ -61,6 +62,13 @@ def docs():
 
 def ours(p):
     return p.exists() and MARK in p.read_text(encoding="utf-8", errors="ignore")
+
+
+def rebase(text):
+    """Point links written for the old project-site address at BASE. Does nothing until BASE moves."""
+    if BASE == OLD_BASE:
+        return text
+    return text.replace(OLD_BASE, BASE).replace('href="/tokentrim/', 'href="/')
 
 
 def page(d, head, header, footer):
@@ -148,7 +156,7 @@ def main():
             print(f"jarvis: skip {d['path']} (an existing .html page owns it)")
             continue
         out.parent.mkdir(exist_ok=True)
-        out.write_text(page(d, head, header, footer), encoding="utf-8")
+        out.write_text(rebase(page(d, head, header, footer)), encoding="utf-8")
         live.append(d); want.add(out.parent.name)
     for idx in ROOT.glob("*/index.html"):    # pages whose JSON was removed
         if idx.parent.name not in want and ours(idx):
