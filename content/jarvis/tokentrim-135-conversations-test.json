@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-135-conversations-test/",
+ "title": "Tokentrim 135 Conversations Test",
+ "h1": "Tokentrim 135 Conversations Test",
+ "description": "The Tokentrim 135 conversations test shows that Tokentrim can reduce history re-read by 75% and make limits last 4.0x longer. This test was conducted on",
+ "html": "<h1>Tokentrim 135 Conversations Test</h1>\n<p>The Tokentrim 135 conversations test shows that Tokentrim can reduce history re-read by 75% and make limits last 4.0x longer. This test was conducted on 135 real conversations and resulted in a billed cost fall of roughly 55-70%.</p>\n<h2>How it Works</h2>\n<p>Tokentrim trims tool output, reads files in ranges, and spools long output to disk. It also summarizes earlier conversation, which is the biggest saving. You can use the replay command to see your own numbers and understand how Tokentrim can benefit your specific use case.</p>\n<h2>What You Get</h2>\n<p>The free version of Tokentrim includes all hooks, 3 strength profiles, replay, dashboard, daily budget guard, and cold-cache alert. The Pro version adds a hosted dashboard on any device, Monday digest, weekly budget with alert at 80%, and Slack totals.</p>\n<h2>FAQ</h2>\n<p><b>What were the results of the 135 conversations test?</b> The test resulted in a 75% reduction in history re-read and made limits last 4.0x longer, with a billed cost fall of roughly 55-70%. <b>Is my data secure with Tokentrim?</b> Nothing leaves your machine by default, ensuring your data remains secure. <b>What are the system requirements for Tokentrim?</b> Tokentrim requires Python 3.9 or newer and has been tested on macOS and Linux. To get started with Tokentrim, you can install it for free or buy the Pro version for $49, limited to the first 500 buyers, or $9/month. Visit the <a href=\"/tokentrim/\">Tokentrim homepage</a> to install or purchase Tokentrim and start optimizing your Claude Code usage today.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What were the results of the 135 conversations test?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The test resulted in a 75% reduction in history re-read and made limits last 4.0x longer, with a billed cost fall of roughly 55-70%."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my data secure with Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing leaves your machine by default, ensuring your data remains secure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What are the system requirements for Tokentrim?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Tokentrim requires Python 3.9 or newer and has been tested on macOS and Linux. To get started with Tokentrim, you can install it for free or buy the Pro version for $49, limited to the first 500 buyers, or $9/month. Visit the [Tokentrim homepage](/tokentrim/) to install or purchase Tokentrim and start optimizing your Claude Code usage today."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 135 conversations test"
+ ],
+ "updated": "2026-11-04",
+ "draft_id": "d39c127e21",
+ "source": "seo"
+}
