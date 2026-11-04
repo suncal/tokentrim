@@ -1,0 +1,45 @@
+{
+ "path": "/tokentrim-28-854-steps/",
+ "title": "tokentrim 28,854 steps",
+ "h1": "tokentrim 28,854 steps",
+ "description": "tokentrim trimmed 28,854 steps from a Claude Code session, showing how much token output can be reduced. You can see that reduction by running the replay",
+ "html": "<h1>tokentrim 28,854 steps</h1>\n<p>tokentrim trimmed 28,854 steps from a Claude Code session, showing how much token output can be reduced. You can see that reduction by running the replay command or opening the local dashboard after installation.</p>\n<h2>How it works</h2>\n<ol><li><b>Install</b> – add the plugin to Claude Code or clone the repository with <code>git clone</code>.</li><li><b>Run a prompt</b> – tokentrim records the tool’s output in token ranges.</li><li><b>Trim and spool</b> – long output is trimmed and spooled to disk, keeping only the needed tokens.</li><li><b>View results</b> – open the dashboard to see the step reduction and replay the session.</li></ol>\n<h2>What you get for free</h2>\n<ul><li>All Claude Code hooks</li><li>Three strength profiles for trimming</li><li>Replay command to show your own numbers</li><li>Local dashboard</li><li>Daily‑budget guard and cold‑cache alert</li></ul>\n<p>Everything runs on your machine; nothing is sent elsewhere unless you enable the hosted dashboard.</p>\n<h2>Pro upgrade (optional)</h2>\n<ul><li>Lifetime price $49 for the first 500 buyers or $9 / month</li><li>Hosted dashboard accessible on any device</li><li>Monday digest and weekly budget alerts at 80% usage</li><li>Slack totals and support for up to three machines</li></ul>\n<p>The Pro features are added on top of the free toolkit; the core trimming functions remain unchanged.</p>\n<h2>FAQ</h2>\n<p><b>Does tokentrim need an internet connection?</b> No. All processing stays on your local computer by default.</p>\n<p><b>Which operating systems are supported?</b> The toolkit is tested on macOS and Linux and requires Python 3.9 or newer.</p>\n<p><b>How can I see the exact savings for my own sessions?</b> Run the <code>replay</code> command after a session; the dashboard will display the step reduction, such as the 28,854‑step example.</p>\n<h2>Next step</h2>\n<p><a href=\"https://suncal.github.io/tokentrim/\">Download the free toolkit</a> and start trimming Claude Code output on your machine.</p>",
+ "ld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does tokentrim need an internet connection?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. All processing stays on your local computer by default."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which operating systems are supported?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The toolkit is tested on macOS and Linux and requires Python 3.9 or newer."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How can I see the exact savings for my own sessions?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Run the `replay` command after a session; the dashboard will display the step reduction, such as the 28,854‑step example."
+     }
+    }
+   ]
+  }
+ ],
+ "keywords": [
+  "tokentrim 28,854 steps"
+ ],
+ "updated": "2026-11-04",
+ "draft_id": "d1f0313acd",
+ "source": "seo"
+}
