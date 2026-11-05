@@ -5,7 +5,7 @@
 - **Install:** `tokentrim install` now adds the `lean` and `lean-browser` sub-agents to `~/.claude/agents/` and their CLAUDE.md lines. Existing files you wrote are left alone; uninstall removes only unchanged copies.
 - **Screenshots:** default scale 0.4; opt-in `screenshot_scale_cap` caps explicit scales too.
 - **browser_batch:** opt-in `batch_last_shot_only` keeps only the last screenshot of a batch (off by default).
-- **Docs:** [benchmarks page](https://suncal.github.io/tokentrim/benchmarks/) with every measured number and its sample size.
+- **Docs:** [benchmarks page](https://tokentrim.app/benchmarks/) with every measured number and its sample size.
 - `scripts/measure_browser.py`: per-day screenshot and sub-agent counts from your transcripts.
 
 ## v0.1.0 — 2026-10-18

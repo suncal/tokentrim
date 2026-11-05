@@ -12,7 +12,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE / "docs"  # the folder Pages serves
-BASE = "https://suncal.github.io/tokentrim"  # public URL of ROOT, no trailing slash
+BASE = "https://tokentrim.app"  # public URL of ROOT, no trailing slash
 OLD_BASE = "https://suncal.github.io/tokentrim"  # the publisher's JSON may still link here
 HOME = ROOT / "index.html"
 SITEMAP = ROOT / "sitemap.xml"

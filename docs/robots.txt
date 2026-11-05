@@ -1,4 +1,4 @@
-# robots.txt for https://suncal.github.io/tokentrim/ — AI answer engines and search crawlers are welcome.
+# robots.txt for https://tokentrim.app/ — AI answer engines and search crawlers are welcome.
 
 User-agent: GPTBot
 Allow: /
@@ -45,4 +45,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://suncal.github.io/tokentrim/sitemap.xml
+Sitemap: https://tokentrim.app/sitemap.xml

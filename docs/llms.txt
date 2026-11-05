@@ -20,6 +20,6 @@
 - Claude Code and Python 3.9+. No packages to install. Tested on macOS and Linux. `tokentrim uninstall` removes exactly what install added.
 
 ## Links
-- Home: https://suncal.github.io/tokentrim/
+- Home: https://tokentrim.app/
 - Source and install: https://github.com/suncal/tokentrim
 - Install: `git clone https://github.com/suncal/tokentrim && tokentrim/bin/tokentrim install`

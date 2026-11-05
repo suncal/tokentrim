@@ -10,10 +10,10 @@
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-3776AB.svg?logo=python&logoColor=white)](#install)
 [![Dependencies: 0](https://img.shields.io/badge/dependencies-0-4ade80.svg)](#install)
-[![Website](https://img.shields.io/badge/website-suncal.github.io%2Ftokentrim-0a0c0b.svg)](https://suncal.github.io/tokentrim/)
+[![Website](https://img.shields.io/badge/website-tokentrim.app-0a0c0b.svg)](https://tokentrim.app/)
 [![GitHub stars](https://img.shields.io/github/stars/suncal/tokentrim?style=social)](https://github.com/suncal/tokentrim/stargazers)
 
-[Website](https://suncal.github.io/tokentrim/) · [Quick start](#quick-start) · [The honest numbers](#the-honest-numbers) · [What it changes](#what-it-changes) · [Pro](#pro) · [Discussions](https://github.com/suncal/tokentrim/discussions)
+[Website](https://tokentrim.app/) · [Quick start](#quick-start) · [The honest numbers](#the-honest-numbers) · [What it changes](#what-it-changes) · [Pro](#pro) · [Discussions](https://github.com/suncal/tokentrim/discussions)
 
 ![75% less history re-read on 135 real conversations; usage limits last 4.0x longer](docs/savings.png)
 
@@ -111,7 +111,7 @@ bin/tokentrim uninstall              # removes exactly what install added
 
 `install` backs up `~/.claude/settings.json` first, keeps all your existing hooks and env, and is idempotent. New sessions pick it up.
 
-Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Two opt-in switches, off by default: `"screenshot_scale_cap": 0.4` caps even an explicit screenshot `scale`, and `"batch_last_shot_only": true` keeps only the last screenshot of a `browser_batch`. Measured numbers: [benchmarks](https://suncal.github.io/tokentrim/benchmarks/). Set `"enabled": false` to switch every hook off instantly.
+Tune any threshold in `~/.config/tokentrim/config.json` (see `tokentrim/config.py`). Two opt-in switches, off by default: `"screenshot_scale_cap": 0.4` caps even an explicit screenshot `scale`, and `"batch_last_shot_only": true` keeps only the last screenshot of a `browser_batch`. Measured numbers: [benchmarks](https://tokentrim.app/benchmarks/). Set `"enabled": false` to switch every hook off instantly.
 
 ## Live view
 
