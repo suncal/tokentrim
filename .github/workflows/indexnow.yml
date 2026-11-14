@@ -2,7 +2,7 @@ name: IndexNow
 # Tells Bing/Yandex/Naver/Seznam about changed pages after GitHub Pages deploys the site.
 on:
   workflow_run:
-    workflows: ["pages-build-deployment"]
+    workflows: ["pages build and deployment"]
     types: [completed]
   workflow_dispatch:
 jobs:
