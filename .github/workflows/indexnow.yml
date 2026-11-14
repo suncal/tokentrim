@@ -1,13 +1,11 @@
 name: IndexNow
 # Tells Bing/Yandex/Naver/Seznam about changed pages after GitHub Pages deploys the site.
 on:
-  workflow_run:
-    workflows: ["pages build and deployment"]
-    types: [completed]
+  deployment_status:
   workflow_dispatch:
 jobs:
   ping:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'github-pages') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
